@@ -32,14 +32,15 @@ function renderHead(options: LayoutOptions): string {
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            sans: ['Figtree', 'system-ui', 'sans-serif'],
+            display: ['Instrument Serif', 'Georgia', 'serif'],
           },
         },
       },
@@ -47,80 +48,109 @@ function renderHead(options: LayoutOptions): string {
   </script>
 
   <style>
-    * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    * { font-family: 'Figtree', system-ui, sans-serif; }
 
     :root {
-      --glass-bg: rgba(255, 255, 255, 0.06);
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --glass-highlight: rgba(255, 255, 255, 0.15);
-      --glass-shadow: rgba(0, 0, 0, 0.3);
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-highlight: rgba(255, 255, 255, 0.12);
+      --glass-shadow: rgba(0, 0, 0, 0.4);
       --accent: #2BDE73;
-      --accent-glow: rgba(43, 222, 115, 0.3);
+      --accent-glow: rgba(43, 222, 115, 0.25);
       --accent-dark: #1AAF5C;
-      --surface: #0a0a0c;
-      --surface-elevated: #141416;
+      --accent-warm: #E8C547;
+      --surface: #06060a;
+      --surface-elevated: #0e0e14;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
       background: var(--surface);
-      color: #f5f5f7;
+      color: #e8e8ed;
       overflow-x: hidden;
+      position: relative;
     }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    body > * { position: relative; z-index: 1; }
+
+    .font-display { font-family: 'Instrument Serif', Georgia, serif; }
 
     .glass-card {
       background: var(--glass-bg);
-      backdrop-filter: blur(40px) saturate(180%);
-      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      backdrop-filter: blur(48px) saturate(200%);
+      -webkit-backdrop-filter: blur(48px) saturate(200%);
       border: 1px solid var(--glass-border);
       border-radius: 20px;
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .glass-card:hover {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.14);
       box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
+        0 12px 48px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transform: translateY(-3px);
     }
 
     .glass-nav {
-      background: rgba(10, 10, 12, 0.7);
-      backdrop-filter: blur(40px) saturate(180%);
-      -webkit-backdrop-filter: blur(40px) saturate(180%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(6, 6, 10, 0.75);
+      backdrop-filter: blur(48px) saturate(200%);
+      -webkit-backdrop-filter: blur(48px) saturate(200%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .glass-input {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      color: #f5f5f7;
-      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      color: #e8e8ed;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .glass-input:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px var(--accent-glow), 0 0 24px rgba(43, 222, 115, 0.08);
+      background: rgba(255, 255, 255, 0.06);
     }
 
-    .glass-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+    .glass-input::placeholder { color: rgba(255, 255, 255, 0.25); }
 
     .glass-btn {
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       border: none;
       border-radius: 980px;
-      color: #0a0a0c;
-      font-weight: 600;
-      padding: 12px 28px;
-      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      color: #06060a;
+      font-weight: 700;
+      font-family: 'Figtree', system-ui, sans-serif;
+      letter-spacing: -0.01em;
+      padding: 14px 32px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
     }
@@ -129,79 +159,84 @@ function renderHead(options: LayoutOptions): string {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      background: linear-gradient(135deg, rgba(255,255,255,0.25), transparent 60%);
       border-radius: inherit;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.35s;
     }
 
     .glass-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 20px var(--accent-glow);
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 6px 32px var(--accent-glow), 0 0 80px rgba(43, 222, 115, 0.12);
     }
 
     .glass-btn:hover::before { opacity: 1; }
 
     .glass-btn-outline {
-      background: transparent;
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
       border-radius: 980px;
-      color: #f5f5f7;
-      font-weight: 500;
-      padding: 12px 28px;
+      color: #e8e8ed;
+      font-weight: 600;
+      font-family: 'Figtree', system-ui, sans-serif;
+      letter-spacing: -0.01em;
+      padding: 14px 32px;
       backdrop-filter: blur(20px);
-      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .glass-btn-outline:hover {
       background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.4);
-      transform: scale(1.02);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
     }
 
     .liquid-gradient {
-      background: radial-gradient(ellipse at 30% 20%, rgba(43, 222, 115, 0.12) 0%, transparent 50%),
-                  radial-gradient(ellipse at 70% 80%, rgba(26, 175, 92, 0.08) 0%, transparent 50%),
-                  radial-gradient(ellipse at 50% 50%, rgba(43, 222, 115, 0.04) 0%, transparent 70%);
+      background: radial-gradient(ellipse at 20% 0%, rgba(43, 222, 115, 0.1) 0%, transparent 55%),
+                  radial-gradient(ellipse at 80% 100%, rgba(26, 175, 92, 0.06) 0%, transparent 55%),
+                  radial-gradient(ellipse at 60% 40%, rgba(232, 197, 71, 0.03) 0%, transparent 50%);
     }
 
     .orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.4;
-      animation: orbFloat 8s ease-in-out infinite;
+      filter: blur(100px);
+      opacity: 0.3;
+      animation: orbFloat 12s ease-in-out infinite;
+      will-change: transform;
     }
 
     .orb-1 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(43, 222, 115, 0.35), transparent);
-      top: -100px; right: -100px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(43, 222, 115, 0.3), transparent 70%);
+      top: -150px; right: -100px;
       animation-delay: 0s;
     }
 
     .orb-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(26, 175, 92, 0.25), transparent);
-      bottom: -50px; left: -50px;
-      animation-delay: -4s;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(26, 175, 92, 0.2), transparent 70%);
+      bottom: -80px; left: -80px;
+      animation-delay: -6s;
     }
 
     .orb-3 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(108, 245, 160, 0.15), transparent);
-      top: 40%; left: 60%;
-      animation-delay: -2s;
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(232, 197, 71, 0.1), transparent 70%);
+      top: 40%; left: 55%;
+      animation-delay: -3s;
     }
 
     @keyframes orbFloat {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -30px) scale(1.05); }
-      66% { transform: translate(-20px, 20px) scale(0.95); }
+      25% { transform: translate(25px, -35px) scale(1.06); }
+      50% { transform: translate(-15px, 15px) scale(0.97); }
+      75% { transform: translate(20px, 25px) scale(1.03); }
     }
 
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
+      from { opacity: 0; transform: translateY(40px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -211,17 +246,17 @@ function renderHead(options: LayoutOptions): string {
     }
 
     @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-40px); }
+      from { opacity: 0; transform: translateX(-50px); }
       to { opacity: 1; transform: translateX(0); }
     }
 
     @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(40px); }
+      from { opacity: 0; transform: translateX(50px); }
       to { opacity: 1; transform: translateX(0); }
     }
 
     @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.9); }
+      from { opacity: 0; transform: scale(0.92); }
       to { opacity: 1; transform: scale(1); }
     }
 
@@ -245,10 +280,20 @@ function renderHead(options: LayoutOptions): string {
       100% { transform: scale(1.5); opacity: 0; }
     }
 
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { border-color: rgba(43, 222, 115, 0.15); }
+      50% { border-color: rgba(43, 222, 115, 0.35); }
+    }
+
     .animate-on-scroll {
       opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform: translateY(35px);
+      transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .animate-on-scroll.visible {
@@ -256,21 +301,21 @@ function renderHead(options: LayoutOptions): string {
       transform: translateY(0);
     }
 
-    .stagger-1 { transition-delay: 0.1s; }
-    .stagger-2 { transition-delay: 0.2s; }
-    .stagger-3 { transition-delay: 0.3s; }
-    .stagger-4 { transition-delay: 0.4s; }
-    .stagger-5 { transition-delay: 0.5s; }
-    .stagger-6 { transition-delay: 0.6s; }
+    .stagger-1 { transition-delay: 0.08s; }
+    .stagger-2 { transition-delay: 0.16s; }
+    .stagger-3 { transition-delay: 0.24s; }
+    .stagger-4 { transition-delay: 0.32s; }
+    .stagger-5 { transition-delay: 0.40s; }
+    .stagger-6 { transition-delay: 0.48s; }
 
     .logo-scroll {
-      animation: scrollLogos 30s linear infinite;
+      animation: scrollLogos 35s linear infinite;
     }
 
     .logo-scroll:hover { animation-play-state: paused; }
 
     .text-gradient {
-      background: linear-gradient(135deg, #f5f5f7, rgba(255,255,255,0.6));
+      background: linear-gradient(160deg, #ffffff, rgba(255,255,255,0.55));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -280,7 +325,7 @@ function renderHead(options: LayoutOptions): string {
     }
 
     .text-gradient-accent {
-      background: linear-gradient(135deg, var(--accent), #6CF5A0);
+      background: linear-gradient(135deg, var(--accent), #8DFFC0);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -290,8 +335,9 @@ function renderHead(options: LayoutOptions): string {
     }
 
     h1, h2, h3, h4, h5, h6 {
-      line-height: 1.35;
+      line-height: 1.25;
       overflow: visible;
+      letter-spacing: -0.03em;
     }
 
     h1 .text-gradient,
@@ -300,40 +346,51 @@ function renderHead(options: LayoutOptions): string {
     h2 .text-gradient-accent {
       display: inline-block;
       padding-bottom: 0.15em;
+      padding-right: 0.08em;
+      padding-left: 0.02em;
     }
 
     .section-divider {
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    }
+
+    .glow-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.3;
     }
 
     .prose-content h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 400;
       color: #fff;
       margin-top: 2.5rem;
       margin-bottom: 1rem;
-      line-height: 1.3;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
     }
     .prose-content h3 {
       font-size: 1.35rem;
-      font-weight: 600;
+      font-weight: 700;
       color: rgba(255,255,255,0.9);
       margin-top: 2rem;
       margin-bottom: 0.75rem;
-      line-height: 1.4;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
     }
     .prose-content p {
-      color: rgba(255,255,255,0.55);
-      line-height: 1.8;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.85;
       margin-bottom: 1.25rem;
     }
     .prose-content strong {
       color: rgba(255,255,255,0.85);
-      font-weight: 600;
+      font-weight: 700;
     }
     .prose-content ul, .prose-content ol {
-      color: rgba(255,255,255,0.55);
+      color: rgba(255,255,255,0.5);
       padding-left: 1.5rem;
       margin-bottom: 1.25rem;
     }
@@ -341,22 +398,25 @@ function renderHead(options: LayoutOptions): string {
     .prose-content ol { list-style-type: decimal; }
     .prose-content li {
       margin-bottom: 0.5rem;
-      line-height: 1.7;
+      line-height: 1.75;
     }
     .prose-content a {
       color: var(--accent);
       text-decoration: underline;
-      text-underline-offset: 2px;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
     }
     .prose-content a:hover {
-      color: var(--accent-dark);
+      color: #8DFFC0;
     }
     .prose-content blockquote {
-      border-left: 3px solid var(--accent);
-      padding-left: 1.25rem;
+      border-left: 2px solid var(--accent);
+      padding-left: 1.5rem;
       margin: 1.5rem 0;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.45);
       font-style: italic;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 1.1rem;
     }
     .line-clamp-3 {
       display: -webkit-box;
@@ -369,14 +429,15 @@ function renderHead(options: LayoutOptions): string {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 980px;
-      background: rgba(43, 222, 115, 0.1);
-      border: 1px solid rgba(43, 222, 115, 0.2);
+      background: rgba(43, 222, 115, 0.06);
+      border: 1px solid rgba(43, 222, 115, 0.15);
       color: var(--accent);
       font-size: 0.8125rem;
-      font-weight: 500;
-      letter-spacing: 0.02em;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .check-icon {
@@ -385,7 +446,7 @@ function renderHead(options: LayoutOptions): string {
       justify-content: center;
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: rgba(52, 199, 89, 0.15);
+      background: rgba(52, 199, 89, 0.12);
     }
 
     .x-icon {
@@ -394,7 +455,7 @@ function renderHead(options: LayoutOptions): string {
       justify-content: center;
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: rgba(255, 69, 58, 0.15);
+      background: rgba(255, 69, 58, 0.12);
     }
 
     .partial-icon {
@@ -403,7 +464,7 @@ function renderHead(options: LayoutOptions): string {
       justify-content: center;
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: rgba(255, 214, 10, 0.15);
+      background: rgba(255, 214, 10, 0.12);
     }
 
     .step-number {
@@ -413,25 +474,25 @@ function renderHead(options: LayoutOptions): string {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 1.25rem;
-      color: #0a0a0c;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      color: #06060a;
+      box-shadow: 0 4px 24px var(--accent-glow);
     }
 
     .glass-select {
       appearance: none;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      color: #f5f5f7;
-      padding: 12px 40px 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      color: #e8e8ed;
+      padding: 14px 44px 14px 18px;
       width: 100%;
-      transition: all 0.3s ease;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 01.708 0L8 8.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 01.708 0L8 8.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 16px center;
+      background-position: right 18px center;
     }
 
     .glass-select:focus {
@@ -441,10 +502,15 @@ function renderHead(options: LayoutOptions): string {
     }
 
     .metric-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      padding: 18px;
+      transition: border-color 0.4s ease;
+    }
+
+    .metric-card:hover {
+      border-color: rgba(43, 222, 115, 0.2);
     }
 
     .bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 100px; }
@@ -475,9 +541,8 @@ function renderNav(): string {
        data-testid="navigation">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 lg:h-[72px]">
-        <a href="/" class="flex items-center gap-2.5" data-testid="link-logo">
-          <img src="/assets/HBDR_Logo_Pack_all_sizes_-_8_1770577514801.jpeg" alt="HBDR Logo" class="h-9 w-9 rounded-lg object-cover" data-testid="img-nav-logo" />
-          <span class="text-xl font-bold text-white tracking-tight">HBDR</span>
+        <a href="/" class="flex items-center" data-testid="link-logo">
+          <img src="/assets/HBDR_logo_wo_tagline_crp_370x116_web_1770664100214.png" alt="HBDR" class="h-8 w-auto" data-testid="img-nav-logo" />
         </a>
 
         <div class="hidden lg:flex items-center gap-8">
@@ -496,6 +561,7 @@ function renderNav(): string {
                  class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-2xl py-2 z-50" data-testid="solutions-dropdown">
               <a href="/solutions/header-bidding" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-header-bidding">Header Bidding</a>
               <a href="/solutions/display-ads" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-display-ads">Display Ads</a>
+              <a href="/solutions/video-player" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-video-player">Video Player</a>
               <a href="/solutions/ctv-ott" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-ctv-ott">CTV & OTT</a>
               <a href="/solutions/in-app-ads" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-in-app-ads">In-App Ads</a>
               <a href="/solutions/mcm" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-mcm">MCM</a>
@@ -505,10 +571,32 @@ function renderNav(): string {
               <a href="/solutions/ad-exchange-adx" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-ad-exchange">Ad Exchange AdX</a>
             </div>
           </div>
-          <a href="/how-it-works" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-how-it-works">How It Works</a>
-          <a href="/about" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-about">About</a>
-          <a href="/blog" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-blog">Blog</a>
-          <a href="/contact" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-contact">Contact</a>
+          <a href="/publishers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-publishers">Publishers</a>
+          <a href="/advertisers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-advertisers">Advertisers</a>
+          <a href="/partners" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-partners">Partners</a>
+          <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+            <button class="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1 cursor-pointer" data-testid="link-company">
+              Company
+              <svg class="w-3.5 h-3.5 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div x-show="open" x-cloak
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 translate-y-1"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-1"
+                 class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-2xl py-2 z-50" data-testid="company-dropdown">
+              <a href="/about" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-about">About Us</a>
+              <a href="/how-it-works" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-how-it-works">How It Works</a>
+              <a href="/trust" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-trust">Trust & Compliance</a>
+              <a href="/dashboard" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-dashboard">Dashboard</a>
+              <a href="/blog" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-blog">Blog</a>
+              <a href="/careers" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-careers">Careers</a>
+              <a href="/press" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-press">Press</a>
+              <a href="/contact" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-contact">Contact</a>
+            </div>
+          </div>
         </div>
 
         <div class="hidden lg:flex items-center gap-3">
@@ -544,6 +632,7 @@ function renderNav(): string {
         <div x-show="solOpen" x-cloak x-transition class="pl-4 space-y-0.5 pb-2">
           <a href="/solutions/header-bidding" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-header-bidding">Header Bidding</a>
           <a href="/solutions/display-ads" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-display-ads">Display Ads</a>
+          <a href="/solutions/video-player" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-video-player">Video Player</a>
           <a href="/solutions/ctv-ott" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-ctv-ott">CTV & OTT</a>
           <a href="/solutions/in-app-ads" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-in-app-ads">In-App Ads</a>
           <a href="/solutions/mcm" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-mcm">MCM</a>
@@ -552,8 +641,13 @@ function renderNav(): string {
           <a href="/solutions/open-bidding" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-open-bidding">Open Bidding</a>
           <a href="/solutions/ad-exchange-adx" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-ad-exchange">Ad Exchange AdX</a>
         </div>
+        <a href="/publishers" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-publishers">For Publishers</a>
+        <a href="/advertisers" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-advertisers">For Advertisers</a>
+        <a href="/partners" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-partners">Partners</a>
         <a href="/how-it-works" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-how-it-works">How It Works</a>
         <a href="/about" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-about">About</a>
+        <a href="/trust" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-trust">Trust & Compliance</a>
+        <a href="/dashboard" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-dashboard">Dashboard</a>
         <a href="/blog" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-blog">Blog</a>
         <a href="/contact" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-contact">Contact</a>
         <div class="pt-4 flex flex-col gap-3">
@@ -568,20 +662,19 @@ function renderFooter(): string {
   const companyLinks = [
     { label: "About Us", href: "/about" },
     { label: "How It Works", href: "/how-it-works" },
-    { label: "Blog", href: "/blog" },
     { label: "Careers", href: "/careers" },
     { label: "Press", href: "/press" },
     { label: "Contact", href: "/contact" },
   ];
 
   return `
-  <footer class="border-t border-white/5 pt-16 pb-8" data-testid="footer">
+  <footer class="pt-16 pb-8" data-testid="footer">
+    <div class="glow-line max-w-4xl mx-auto mb-16"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
         <div class="col-span-2">
-          <div class="flex items-center gap-2.5 mb-4">
-            <img src="/assets/HBDR_Logo_Pack_all_sizes_-_8_1770577514801.jpeg" alt="HBDR Logo" class="h-10 w-10 rounded-lg object-cover" data-testid="img-footer-logo" />
-            <span class="text-xl font-bold text-white tracking-tight">HBDR</span>
+          <div class="flex items-center mb-4">
+            <img src="/assets/HBDR_logo_wo_tagline_crp_370x116_web_1770664100214.png" alt="HBDR" class="h-9 w-auto" data-testid="img-footer-logo" />
           </div>
           <p class="text-white/30 leading-relaxed max-w-xs text-sm mb-6">
             Global leader in ad monetization and header bidding solutions. Maximize your revenue with our enterprise-grade platform.
@@ -621,13 +714,25 @@ function renderFooter(): string {
         <div>
           <h4 class="font-semibold text-white text-sm mb-4">Resources</h4>
           <ul class="space-y-3">
-            ${["Blog", "Case Studies", "Documentation", "Support", "FAQ"].map((l) => `<li><a href="#" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l}</a></li>`).join("")}
+            ${[
+              { label: "For Publishers", href: "/publishers" },
+              { label: "For Advertisers", href: "/advertisers" },
+              { label: "Partners", href: "/partners" },
+              { label: "Trust & Compliance", href: "/trust" },
+              { label: "Blog", href: "/blog" },
+              { label: "FAQ & Support", href: "/support" },
+              { label: "Dashboard", href: "/dashboard" },
+            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l.label}</a></li>`).join("")}
           </ul>
         </div>
         <div>
           <h4 class="font-semibold text-white text-sm mb-4">Legal</h4>
           <ul class="space-y-3">
-            ${["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR"].map((l) => `<li><a href="#" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l}</a></li>`).join("")}
+            ${[
+              { label: "Privacy Policy", href: "/privacy-policy" },
+              { label: "Terms & Conditions", href: "/terms" },
+              { label: "GDPR & Cookie Policy", href: "/gdpr-cookie-policy" },
+            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l.label}</a></li>`).join("")}
           </ul>
         </div>
       </div>
@@ -689,7 +794,7 @@ function renderContactFormSection(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Get Started</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">
           Start Monetizing Today
         </h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
@@ -723,7 +828,7 @@ function renderContactFormSection(): string {
               </div>
               <div>
                 <div class="font-semibold text-white">Call Us</div>
-                <div class="text-white/40">+1 (555) 123-4567</div>
+                <div class="text-white/40">(786) 675-6080</div>
               </div>
             </div>
 
@@ -733,7 +838,7 @@ function renderContactFormSection(): string {
               </div>
               <div>
                 <div class="font-semibold text-white">Visit Us</div>
-                <div class="text-white/40">123 Ad Tech Boulevard<br/>San Francisco, CA 94102</div>
+                <div class="text-white/40">1200 Brickell Ave Ste 1950<br/>Miami, FL 33131</div>
               </div>
             </div>
           </div>
@@ -848,7 +953,7 @@ function renderContactFormSection(): string {
               </button>
 
               <p class="text-center text-sm text-white/30">
-                By submitting, you agree to our Privacy Policy
+                By submitting, you agree to our <a href="/privacy-policy" class="text-[var(--accent)] hover:underline">Privacy Policy</a>
               </p>
             </form>
           </div>
@@ -868,8 +973,8 @@ function renderStatsSection(): string {
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Our Impact</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">
-          Delivering Results at Scale
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6">
+          <span class="text-gradient">Delivering Results</span> <span class="text-gradient-accent italic">at Scale</span>
         </h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
           Numbers that speak for themselves.
@@ -908,19 +1013,19 @@ function renderStatsSection(): string {
 
 function renderPageHero(tag: string, title: string, description: string): string {
   return `
-  <section class="relative overflow-hidden liquid-gradient pt-32 pb-16" data-testid="page-hero">
-    <div class="orb orb-1" style="opacity: 0.25;"></div>
-    <div class="orb orb-2" style="opacity: 0.15;"></div>
+  <section class="relative overflow-hidden liquid-gradient pt-36 pb-20" data-testid="page-hero">
+    <div class="orb orb-1" style="opacity: 0.2;"></div>
+    <div class="orb orb-2" style="opacity: 0.12;"></div>
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <div class="glass-tag mb-6 mx-auto w-fit" style="animation: fadeInUp 0.6s ease forwards">${tag}</div>
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-gradient" style="animation: fadeInUp 0.6s 0.1s ease both">
+      <div class="glass-tag mb-6 mx-auto w-fit" style="animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards">${tag}</div>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display tracking-tight mb-6 text-gradient" style="animation: fadeInUp 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both">
         ${title}
       </h1>
-      <p class="text-lg sm:text-xl text-white/50 leading-relaxed max-w-2xl mx-auto" style="animation: fadeInUp 0.6s 0.2s ease both">
+      <p class="text-lg sm:text-xl text-white/45 leading-relaxed max-w-2xl mx-auto" style="animation: fadeInUp 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both">
         ${description}
       </p>
     </div>
-    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[var(--surface)] to-transparent"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[var(--surface)] to-transparent"></div>
   </section>`;
 }
 
@@ -929,7 +1034,7 @@ function renderCTASection(heading: string, buttonText: string): string {
   <section class="py-24 lg:py-32 relative overflow-hidden" data-testid="cta-section">
     <div class="absolute inset-0 liquid-gradient opacity-40"></div>
     <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-on-scroll">
-      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">${heading}</h2>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">${heading}</h2>
       <a href="/contact" class="glass-btn text-base px-8 py-3.5 inline-flex items-center gap-2" data-testid="button-cta">
         ${buttonText}
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -957,10 +1062,10 @@ export function renderPage(): string {
             25+ Years of Ad Tech Expertise
           </div>
 
-          <h1 class="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold leading-[1.2] tracking-tight mb-6" style="animation: fadeInUp 0.6s 0.1s ease both">
-            <span class="text-gradient">Maximize Your</span><br/>
-            <span class="text-gradient-accent">Ad Revenue</span><br/>
-            <span class="text-gradient">with Header Bidding</span>
+          <h1 class="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl leading-[1.15] tracking-tight mb-6" style="animation: fadeInUp 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both">
+            <span class="text-gradient font-bold">Maximize Your</span><br/>
+            <span class="text-gradient-accent font-display text-5xl sm:text-6xl lg:text-[4rem] xl:text-7xl italic">Ad Revenue</span><br/>
+            <span class="text-gradient font-bold">with Header Bidding</span>
           </h1>
 
           <p class="text-lg sm:text-xl text-white/50 leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0" style="animation: fadeInUp 0.6s 0.2s ease both">
@@ -1085,9 +1190,9 @@ export function renderPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Our Solutions</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
-          <span class="text-gradient">Complete Ad Monetization</span><br/>
-          <span class="text-gradient-accent">Platform</span>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl tracking-tight mb-6">
+          <span class="text-gradient font-bold">Complete Ad Monetization</span><br/>
+          <span class="text-gradient-accent font-display italic">Platform</span>
         </h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
           From header bidding to CTV, we provide end-to-end solutions to maximize your advertising revenue.
@@ -1134,7 +1239,7 @@ export function renderPage(): string {
             description: "Comprehensive video ad solutions including instream, outstream, and interactive formats for maximum engagement.",
             features: ["VAST/VPAID", "High viewability", "Engagement metrics"],
             gradient: "from-rose-500/20 to-rose-500/5",
-            href: "/solutions/open-bidding",
+            href: "/solutions/video-player",
           },
           {
             icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>',
@@ -1142,7 +1247,7 @@ export function renderPage(): string {
             description: "Detailed metrics on partner-level performance, auction data, and A/B testing capabilities for optimization.",
             features: ["Real-time data", "Custom reports", "Revenue insights"],
             gradient: "from-teal-500/20 to-teal-500/5",
-            href: "/solutions/manage-account",
+            href: "/dashboard",
           },
         ]
           .map(
@@ -1175,7 +1280,7 @@ export function renderPage(): string {
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Why HBDR</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">
           The HBDR Advantage
         </h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
@@ -1238,7 +1343,7 @@ export function renderPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Simple Process</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">
           How It Works
         </h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
@@ -1312,8 +1417,8 @@ export function renderPage(): string {
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Our Impact</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">
-          Delivering Results at Scale
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6">
+          <span class="text-gradient">Delivering Results</span> <span class="text-gradient-accent italic">at Scale</span>
         </h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
           Numbers that speak for themselves.
@@ -1376,7 +1481,7 @@ export function renderPage(): string {
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Testimonials</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">
           What Publishers Say
         </h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
@@ -1385,30 +1490,33 @@ export function renderPage(): string {
       </div>
 
       <div class="relative">
-        <div class="glass-card p-8 sm:p-12 min-h-[280px]" data-testid="testimonial-card">
+        <div class="glass-card p-8 sm:p-12" data-testid="testimonial-card">
           <svg class="w-10 h-10 text-white/10 mb-6" fill="currentColor" viewBox="0 0 24 24">
             <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z"/>
           </svg>
 
-          <template x-for="(t, index) in testimonials" :key="index">
-            <div x-show="current === index"
-                 x-transition:enter="transition ease-out duration-500"
-                 x-transition:enter-start="opacity-0 translate-x-8"
-                 x-transition:enter-end="opacity-100 translate-x-0"
-                 x-transition:leave="transition ease-in duration-300"
-                 x-transition:leave-start="opacity-100 translate-x-0"
-                 x-transition:leave-end="opacity-0 -translate-x-8">
-              <blockquote class="text-xl sm:text-2xl text-white/80 leading-relaxed mb-8 font-light" x-text="'&ldquo;' + t.quote + '&rdquo;'"></blockquote>
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-[var(--accent)]/10 flex items-center justify-center text-[var(--accent)] font-semibold text-sm" x-text="t.initials"></div>
-                <div>
-                  <div class="font-semibold text-white" x-text="t.author"></div>
-                  <div class="text-sm text-white/40" x-text="t.title"></div>
-                  <div class="text-sm text-[var(--accent)]" x-text="t.company"></div>
+          <div class="relative min-h-[200px] sm:min-h-[180px]">
+            <template x-for="(t, index) in testimonials" :key="index">
+              <div x-show="current === index"
+                   x-transition:enter="transition ease-out duration-500"
+                   x-transition:enter-start="opacity-0 translate-x-8"
+                   x-transition:enter-end="opacity-100 translate-x-0"
+                   x-transition:leave="transition ease-in duration-300"
+                   x-transition:leave-start="opacity-100 translate-x-0"
+                   x-transition:leave-end="opacity-0 -translate-x-8"
+                   class="absolute inset-0">
+                <blockquote class="text-xl sm:text-2xl text-white/80 leading-relaxed mb-8 font-light" x-text="'&ldquo;' + t.quote + '&rdquo;'"></blockquote>
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-[var(--accent)]/10 flex items-center justify-center text-[var(--accent)] font-semibold text-sm" x-text="t.initials"></div>
+                  <div>
+                    <div class="font-semibold text-white" x-text="t.author"></div>
+                    <div class="text-sm text-white/40" x-text="t.title"></div>
+                    <div class="text-sm text-[var(--accent)]" x-text="t.company"></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </template>
+            </template>
+          </div>
         </div>
 
         <div class="flex items-center justify-center gap-4 mt-8">
@@ -1476,7 +1584,7 @@ export function renderAboutPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Our Journey</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Our Story</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Our Story</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Key milestones that shaped who we are today.</p>
       </div>
 
@@ -1503,7 +1611,7 @@ export function renderAboutPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">What We Stand For</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Our Values</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Our Values</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">The principles that guide everything we do.</p>
       </div>
 
@@ -1552,7 +1660,7 @@ export function renderHowItWorksPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Getting Started</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Three Simple Steps</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Three Simple Steps</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Getting started with HBDR is simple. Our streamlined process gets you monetizing faster.</p>
       </div>
 
@@ -1588,7 +1696,7 @@ export function renderHowItWorksPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">After Launch</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">What Happens Next</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">What Happens Next</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Our partnership doesn't end at implementation. Here's how we continue to drive results.</p>
       </div>
 
@@ -1616,7 +1724,7 @@ export function renderHowItWorksPage(): string {
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">FAQ</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Frequently Asked Questions</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Frequently Asked Questions</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Common questions about working with HBDR.</p>
       </div>
 
@@ -1662,7 +1770,7 @@ export function renderCareersPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Why Join Us</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Why HBDR</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Why HBDR</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Join a team that's redefining digital advertising technology.</p>
       </div>
 
@@ -1690,7 +1798,7 @@ export function renderCareersPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Perks & Benefits</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Benefits</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Benefits</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">We take care of our team so they can focus on doing their best work.</p>
       </div>
 
@@ -1721,7 +1829,7 @@ export function renderCareersPage(): string {
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Open Roles</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Open Positions</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Open Positions</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Find your next opportunity at HBDR.</p>
       </div>
 
@@ -1770,7 +1878,7 @@ export function renderPressPage(): string {
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Latest News</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Press Releases</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Press Releases</h2>
       </div>
 
       <div class="space-y-6">
@@ -1811,7 +1919,7 @@ export function renderPressPage(): string {
             </div>
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-              <span class="text-white/60">+1 (555) 123-4567</span>
+              <span class="text-white/60">(786) 675-6080</span>
             </div>
           </div>
         </div>
@@ -1973,7 +2081,7 @@ export function renderBlogPostPage(post: BlogPostData): string {
           <span class="text-xs font-medium px-3 py-1 rounded-full border ${getCategoryColor(post.category)}">${post.category}</span>
           <span class="text-sm text-white/30">${formatDate(post.publishedAt)}</span>
         </div>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gradient leading-snug mb-6" data-testid="text-post-title">${post.title}</h1>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight text-gradient leading-snug mb-6" data-testid="text-post-title">${post.title}</h1>
         <p class="text-lg text-white/50 leading-relaxed mb-8">${post.excerpt}</p>
         <div class="flex items-center gap-4 pb-8 border-b border-white/5">
           <div class="w-12 h-12 rounded-full bg-[var(--accent)]/20 flex items-center justify-center">
@@ -2260,7 +2368,7 @@ export function renderHeaderBiddingPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Our Approach</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Client-Side & Server-Side Bidding</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Client-Side & Server-Side Bidding</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">We deploy a hybrid architecture that combines the transparency of client-side auctions with the speed and scale of server-to-server connections.</p>
       </div>
 
@@ -2303,7 +2411,7 @@ export function renderHeaderBiddingPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Key Features</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Enterprise-Grade Header Bidding</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Enterprise-Grade Header Bidding</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Every feature designed to maximize yield and simplify operations.</p>
       </div>
 
@@ -2370,7 +2478,7 @@ export function renderDisplayAdsPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Ad Formats</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Premium Display Formats</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Premium Display Formats</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Optimized ad units that balance user experience with maximum revenue potential.</p>
       </div>
 
@@ -2397,7 +2505,7 @@ export function renderDisplayAdsPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Key Capabilities</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Intelligent Display Optimization</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Intelligent Display Optimization</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Every tool you need to maximize display revenue while protecting user experience.</p>
       </div>
 
@@ -2462,7 +2570,7 @@ export function renderCtvOttPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Capabilities</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">End-to-End CTV Monetization</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">End-to-End CTV Monetization</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">From ad pod management to audience targeting, everything you need to monetize streaming content.</p>
       </div>
 
@@ -2505,7 +2613,7 @@ export function renderCtvOttPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Platform Features</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Built for Streaming Scale</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Built for Streaming Scale</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Enterprise features that power the biggest names in streaming.</p>
       </div>
 
@@ -2569,7 +2677,7 @@ export function renderInAppAdsPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Ad Formats</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Formats That Perform</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Formats That Perform</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Every format optimized for engagement, revenue, and user retention.</p>
       </div>
 
@@ -2653,7 +2761,7 @@ export function renderMcmPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Benefits</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Why Publishers Choose MCM</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Why Publishers Choose MCM</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Unlock premium demand, simplified operations, and accelerated revenue growth through our MCM partnership.</p>
       </div>
 
@@ -2742,7 +2850,7 @@ export function renderManageAccountPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">How It Works</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">The MCM Parent-Child Structure</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">The MCM Parent-Child Structure</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">A transparent relationship where HBDR provides the AdX connection and you stay in the driver's seat.</p>
       </div>
 
@@ -2784,7 +2892,7 @@ export function renderManageAccountPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Benefits</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Why Publishers Choose HBDR MA</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Why Publishers Choose HBDR MA</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Access premium Google AdX demand without changing how you run your ads.</p>
       </div>
 
@@ -2844,7 +2952,7 @@ export function renderManageAccountPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">FAQ</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Common Questions About Google MA</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Common Questions About Google MA</h2>
       </div>
 
       <div class="max-w-3xl mx-auto space-y-6">
@@ -2911,7 +3019,7 @@ export function renderManageInventoryPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">How It Works</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">The MCM Manage Inventory Connection</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">The MCM Manage Inventory Connection</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">You grant HBDR access to manage your GAM inventory, and our team takes it from there.</p>
       </div>
 
@@ -2953,7 +3061,7 @@ export function renderManageInventoryPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">What HBDR Manages</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Complete Yield Management</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Complete Yield Management</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Every layer of your ad monetization stack, handled by our expert team using industry-leading tools.</p>
       </div>
 
@@ -3088,7 +3196,7 @@ export function renderManageInventoryPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">HBDR Advantage</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Our Tools & Team</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Our Tools & Team</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Proprietary technology and seasoned ad ops professionals working together to maximize your revenue.</p>
       </div>
 
@@ -3187,7 +3295,7 @@ export function renderOpenBiddingPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">Advantages</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Why Open Bidding Matters</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Why Open Bidding Matters</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Combine the best of server-side speed with the scale of Google's ecosystem.</p>
       </div>
 
@@ -3214,7 +3322,7 @@ export function renderOpenBiddingPage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">HBDR Advantage</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Our Open Bidding Expertise</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Our Open Bidding Expertise</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">We maximize Open Bidding performance through strategic partner selection and ongoing optimization.</p>
       </div>
 
@@ -3279,7 +3387,7 @@ export function renderAdExchangePage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">AdX vs AdSense</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Why AdX Outperforms AdSense</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Why AdX Outperforms AdSense</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">The key differences that drive 2-3x higher revenue for publishers.</p>
       </div>
 
@@ -3322,7 +3430,7 @@ export function renderAdExchangePage(): string {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-20 animate-on-scroll">
         <div class="glass-tag mb-6 mx-auto w-fit">HBDR + AdX</div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gradient">Maximize Your AdX Revenue</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Maximize Your AdX Revenue</h2>
         <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Our expertise turns AdX access into maximum revenue.</p>
       </div>
 
@@ -3358,6 +3466,1747 @@ export function renderAdExchangePage(): string {
     title: "Google Ad Exchange (AdX) - HBDR",
     description: "Access Google Ad Exchange premium demand through HBDR. Real-time auctions, 2-3x higher CPMs than AdSense, and expert AdX management for publishers.",
     canonicalPath: "/solutions/ad-exchange-adx",
+    bodyContent: content,
+  });
+}
+
+export function renderPrivacyPolicyPage(): string {
+  const content = `
+  ${renderPageHero("Legal", "Privacy Policy", "Your privacy is important to us. This policy explains how HBDR collects, uses, and protects your information.")}
+
+  <section class="py-20 lg:py-28" data-testid="privacy-policy-content">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll" data-testid="privacy-last-updated">
+        <p class="text-white/40 text-sm">Last Updated: February 2026</p>
+        <p class="text-white/50 mt-4 leading-relaxed">HBDR ("we," "our," or "us") operates an enterprise ad monetization and header bidding platform. This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you visit our website, use our platform, or engage with our services.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="privacy-section-collect">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">1. Information We Collect</h2>
+
+        <h3 class="text-xl font-semibold text-white mb-3">Personal Information</h3>
+        <p class="text-white/40 leading-relaxed mb-4">We may collect personal information that you voluntarily provide when you register for an account, express interest in obtaining information about us or our products, participate in activities on our platform, or otherwise contact us. This includes:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-6">
+          <li>Name, email address, and phone number</li>
+          <li>Company name and job title</li>
+          <li>Billing and payment information</li>
+          <li>Website URLs and publisher account details</li>
+          <li>Any other information you choose to provide</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-white mb-3">Usage Data</h3>
+        <p class="text-white/40 leading-relaxed mb-4">We automatically collect certain information when you visit, use, or navigate our platform. This includes:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-6">
+          <li>Device and browser information (IP address, browser type, operating system)</li>
+          <li>Log data such as access times, pages viewed, and referring URLs</li>
+          <li>Ad performance metrics including impressions, clicks, and revenue data</li>
+          <li>Header bidding auction data and bid response information</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-white mb-3">Cookies & Tracking Technologies</h3>
+        <p class="text-white/40 leading-relaxed">We use cookies, web beacons, pixel tags, and similar tracking technologies to collect and store information about your interactions with our platform. These technologies help us analyze trends, administer our website, track user movements, and gather demographic information. For detailed information about the cookies we use, please see our <a href="/gdpr-cookie-policy" class="text-[var(--accent)] hover:underline">GDPR & Cookie Policy</a>.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-2" data-testid="privacy-section-use">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">2. How We Use Your Information</h2>
+        <p class="text-white/40 leading-relaxed mb-4">We use the information we collect for the following purposes:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2">
+          <li>To provide, operate, and maintain our ad monetization and header bidding services</li>
+          <li>To optimize ad delivery, improve bid density, and maximize publisher revenue</li>
+          <li>To process transactions, manage billing, and send invoices</li>
+          <li>To communicate with you about account updates, service changes, and support requests</li>
+          <li>To send marketing and promotional materials (with your consent where required)</li>
+          <li>To analyze platform usage, diagnose technical issues, and improve our services</li>
+          <li>To detect, prevent, and address fraud, unauthorized access, and security issues</li>
+          <li>To comply with legal obligations and enforce our terms of service</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-3" data-testid="privacy-section-sharing">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">3. Information Sharing and Disclosure</h2>
+        <p class="text-white/40 leading-relaxed mb-4">We may share your information in the following circumstances:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2">
+          <li><strong class="text-white/80">Demand Partners & Ad Exchanges:</strong> We share bid request data with demand-side platforms (DSPs), ad exchanges, and advertising networks to facilitate programmatic ad auctions on your behalf.</li>
+          <li><strong class="text-white/80">Service Providers:</strong> We engage third-party vendors who assist us with hosting, analytics, payment processing, customer support, and other operational functions.</li>
+          <li><strong class="text-white/80">Business Transfers:</strong> In the event of a merger, acquisition, or sale of assets, your information may be transferred as part of the transaction.</li>
+          <li><strong class="text-white/80">Legal Requirements:</strong> We may disclose your information if required by law, court order, or government regulation, or if we believe disclosure is necessary to protect our rights, safety, or property.</li>
+          <li><strong class="text-white/80">With Your Consent:</strong> We may share your information with third parties when you have given us explicit consent to do so.</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="privacy-section-security">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">4. Data Security</h2>
+        <p class="text-white/40 leading-relaxed mb-4">We implement industry-standard security measures to protect your personal information, including:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-4">
+          <li>Encryption of data in transit (TLS/SSL) and at rest</li>
+          <li>Regular security audits and penetration testing</li>
+          <li>Access controls and authentication protocols for platform access</li>
+          <li>Secure data centers with physical and network-level protections</li>
+          <li>Employee training on data protection and security best practices</li>
+        </ul>
+        <p class="text-white/40 leading-relaxed">While we strive to protect your personal information, no method of transmission over the internet or electronic storage is completely secure. We cannot guarantee absolute security but are committed to implementing reasonable safeguards.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-2" data-testid="privacy-section-rights">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">5. Your Rights and Choices</h2>
+        <p class="text-white/40 leading-relaxed mb-4">Depending on your jurisdiction, you may have the following rights regarding your personal information:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-4">
+          <li><strong class="text-white/80">Access:</strong> Request a copy of the personal data we hold about you.</li>
+          <li><strong class="text-white/80">Rectification:</strong> Request correction of inaccurate or incomplete data.</li>
+          <li><strong class="text-white/80">Erasure:</strong> Request deletion of your personal data, subject to legal obligations.</li>
+          <li><strong class="text-white/80">Restriction:</strong> Request that we limit how we use your data.</li>
+          <li><strong class="text-white/80">Portability:</strong> Request a machine-readable copy of your data.</li>
+          <li><strong class="text-white/80">Objection:</strong> Object to processing of your data for certain purposes.</li>
+          <li><strong class="text-white/80">Opt-Out:</strong> Unsubscribe from marketing emails at any time by clicking the unsubscribe link or contacting us.</li>
+        </ul>
+        <p class="text-white/40 leading-relaxed">To exercise any of these rights, please contact us using the information provided below. We will respond to your request within 30 days.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-3" data-testid="privacy-section-children">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">6. Children's Privacy</h2>
+        <p class="text-white/40 leading-relaxed">Our platform and services are not directed at individuals under the age of 18. We do not knowingly collect personal information from children. If we become aware that we have inadvertently collected data from a child under 18, we will take steps to delete such information promptly. If you believe we have collected information from a child, please contact us immediately.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="privacy-section-changes">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">7. Changes to This Policy</h2>
+        <p class="text-white/40 leading-relaxed">We may update this Privacy Policy from time to time to reflect changes in our practices, technologies, legal requirements, or other factors. We will notify you of material changes by posting the updated policy on this page and updating the "Last Updated" date. We encourage you to review this policy periodically. Your continued use of our services after changes are posted constitutes your acceptance of the revised policy.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 animate-on-scroll stagger-2" data-testid="privacy-section-contact">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">8. Contact Us</h2>
+        <p class="text-white/40 leading-relaxed mb-6">If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
+        <div class="space-y-3 text-white/50">
+          <p><strong class="text-white/80">HBDR</strong></p>
+          <p>1200 Brickell Ave Ste 1950, Miami, FL 33131</p>
+          <p>Email: <a href="mailto:contact@hbdr.com" class="text-[var(--accent)] hover:underline" data-testid="link-privacy-email">contact@hbdr.com</a></p>
+          <p>Phone: <a href="tel:+17866756080" class="text-[var(--accent)] hover:underline" data-testid="link-privacy-phone">(786) 675-6080</a></p>
+        </div>
+      </div>
+    </div>
+  </section>`;
+
+  return renderLayout({
+    title: "Privacy Policy - HBDR",
+    description: "HBDR Privacy Policy. Learn how we collect, use, and protect your information across our ad monetization and header bidding platform.",
+    canonicalPath: "/privacy-policy",
+    bodyContent: content,
+  });
+}
+
+export function renderTermsPage(): string {
+  const content = `
+  ${renderPageHero("Legal", "Terms & Conditions", "Please read these terms carefully before using HBDR's platform and services.")}
+
+  <section class="py-20 lg:py-28" data-testid="terms-content">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll" data-testid="terms-last-updated">
+        <p class="text-white/40 text-sm">Last Updated: February 2026</p>
+        <p class="text-white/50 mt-4 leading-relaxed">These Terms and Conditions ("Terms") govern your access to and use of the HBDR platform, website, and services. By accessing or using our services, you agree to be bound by these Terms. If you do not agree, you may not use our services.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="terms-section-acceptance">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">1. Acceptance of Terms</h2>
+        <p class="text-white/40 leading-relaxed mb-4">By creating an account, accessing our platform, or using any of our ad monetization services, you acknowledge that you have read, understood, and agree to be bound by these Terms and our <a href="/privacy-policy" class="text-[var(--accent)] hover:underline">Privacy Policy</a>. If you are using our services on behalf of an organization, you represent and warrant that you have the authority to bind that organization to these Terms.</p>
+        <p class="text-white/40 leading-relaxed">You must be at least 18 years of age and legally capable of entering into binding agreements to use our services.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-2" data-testid="terms-section-services">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">2. Services Description</h2>
+        <p class="text-white/40 leading-relaxed mb-4">HBDR provides ad monetization services including but not limited to:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2">
+          <li>Header bidding implementation and optimization (Prebid.js, server-side bidding)</li>
+          <li>Programmatic ad exchange access and demand partner management</li>
+          <li>Google Ad Manager and Google Ad Exchange (AdX) integration</li>
+          <li>Display, video, CTV/OTT, and in-app advertising solutions</li>
+          <li>Ad inventory management, yield optimization, and revenue analytics</li>
+          <li>Multiple Customer Management (MCM) services</li>
+          <li>Technical support, account management, and consulting</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-3" data-testid="terms-section-account">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">3. Account Terms</h2>
+        <p class="text-white/40 leading-relaxed mb-4">When you create an account with HBDR, you agree to:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2">
+          <li>Provide accurate, current, and complete information during registration</li>
+          <li>Maintain and promptly update your account information</li>
+          <li>Maintain the security and confidentiality of your login credentials</li>
+          <li>Accept responsibility for all activities that occur under your account</li>
+          <li>Notify us immediately of any unauthorized access or security breaches</li>
+          <li>Comply with all applicable Google Ad Manager and AdX policies</li>
+          <li>Not use our services for any unlawful or prohibited purpose</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="terms-section-ip">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">4. Intellectual Property</h2>
+        <p class="text-white/40 leading-relaxed mb-4">All intellectual property rights in our platform, technology, software, documentation, and related materials are owned by HBDR or our licensors. This includes our proprietary header bidding algorithms, optimization technology, analytics dashboards, and reporting tools.</p>
+        <p class="text-white/40 leading-relaxed mb-4">You retain ownership of your content, including your website content, ad inventory data, and creative assets. By using our services, you grant HBDR a non-exclusive, worldwide license to use, process, and display your content solely for the purpose of providing our services.</p>
+        <p class="text-white/40 leading-relaxed">You may not copy, modify, distribute, reverse engineer, or create derivative works from our proprietary technology without our written consent.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-2" data-testid="terms-section-liability">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">5. Limitation of Liability</h2>
+        <p class="text-white/40 leading-relaxed mb-4">To the maximum extent permitted by applicable law, HBDR and its directors, officers, employees, and agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of our services, including but not limited to:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-4">
+          <li>Loss of revenue, profits, or anticipated savings</li>
+          <li>Loss of data or business interruption</li>
+          <li>Fluctuations in ad revenue or CPM rates due to market conditions</li>
+          <li>Third-party actions, including demand partner or ad exchange decisions</li>
+          <li>Service interruptions or downtime beyond our reasonable control</li>
+        </ul>
+        <p class="text-white/40 leading-relaxed">Our total cumulative liability for all claims arising from or related to these Terms shall not exceed the total fees paid by you to HBDR during the twelve (12) months preceding the claim.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-3" data-testid="terms-section-indemnification">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">6. Indemnification</h2>
+        <p class="text-white/40 leading-relaxed">You agree to indemnify, defend, and hold harmless HBDR, its affiliates, and their respective directors, officers, employees, and agents from and against any claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or related to your use of our services, your violation of these Terms, your violation of any applicable law or regulation, or your infringement of any intellectual property or other rights of a third party.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="terms-section-termination">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">7. Termination</h2>
+        <p class="text-white/40 leading-relaxed mb-4">Either party may terminate these Terms at any time with thirty (30) days' written notice. HBDR reserves the right to suspend or terminate your access to our services immediately, without prior notice, if:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-4">
+          <li>You breach any provision of these Terms</li>
+          <li>Your account is flagged for policy violations by Google or other ad platforms</li>
+          <li>We detect fraudulent activity, invalid traffic, or ad policy violations</li>
+          <li>Continued service would expose HBDR to legal or regulatory risk</li>
+        </ul>
+        <p class="text-white/40 leading-relaxed">Upon termination, your right to use our services ceases immediately. HBDR will settle any outstanding revenue balances within sixty (60) days of termination, subject to applicable payment thresholds and deductions for chargebacks or clawbacks.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-2" data-testid="terms-section-governing-law">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">8. Governing Law</h2>
+        <p class="text-white/40 leading-relaxed mb-4">These Terms shall be governed by and construed in accordance with the laws of the State of Florida, United States, without regard to its conflict of law provisions.</p>
+        <p class="text-white/40 leading-relaxed">Any disputes arising out of or relating to these Terms or our services shall be resolved exclusively in the state or federal courts located in Miami-Dade County, Florida. You consent to the personal jurisdiction and venue of such courts and waive any objections based on inconvenient forum.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-3" data-testid="terms-section-changes">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">9. Changes to Terms</h2>
+        <p class="text-white/40 leading-relaxed">We reserve the right to modify these Terms at any time. Material changes will be communicated via email or through a prominent notice on our platform at least thirty (30) days before they take effect. Your continued use of our services after the effective date of revised Terms constitutes your acceptance of the changes. If you do not agree to the revised Terms, you must discontinue use of our services.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 animate-on-scroll stagger-1" data-testid="terms-section-contact">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">10. Contact Information</h2>
+        <p class="text-white/40 leading-relaxed mb-6">For questions or concerns about these Terms, please contact us:</p>
+        <div class="space-y-3 text-white/50">
+          <p><strong class="text-white/80">HBDR</strong></p>
+          <p>1200 Brickell Ave Ste 1950, Miami, FL 33131</p>
+          <p>Email: <a href="mailto:contact@hbdr.com" class="text-[var(--accent)] hover:underline" data-testid="link-terms-email">contact@hbdr.com</a></p>
+          <p>Phone: <a href="tel:+17866756080" class="text-[var(--accent)] hover:underline" data-testid="link-terms-phone">(786) 675-6080</a></p>
+        </div>
+      </div>
+    </div>
+  </section>`;
+
+  return renderLayout({
+    title: "Terms & Conditions - HBDR",
+    description: "HBDR Terms and Conditions. Review the terms governing use of our ad monetization platform, header bidding services, and publisher tools.",
+    canonicalPath: "/terms",
+    bodyContent: content,
+  });
+}
+
+export function renderGdprCookiePolicyPage(): string {
+  const content = `
+  ${renderPageHero("Legal", "GDPR & Cookie Policy", "Our commitment to data protection, GDPR compliance, and transparent cookie usage across our platform.")}
+
+  <section class="py-20 lg:py-28" data-testid="gdpr-cookie-content">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll" data-testid="gdpr-last-updated">
+        <p class="text-white/40 text-sm">Last Updated: February 2026</p>
+        <p class="text-white/50 mt-4 leading-relaxed">This policy explains how HBDR complies with the General Data Protection Regulation (GDPR) and describes our use of cookies and similar tracking technologies. It applies to all visitors and users of our website and platform.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="gdpr-section-compliance">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">GDPR Compliance</h2>
+
+        <h3 class="text-xl font-semibold text-white mb-3">Legal Basis for Processing</h3>
+        <p class="text-white/40 leading-relaxed mb-4">Under the GDPR, we process personal data based on one or more of the following legal bases:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-6">
+          <li><strong class="text-white/80">Consent:</strong> Where you have given clear, informed consent for us to process your data for a specific purpose (e.g., marketing communications, non-essential cookies).</li>
+          <li><strong class="text-white/80">Contractual Necessity:</strong> Where processing is necessary to perform our contract with you, such as providing ad monetization services and managing your publisher account.</li>
+          <li><strong class="text-white/80">Legitimate Interests:</strong> Where processing is necessary for our legitimate business interests, such as fraud prevention, platform security, and service improvement, provided these interests do not override your rights.</li>
+          <li><strong class="text-white/80">Legal Obligation:</strong> Where processing is necessary to comply with applicable laws, regulations, or legal proceedings.</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-white mb-3">Data Subject Rights</h3>
+        <p class="text-white/40 leading-relaxed mb-4">If you are located in the European Economic Area (EEA) or United Kingdom, you have the following rights under the GDPR:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-6">
+          <li><strong class="text-white/80">Right of Access:</strong> Obtain confirmation of whether we process your personal data and request a copy of it.</li>
+          <li><strong class="text-white/80">Right to Rectification:</strong> Request correction of inaccurate or incomplete personal data.</li>
+          <li><strong class="text-white/80">Right to Erasure:</strong> Request deletion of your personal data under certain circumstances.</li>
+          <li><strong class="text-white/80">Right to Restriction:</strong> Request that we restrict processing of your data in certain situations.</li>
+          <li><strong class="text-white/80">Right to Data Portability:</strong> Receive your personal data in a structured, commonly used, machine-readable format.</li>
+          <li><strong class="text-white/80">Right to Object:</strong> Object to processing based on legitimate interests or direct marketing.</li>
+          <li><strong class="text-white/80">Right to Withdraw Consent:</strong> Withdraw previously given consent at any time without affecting the lawfulness of prior processing.</li>
+          <li><strong class="text-white/80">Right to Lodge a Complaint:</strong> File a complaint with your local data protection supervisory authority.</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-white mb-3">Data Protection Officer</h3>
+        <p class="text-white/40 leading-relaxed mb-6">For all GDPR-related inquiries, data subject access requests, or complaints, please contact our Data Protection Officer at <a href="mailto:contact@hbdr.com" class="text-[var(--accent)] hover:underline" data-testid="link-gdpr-dpo-email">contact@hbdr.com</a>. We will respond to verified requests within 30 days.</p>
+
+        <h3 class="text-xl font-semibold text-white mb-3">International Data Transfers</h3>
+        <p class="text-white/40 leading-relaxed">When we transfer personal data outside the EEA, we ensure appropriate safeguards are in place, including Standard Contractual Clauses (SCCs) approved by the European Commission, adequacy decisions, or other lawful transfer mechanisms. Our programmatic advertising partners and demand-side platforms operate globally; data shared during real-time bidding auctions may be processed in various jurisdictions. We contractually require all partners to maintain GDPR-compliant data protection standards.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-2" data-testid="gdpr-section-cookies">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Cookie Policy</h2>
+
+        <h3 class="text-xl font-semibold text-white mb-3">What Are Cookies?</h3>
+        <p class="text-white/40 leading-relaxed mb-6">Cookies are small text files stored on your device when you visit a website. They serve various functions such as remembering your preferences, analyzing site usage, and enabling personalized advertising. Cookies may be "session" cookies (deleted when you close your browser) or "persistent" cookies (remaining on your device for a set period).</p>
+
+        <h3 class="text-xl font-semibold text-white mb-3">Types of Cookies We Use</h3>
+
+        <div class="space-y-4 mb-6">
+          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <h4 class="font-semibold text-white mb-2">Essential Cookies</h4>
+            <p class="text-white/40 text-sm leading-relaxed">Required for basic website functionality, security, and authentication. These cookies cannot be disabled as they are necessary for the site to function properly.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <h4 class="font-semibold text-white mb-2">Analytics Cookies</h4>
+            <p class="text-white/40 text-sm leading-relaxed">Help us understand how visitors interact with our website by collecting anonymous usage statistics. This data helps us improve our platform and user experience.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <h4 class="font-semibold text-white mb-2">Advertising & Targeting Cookies</h4>
+            <p class="text-white/40 text-sm leading-relaxed">Used by our advertising partners to build a profile of your interests and deliver relevant ads across websites. As an ad tech platform, these cookies are integral to the programmatic advertising ecosystem.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <h4 class="font-semibold text-white mb-2">Functional Cookies</h4>
+            <p class="text-white/40 text-sm leading-relaxed">Enable enhanced functionality and personalization, such as remembering your settings, language preferences, and dashboard configurations.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-3" data-testid="gdpr-section-cookie-table">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Cookie Details</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm" data-testid="cookie-table">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="text-left py-3 px-4 text-white/70 font-semibold">Cookie Name</th>
+                <th class="text-left py-3 px-4 text-white/70 font-semibold">Type</th>
+                <th class="text-left py-3 px-4 text-white/70 font-semibold">Purpose</th>
+                <th class="text-left py-3 px-4 text-white/70 font-semibold">Duration</th>
+              </tr>
+            </thead>
+            <tbody class="text-white/40">
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_hbdr_session</td>
+                <td class="py-3 px-4">Essential</td>
+                <td class="py-3 px-4">Maintains authenticated session state</td>
+                <td class="py-3 px-4">Session</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_hbdr_csrf</td>
+                <td class="py-3 px-4">Essential</td>
+                <td class="py-3 px-4">Cross-site request forgery protection</td>
+                <td class="py-3 px-4">Session</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_hbdr_consent</td>
+                <td class="py-3 px-4">Essential</td>
+                <td class="py-3 px-4">Stores cookie consent preferences</td>
+                <td class="py-3 px-4">1 year</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_ga</td>
+                <td class="py-3 px-4">Analytics</td>
+                <td class="py-3 px-4">Google Analytics visitor identification</td>
+                <td class="py-3 px-4">2 years</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_ga_*</td>
+                <td class="py-3 px-4">Analytics</td>
+                <td class="py-3 px-4">Google Analytics session persistence</td>
+                <td class="py-3 px-4">2 years</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_gid</td>
+                <td class="py-3 px-4">Analytics</td>
+                <td class="py-3 px-4">Google Analytics session identification</td>
+                <td class="py-3 px-4">24 hours</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_pbjs_userid_*</td>
+                <td class="py-3 px-4">Advertising</td>
+                <td class="py-3 px-4">Prebid.js user identification for header bidding</td>
+                <td class="py-3 px-4">30 days</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">__gads</td>
+                <td class="py-3 px-4">Advertising</td>
+                <td class="py-3 px-4">Google advertising cookie for ad delivery</td>
+                <td class="py-3 px-4">13 months</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_hbdr_prefs</td>
+                <td class="py-3 px-4">Functional</td>
+                <td class="py-3 px-4">Stores dashboard and UI preferences</td>
+                <td class="py-3 px-4">1 year</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-mono text-xs text-white/60">_hbdr_tz</td>
+                <td class="py-3 px-4">Functional</td>
+                <td class="py-3 px-4">Timezone detection for reporting</td>
+                <td class="py-3 px-4">30 days</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 mb-8 animate-on-scroll stagger-1" data-testid="gdpr-section-manage">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">How to Manage Cookies</h2>
+        <p class="text-white/40 leading-relaxed mb-4">You can control and manage cookies through several methods:</p>
+        <ul class="list-disc pl-6 text-white/40 space-y-2 mb-4">
+          <li><strong class="text-white/80">Browser Settings:</strong> Most browsers allow you to view, manage, and delete cookies through their settings. Consult your browser's help documentation for specific instructions.</li>
+          <li><strong class="text-white/80">Opt-Out Tools:</strong> For advertising cookies, you can use industry opt-out tools such as the Digital Advertising Alliance's opt-out page (optout.aboutads.info) or the Network Advertising Initiative's opt-out page (optout.networkadvertising.org).</li>
+          <li><strong class="text-white/80">Google Ad Settings:</strong> Manage your Google advertising preferences at adssettings.google.com.</li>
+          <li><strong class="text-white/80">Do Not Track:</strong> We honor Do Not Track (DNT) signals sent by your browser.</li>
+        </ul>
+        <p class="text-white/40 leading-relaxed">Please note that disabling certain cookies may affect the functionality of our platform and limit your ability to use some features.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 animate-on-scroll stagger-2" data-testid="gdpr-section-contact">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Contact Our DPO</h2>
+        <p class="text-white/40 leading-relaxed mb-6">For any questions about this GDPR & Cookie Policy, to exercise your data rights, or to raise a data protection concern, please contact our Data Protection Officer:</p>
+        <div class="space-y-3 text-white/50">
+          <p><strong class="text-white/80">HBDR Data Protection Officer</strong></p>
+          <p>1200 Brickell Ave Ste 1950, Miami, FL 33131</p>
+          <p>Email: <a href="mailto:contact@hbdr.com" class="text-[var(--accent)] hover:underline" data-testid="link-gdpr-contact-email">contact@hbdr.com</a></p>
+          <p>Phone: <a href="tel:+17866756080" class="text-[var(--accent)] hover:underline" data-testid="link-gdpr-contact-phone">(786) 675-6080</a></p>
+        </div>
+      </div>
+    </div>
+  </section>`;
+
+  return renderLayout({
+    title: "GDPR & Cookie Policy - HBDR",
+    description: "HBDR GDPR compliance and cookie policy. Learn about our data protection practices, your rights, and how we use cookies across our ad tech platform.",
+    canonicalPath: "/gdpr-cookie-policy",
+    bodyContent: content,
+  });
+}
+
+export function renderFaqSupportPage(): string {
+  const faqs = [
+    { category: "General", items: [
+      { q: "What is HBDR and what services do you provide?", a: "HBDR is a global leader in ad monetization and header bidding solutions. We help publishers maximize their advertising revenue through advanced header bidding implementation, Google Ad Exchange (AdX) access, programmatic optimization, display ads, CTV/OTT advertising, in-app ads, and comprehensive yield management services." },
+      { q: "What types of publishers does HBDR work with?", a: "We work with publishers of all sizes, from mid-market websites generating 1 million+ monthly pageviews to large enterprise media companies. Our solutions are tailored to web publishers, app developers, CTV/OTT content providers, and digital media companies across all verticals." },
+      { q: "How does HBDR's revenue share model work?", a: "HBDR operates on a transparent revenue share model. We take a percentage of the incremental revenue we generate for your properties. There are no setup fees, hidden costs, or minimum commitments. You only pay when we deliver results. Contact our team for specific revenue share details based on your inventory volume." },
+      { q: "How long does it take to see revenue improvements?", a: "Most publishers see measurable revenue improvements within the first 2-4 weeks after integration. Our onboarding process typically takes 1-2 weeks, and our optimization algorithms continuously improve performance over the first 60-90 days as they learn your traffic patterns and audience behavior." },
+    ]},
+    { category: "Technical", items: [
+      { q: "What is header bidding and how does it work?", a: "Header bidding is an advanced programmatic advertising technique that allows publishers to offer their ad inventory to multiple demand sources simultaneously before making ad server calls. This creates a unified auction that drives competition among buyers, resulting in higher CPMs and increased fill rates compared to traditional waterfall setups." },
+      { q: "Does HBDR support both client-side and server-side header bidding?", a: "Yes, we support both Prebid.js client-side header bidding and server-side bidding (S2S) through Prebid Server. We recommend a hybrid approach for most publishers, using client-side for latency-sensitive environments and server-side for mobile, video, and high-demand-partner configurations." },
+      { q: "Will HBDR's implementation affect my site speed?", a: "Our implementation is optimized for minimal latency impact. We use asynchronous loading, lazy initialization, timeout management, and server-side bidding to ensure ad auctions do not block page rendering. Most publishers see less than 100ms added to their total page load time." },
+      { q: "What ad formats does HBDR support?", a: "We support all major ad formats including display (standard IAB sizes), native ads, video (instream and outstream), rewarded video, interstitials, rich media, CTV/OTT video ads, and custom high-impact units. Our team will recommend the optimal format mix based on your content and audience." },
+    ]},
+    { category: "Account & Billing", items: [
+      { q: "How do I access my revenue reports and analytics?", a: "All publishers receive access to our real-time analytics dashboard, which includes detailed reporting on impressions, CPMs, fill rates, revenue by demand partner, and more. Reports can be filtered by date range, ad unit, device, geography, and other dimensions. We also support automated report delivery via email." },
+      { q: "What are the payment terms and thresholds?", a: "HBDR pays publishers on a Net-60 basis with a minimum payment threshold of $100. Payments are processed via wire transfer or ACH. Detailed payment statements are available in your dashboard, and our finance team is available for any billing inquiries." },
+      { q: "Can I use HBDR alongside my existing ad partners?", a: "Absolutely. HBDR is designed to work alongside your existing ad stack. We integrate with your current Google Ad Manager setup and add our demand sources to your existing configuration. Our goal is to complement and enhance your current monetization strategy, not replace it." },
+    ]},
+    { category: "Integration & Setup", items: [
+      { q: "What is the onboarding process like?", a: "Our onboarding process consists of four phases: Discovery (understanding your current setup and goals), Integration (implementing our header bidding wrapper and connecting demand partners), Optimization (fine-tuning configurations and floor prices), and Growth (ongoing optimization and scaling). Most publishers are fully integrated within 1-2 weeks." },
+      { q: "Do I need to change my ad server to use HBDR?", a: "No, HBDR works with your existing Google Ad Manager (GAM) setup. We integrate our header bidding solution alongside your current configuration, adding demand without disrupting your existing ad operations. For MCM publishers, we handle the Google partnership integration seamlessly." },
+      { q: "What technical resources do I need for integration?", a: "Minimal technical resources are required. Our team handles the majority of the implementation. You will need someone with access to your website's code (to place the header bidding script) and your Google Ad Manager account. For most CMS platforms, integration is as simple as adding a JavaScript snippet." },
+      { q: "Does HBDR provide an ads.txt file?", a: "Yes, we provide the necessary ads.txt entries that need to be added to your domain's ads.txt file. This is required for authorized digital selling and ensures that our demand partners can bid on your inventory. Our team will provide the exact lines and assist with implementation." },
+    ]},
+  ];
+
+  const content = `
+  ${renderPageHero("Support", "FAQ & Support", "Find answers to common questions or reach out to our dedicated support team for personalized assistance.")}
+
+  <section class="py-20 lg:py-28" data-testid="faq-section">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Frequently Asked Questions</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Browse our most common questions organized by category.</p>
+      </div>
+
+      ${faqs.map((cat, ci) => `
+      <div class="mb-12 animate-on-scroll stagger-${(ci % 3) + 1}" data-testid="faq-category-${ci}">
+        <h3 class="text-2xl font-display text-white mb-6 tracking-tight">${cat.category}</h3>
+        <div class="space-y-3" x-data="{ openFaq: null }">
+          ${cat.items.map((item, i) => {
+            const faqId = `faq-${ci}-${i}`;
+            return `
+          <div class="glass-card overflow-hidden" data-testid="${faqId}">
+            <button
+              @click="openFaq = openFaq === '${faqId}' ? null : '${faqId}'"
+              class="w-full text-left p-6 flex items-center justify-between gap-4 cursor-pointer"
+              data-testid="button-${faqId}"
+            >
+              <span class="font-semibold text-white/90">${item.q}</span>
+              <svg class="w-5 h-5 text-white/40 flex-shrink-0 transition-transform duration-300" :class="openFaq === '${faqId}' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div x-show="openFaq === '${faqId}'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+              <div class="px-6 pb-6 text-white/40 leading-relaxed border-t border-white/5 pt-4">${item.a}</div>
+            </div>
+          </div>`;
+          }).join("")}
+        </div>
+      </div>`).join("")}
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-20 lg:py-28" data-testid="support-channels-section">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Support Channels</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Multiple ways to get the help you need, when you need it.</p>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-6 mb-16">
+        <div class="glass-card p-8 text-center animate-on-scroll stagger-1" data-testid="support-channel-email">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Email Support</h3>
+          <a href="mailto:support@hbdr.com" class="text-[var(--accent)] hover:underline text-sm" data-testid="link-support-email">support@hbdr.com</a>
+          <p class="text-white/30 text-sm mt-2">Response within 24 hours</p>
+        </div>
+        <div class="glass-card p-8 text-center animate-on-scroll stagger-2" data-testid="support-channel-phone">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Phone Support</h3>
+          <a href="tel:+17866756080" class="text-[var(--accent)] hover:underline text-sm" data-testid="link-support-phone">(786) 675-6080</a>
+          <p class="text-white/30 text-sm mt-2">Mon-Fri, 9am-6pm EST</p>
+        </div>
+        <div class="glass-card p-8 text-center animate-on-scroll stagger-3" data-testid="support-channel-priority">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Priority Support</h3>
+          <p class="text-white/50 text-sm">Enterprise clients</p>
+          <p class="text-white/30 text-sm mt-2">Response within 4 hours</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-20 lg:py-28" data-testid="support-form-section">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Submit a Support Request</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Fill out the form below and our support team will get back to you as soon as possible.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 animate-on-scroll stagger-1" data-testid="support-form-card"
+           x-data="{
+             formData: { name: '', email: '', subject: '', priority: 'Medium', message: '' },
+             submitting: false,
+             submitted: false,
+             error: false,
+             async submitForm() {
+               this.submitting = true;
+               this.error = false;
+               try {
+                 const res = await fetch('/api/contact', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify({
+                     name: this.formData.name,
+                     email: this.formData.email,
+                     company: this.formData.subject + ' [Priority: ' + this.formData.priority + ']',
+                     website: '',
+                     monthlyPageviews: '',
+                     message: this.formData.message
+                   })
+                 });
+                 if (res.ok) {
+                   this.submitted = true;
+                 } else {
+                   this.error = true;
+                 }
+               } catch (e) {
+                 this.error = true;
+               } finally {
+                 this.submitting = false;
+               }
+             }
+           }">
+        <div x-show="!submitted">
+          <form @submit.prevent="submitForm()" data-testid="support-form">
+            <div class="grid sm:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-white/60 mb-2">Name</label>
+                <input type="text" x-model="formData.name" required class="glass-input w-full px-4 py-3.5" placeholder="Your name" data-testid="input-support-name" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-white/60 mb-2">Email</label>
+                <input type="email" x-model="formData.email" required class="glass-input w-full px-4 py-3.5" placeholder="you@company.com" data-testid="input-support-email" />
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-white/60 mb-2">Subject</label>
+                <select x-model="formData.subject" required class="glass-select w-full" data-testid="select-support-subject">
+                  <option value="" disabled selected>Select a subject</option>
+                  <option value="Technical Issue">Technical Issue</option>
+                  <option value="Billing Question">Billing Question</option>
+                  <option value="Account Help">Account Help</option>
+                  <option value="Feature Request">Feature Request</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-white/60 mb-2">Priority</label>
+                <select x-model="formData.priority" class="glass-select w-full" data-testid="select-support-priority">
+                  <option value="Low">Low</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-white/60 mb-2">Description</label>
+              <textarea x-model="formData.message" required rows="5" class="glass-input w-full px-4 py-3.5" placeholder="Please describe your issue or question in detail..." data-testid="textarea-support-description"></textarea>
+            </div>
+            <button type="submit" class="glass-btn w-full text-center py-4" :disabled="submitting" data-testid="button-submit-support">
+              <span x-show="!submitting">Submit Support Request</span>
+              <span x-show="submitting" x-cloak class="inline-flex items-center gap-2">
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Sending...
+              </span>
+            </button>
+            <p x-show="error" x-cloak class="text-red-400 text-sm text-center mt-4">Something went wrong. Please try again or email us at support@hbdr.com.</p>
+          </form>
+        </div>
+        <div x-show="submitted" x-cloak class="text-center py-8">
+          <div class="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <h3 class="text-2xl font-display text-white mb-2">Request Submitted</h3>
+          <p class="text-white/40">Our support team will get back to you within 24 hours. Thank you for reaching out.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Need a custom solution?", "Contact Our Team")}`;
+
+  return renderLayout({
+    title: "FAQ & Support - HBDR",
+    description: "Find answers to common questions about HBDR's ad monetization and header bidding services. Get support from our dedicated team.",
+    canonicalPath: "/support",
+    bodyContent: content,
+  });
+}
+
+export function renderDashboardPage(): string {
+  const content = `
+  ${renderPageHero("Dashboard", "Analytics Dashboard", "Powerful real-time analytics and reporting tools that give publishers complete visibility into every dimension of their ad performance.")}
+
+  <section class="py-24 lg:py-32" data-testid="dashboard-overview-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto animate-on-scroll">
+        <div class="glass-card p-8 sm:p-12" data-testid="card-dashboard-overview">
+          <div class="glass-tag mb-6">Analytics Suite</div>
+          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-6 text-gradient">Your Revenue Command Center</h2>
+          <p class="text-lg text-white/50 leading-relaxed mb-6">
+            HBDR's proprietary analytics dashboard is a comprehensive data suite that gives publishers complete visibility into their ad performance. From real-time revenue tracking to granular breakdowns by geography, device, and demand source, every metric you need is at your fingertips.
+          </p>
+          <p class="text-lg text-white/50 leading-relaxed mb-8">
+            The dashboard is fully web-based, updates in real time, and is accessible from anywhere. Whether you manage a single site or a portfolio of properties, our command center consolidates all your data into one powerful interface.
+          </p>
+          <a href="https://dashboard.hbdr.com" target="_blank" rel="noopener noreferrer" class="glass-btn inline-flex items-center gap-2" data-testid="link-dashboard-external">
+            Access Dashboard
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="dashboard-dimensions-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Data Dimensions</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Slice Your Data Any Way You Need</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Drill down into performance across every dimension that matters to your business.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${[
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>', title: "By Ad Unit", description: "Break down performance by individual ad units to identify top performers and underperformers across your inventory." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>', title: "By Geography", description: "See revenue, CPMs, and fill rates broken down by country, region, and city to optimize your geo-targeting strategy." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0"/>', title: "By Carrier", description: "Mobile carrier-level analytics showing performance across different network providers for granular mobile insights." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>', title: "By App Name & App ID", description: "For in-app publishers, drill down into individual app-level performance metrics with full app name and ID visibility." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>', title: "By Device Type", description: "Desktop, mobile, and tablet breakdowns with device-specific optimization insights to tailor your ad strategy." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>', title: "By Demand Source", description: "See which SSPs and demand partners are driving the most value, compare bid rates, and optimize your partner mix." },
+        ].map((f, i) => `
+        <div class="glass-card p-7 group animate-on-scroll stagger-${(i % 3) + 1}" data-testid="dashboard-dimension-card-${i}">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">${f.icon}</svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3 group-hover:text-[var(--accent)] transition-colors">${f.title}</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem]">${f.description}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="dashboard-revenue-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Revenue Views</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Complete Revenue Visibility</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Understand exactly where your revenue comes from with dedicated views for every monetization channel.</p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="glass-card p-8 animate-on-scroll stagger-1" data-testid="card-adx-revenue">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3">AdX Revenue & Performance</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem]">
+            Google Ad Exchange metrics including CPMs, fill rates, revenue, and impression-level data. Track your AdX performance in real time with full transparency into auction dynamics.
+          </p>
+        </div>
+        <div class="glass-card p-8 animate-on-scroll stagger-2" data-testid="card-adserver-revenue">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3">Ad Server Revenue & Performance</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem]">
+            Overall ad server (GAM) metrics and delivery data. Monitor line item pacing, total impressions served, and overall ad server revenue across all demand channels.
+          </p>
+        </div>
+        <div class="glass-card p-8 animate-on-scroll stagger-3" data-testid="card-ssp-revenue">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3">SSP Performance</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem]">
+            Individual SSP and demand partner performance comparison. Evaluate bid rates, win rates, CPMs, and revenue contribution from each partner to optimize your demand stack.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center mt-12 animate-on-scroll">
+        <a href="https://dashboard.hbdr.com" target="_blank" rel="noopener noreferrer" class="glass-btn inline-flex items-center gap-2" data-testid="link-dashboard-external-2">
+          Access Dashboard
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="dashboard-features-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Platform Features</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Everything You Need in One Dashboard</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Built for publishers who demand speed, accuracy, and actionable insights.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${[
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>', title: "Real-Time Data", description: "Updates every few minutes so you always have the latest performance metrics." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>', title: "Custom Date Ranges", description: "Select any date range to analyze trends, compare periods, and track growth." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>', title: "Exportable Reports", description: "Download your data in CSV or PDF format for offline analysis and stakeholder sharing." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>', title: "Automated Email Reports", description: "Schedule daily or weekly reports delivered straight to your inbox." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>', title: "Revenue Forecasting", description: "Predictive analytics that help you plan ahead with revenue projections." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>', title: "Anomaly Detection", description: "Automatic alerts when revenue, fill rates, or CPMs deviate from expected patterns." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>', title: "Multi-Site Management", description: "A single view across all your properties for consolidated performance monitoring." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>', title: "Access Controls", description: "User-level permissions so your team sees exactly what they need." },
+        ].map((f, i) => `
+        <div class="glass-card p-6 group animate-on-scroll stagger-${(i % 4) + 1}" data-testid="dashboard-feature-card-${i}">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">${f.icon}</svg>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-[var(--accent)] transition-colors">${f.title}</h3>
+          <p class="text-white/40 leading-relaxed text-sm">${f.description}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Ready to see your data?", "Access Dashboard")}`;
+
+  return renderLayout({
+    title: "Analytics Dashboard - HBDR",
+    description: "HBDR's proprietary analytics dashboard gives publishers complete visibility into ad performance with real-time data, revenue breakdowns, and actionable insights.",
+    canonicalPath: "/dashboard",
+    bodyContent: content,
+  });
+}
+
+export function renderVideoPlayerPage(): string {
+  const content = `
+  ${renderPageHero("Solutions", "Video Player", "HBDR's custom-built, high-performance video player engineered for maximum ad revenue and seamless user experience across all devices.")}
+
+  <section class="py-24 lg:py-32" data-testid="video-overview-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto animate-on-scroll">
+        <div class="glass-card p-8 sm:p-12" data-testid="card-video-overview">
+          <div class="glass-tag mb-6">Custom-Built Player</div>
+          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-6 text-gradient">Built for Revenue, Designed for Users</h2>
+          <p class="text-lg text-white/50 leading-relaxed mb-6">
+            HBDR's video player is fully custom-built from the ground up — not a white-labeled third-party solution. Every line of code is optimized for both desktop and mobile, supporting instream and outstream video formats for all OLV (Online Video) purposes.
+          </p>
+          <p class="text-lg text-white/50 leading-relaxed">
+            The player generates massive RPMs and yield for publishers by delivering high-quality video ads on websites and in apps. With intelligent ad scheduling, viewability optimization, and multi-source header bidding built in, our player turns every video impression into maximum revenue.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="video-formats-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Format Support</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Every Video Format, One Player</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">From instream to outstream, our player handles every video ad format with ease.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-8">
+        <div class="glass-card p-8 animate-on-scroll stagger-1" data-testid="card-instream">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3">Instream Video</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem] mb-4">
+            Pre-roll, mid-roll, and post-roll ads delivered within content video. Maximize engagement with ads that play alongside premium publisher content for the highest completion rates and CPMs.
+          </p>
+          <ul class="space-y-2 text-white/40 text-[0.9375rem]">
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Pre-roll, mid-roll, post-roll support</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Ad pod scheduling for multi-ad breaks</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Companion banner support</li>
+          </ul>
+        </div>
+        <div class="glass-card p-8 animate-on-scroll stagger-2" data-testid="card-outstream">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V9a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2h-2z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3">Outstream Video</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem] mb-4">
+            In-article, in-feed, and in-banner video that plays without requiring content video. Unlock video ad revenue on any page, even without native video content.
+          </p>
+          <ul class="space-y-2 text-white/40 text-[0.9375rem]">
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> In-article and in-feed placements</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> No content video required</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Viewability-triggered playback</li>
+          </ul>
+        </div>
+        <div class="glass-card p-8 animate-on-scroll stagger-1" data-testid="card-sticky-player">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3">Floating / Sticky Player</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem] mb-4">
+            The player follows users as they scroll, maintaining viewability and engagement throughout the entire session. Maximize ad completion rates with a player that stays in view.
+          </p>
+          <ul class="space-y-2 text-white/40 text-[0.9375rem]">
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Scroll-triggered sticky behavior</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> User-dismissible controls</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Configurable position and size</li>
+          </ul>
+        </div>
+        <div class="glass-card p-8 animate-on-scroll stagger-2" data-testid="card-mobile-optimized">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3">Mobile-Optimized</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem] mb-4">
+            A responsive player that adapts seamlessly to any screen size with touch-optimized controls. Deliver a native-like video experience on every mobile device.
+          </p>
+          <ul class="space-y-2 text-white/40 text-[0.9375rem]">
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Touch-friendly controls</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Adaptive aspect ratios</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-1">&#10003;</span> Bandwidth-aware loading</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="video-revenue-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto animate-on-scroll">
+        <div class="glass-card p-8 sm:p-12" data-testid="card-video-revenue">
+          <div class="glass-tag mb-6">Revenue Engine</div>
+          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-6 text-gradient">Maximizing Video RPMs</h2>
+          <p class="text-lg text-white/50 leading-relaxed mb-6">
+            Every aspect of the HBDR video player is engineered for the highest possible RPMs. From intelligent ad pod scheduling that sequences ads for maximum yield, to viewability optimization that keeps the player in view, our technology ensures no revenue is left on the table.
+          </p>
+          <div class="grid sm:grid-cols-2 gap-4 mt-8">
+            ${[
+              "Intelligent ad pod scheduling",
+              "Viewability optimization",
+              "Multi-demand-source video header bidding",
+              "Lazy loading for performance",
+              "Adaptive bitrate for quality across connections",
+              "VAST/VPAID/VMAP compliance",
+            ].map(f => `
+            <div class="flex items-start gap-3">
+              <span class="text-[var(--accent)] mt-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              </span>
+              <span class="text-white/50 text-[0.9375rem]">${f}</span>
+            </div>`).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="video-technical-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Technical Excellence</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Built to Perform, Built to Scale</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Enterprise-grade video technology that meets the highest standards.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${[
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>', title: "Lightweight & Fast", description: "Minimal page load impact with optimized code that keeps Core Web Vitals in check." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>', title: "Cross-Browser", description: "Full compatibility across Chrome, Safari, Firefox, Edge, and all major browsers." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>', title: "AMP Compatible", description: "Full support for Accelerated Mobile Pages to reach the mobile-first audience." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>', title: "Custom Branding", description: "Fully customizable player skin and branding to match your site's design." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>', title: "Privacy Compliant", description: "GDPR/CCPA compliant consent integration built directly into the player." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>', title: "Video Analytics", description: "Detailed video-specific analytics and reporting for every impression and engagement." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>', title: "A/B Testing", description: "Test different ad configurations to find the optimal setup for your audience." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01"/>', title: "Anti-Fraud & IVT", description: "Built-in protection against invalid traffic and ad fraud to safeguard your revenue." },
+        ].map((f, i) => `
+        <div class="glass-card p-6 group animate-on-scroll stagger-${(i % 4) + 1}" data-testid="video-tech-card-${i}">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">${f.icon}</svg>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-[var(--accent)] transition-colors">${f.title}</h3>
+          <p class="text-white/40 leading-relaxed text-sm">${f.description}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderStatsSection()}
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Ready to monetize with video?", "Get Started")}`;
+
+  return renderLayout({
+    title: "Video Player - HBDR",
+    description: "HBDR's custom-built video player optimized for maximum ad revenue. Supports instream, outstream, floating player, and mobile-optimized formats.",
+    canonicalPath: "/solutions/video-player",
+    bodyContent: content,
+  });
+}
+
+export function renderPartnersPage(): string {
+  const sspPartners = [
+    { name: "Google Ad Exchange (AdX)", desc: "Premium programmatic demand from Google's marketplace" },
+    { name: "Amazon TAM/UAM", desc: "Amazon's Transparent Ad Marketplace and Unified Ad Marketplace" },
+    { name: "Magnite (formerly Rubicon Project)", desc: "Leading independent sell-side platform" },
+    { name: "PubMatic", desc: "Cloud infrastructure platform for digital advertising" },
+    { name: "Index Exchange", desc: "Transparent, real-time programmatic marketplace" },
+    { name: "OpenX", desc: "Technology-forward SSP with quality-focused marketplace" },
+    { name: "Xandr (Microsoft)", desc: "Microsoft's advertising platform and exchange" },
+    { name: "Sovrn", desc: "Publisher-focused monetization and data platform" },
+    { name: "TripleLift", desc: "Native, video, and display programmatic advertising" },
+    { name: "GumGum", desc: "Contextual intelligence and advertising platform" },
+    { name: "33Across", desc: "Attention-based programmatic marketplace" },
+    { name: "Sharethrough", desc: "Enhanced supply-side platform for human-centric advertising" },
+    { name: "Sonobi", desc: "Technology platform connecting premium publishers to demand" },
+    { name: "EMX Digital", desc: "Full-service programmatic exchange" },
+    { name: "Criteo", desc: "Commerce media and performance advertising" },
+    { name: "Kargo", desc: "Premium digital advertising for mobile and web" },
+  ];
+
+  const dspPartners = [
+    { name: "Google DV360 (Display & Video 360)", desc: "Google's enterprise demand-side platform" },
+    { name: "The Trade Desk", desc: "Independent DSP for omnichannel advertising" },
+    { name: "Amazon DSP", desc: "Amazon's demand-side platform for programmatic buying" },
+    { name: "MediaMath", desc: "Enterprise DSP for omnichannel campaigns" },
+    { name: "Xandr Invest", desc: "Microsoft's programmatic buying platform" },
+    { name: "Yahoo DSP", desc: "Unified demand-side buying platform" },
+    { name: "Basis Technologies (Centro)", desc: "Comprehensive media automation platform" },
+    { name: "StackAdapt", desc: "Multi-channel programmatic advertising platform" },
+  ];
+
+  const identityPartners = [
+    { name: "Unified ID 2.0 (UID2)", desc: "Open-source identity framework for the cookieless future" },
+    { name: "LiveRamp ATS (Authenticated Traffic Solution)", desc: "People-based identity resolution" },
+    { name: "ID5", desc: "Universal, privacy-compliant identity infrastructure" },
+    { name: "SharedID (Prebid)", desc: "First-party cookie-based identity from Prebid" },
+    { name: "Google PPID (Publisher Provided Identifiers)", desc: "First-party audience signals to Google" },
+    { name: "Lotame Panorama ID", desc: "People-based, privacy-compliant identity solution" },
+  ];
+
+  const compliancePartners = [
+    { name: "TAG (Trustworthy Accountability Group)", desc: "Anti-fraud certification and brand safety" },
+    { name: "IAB Tech Lab", desc: "ads.txt, sellers.json, app-ads.txt implementation" },
+    { name: "Google CMP (Consent Management)", desc: "GDPR and CCPA consent collection" },
+    { name: "Integral Ad Science (IAS)", desc: "Ad verification, viewability, and brand safety" },
+    { name: "DoubleVerify", desc: "Media quality and performance authentication" },
+    { name: "MOAT (Oracle)", desc: "Attention analytics and ad measurement" },
+    { name: "Pixalate", desc: "Ad fraud detection and compliance analytics" },
+  ];
+
+  const techPartners = [
+    { name: "Google Ad Manager (GAM)", desc: "Full ad serving and yield management integration" },
+    { name: "Prebid.js", desc: "Open-source header bidding wrapper" },
+    { name: "Amazon APS (A9)", desc: "Amazon Publisher Services server-to-server integration" },
+    { name: "Google Open Bidding", desc: "Server-side exchange bidding through GAM" },
+    { name: "Confiant", desc: "Real-time creative quality and security scanning" },
+    { name: "AdLightning", desc: "Malvertising protection and creative blocking" },
+    { name: "CMP Integration (OneTrust, Cookiebot, etc.)", desc: "Consent management platform integration" },
+    { name: "Google Analytics & GA4", desc: "Revenue attribution and performance analytics" },
+  ];
+
+  const content = `
+  ${renderPageHero("Partners", "Partners & Integrations", "Discover HBDR's extensive ecosystem of demand partners, technology integrations, and data solutions powering premium ad monetization worldwide.")}
+
+  <section class="py-24 lg:py-32" data-testid="partners-demand-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">World-Class Demand Ecosystem</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">HBDR connects publishers to the world's largest demand sources, ensuring maximum competition for every impression and the highest possible CPMs.</p>
+      </div>
+
+      <div class="mb-16 animate-on-scroll">
+        <h3 class="text-2xl font-display text-white mb-8 tracking-tight">SSP & Exchange Partners</h3>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          ${sspPartners.map((p, i) => `
+          <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="partner-ssp-${i}">
+            <h4 class="text-lg font-semibold text-white mb-2">${p.name}</h4>
+            <p class="text-white/40 text-sm leading-relaxed">${p.desc}</p>
+          </div>`).join("")}
+        </div>
+      </div>
+
+      <div class="animate-on-scroll">
+        <h3 class="text-2xl font-display text-white mb-8 tracking-tight">DSP Partners</h3>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          ${dspPartners.map((p, i) => `
+          <div class="glass-card p-6 animate-on-scroll stagger-${(i % 4) + 1}" data-testid="partner-dsp-${i}">
+            <h4 class="text-lg font-semibold text-white mb-2">${p.name}</h4>
+            <p class="text-white/40 text-sm leading-relaxed">${p.desc}</p>
+          </div>`).join("")}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="partners-identity-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Identity & Data Integrations</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Privacy-first identity solutions that help publishers maintain addressability and maximize revenue in a cookieless world.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${identityPartners.map((p, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="partner-identity-${i}">
+          <h4 class="text-lg font-semibold text-white mb-2">${p.name}</h4>
+          <p class="text-white/40 text-sm leading-relaxed">${p.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="partners-compliance-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Compliance & Verification Partners</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${compliancePartners.map((p, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="partner-compliance-${i}">
+          <h4 class="text-lg font-semibold text-white mb-2">${p.name}</h4>
+          <p class="text-white/40 text-sm leading-relaxed">${p.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="partners-tech-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Technology Integrations</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${techPartners.map((p, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 4) + 1}" data-testid="partner-tech-${i}">
+          <h4 class="text-lg font-semibold text-white mb-2">${p.name}</h4>
+          <p class="text-white/40 text-sm leading-relaxed">${p.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Ready to access our demand ecosystem?", "Become a Partner")}`;
+
+  return renderLayout({
+    title: "Partners & Integrations - HBDR",
+    description: "Explore HBDR's extensive network of demand partners, SSPs, DSPs, and technology integrations powering premium ad monetization.",
+    canonicalPath: "/partners",
+    bodyContent: content,
+  });
+}
+
+export function renderPublishersPage(): string {
+  const valueProps = [
+    { title: "No Upfront Costs", desc: "Zero setup fees, no minimums. We invest in your success from day one." },
+    { title: "Revenue Guarantee", desc: "We don't get paid unless your revenue increases. Our success is tied to yours." },
+    { title: "Full Transparency", desc: "Real-time dashboard, detailed reporting, and complete visibility into every impression." },
+    { title: "Dedicated Support", desc: "Your own account manager who understands your business and goals." },
+    { title: "No Lock-In Contracts", desc: "Month-to-month agreements. Stay because of results, not because of contracts." },
+    { title: "Enterprise Technology", desc: "The same ad stack used by the largest publishers in the world, available to everyone." },
+  ];
+
+  const onboardingSteps = [
+    { num: "1", title: "Discovery Call", subtitle: "15-30 min", bullets: [
+      "We learn about your site(s), traffic, current monetization setup, and goals",
+      "No obligation, no pressure \u2014 just a conversation",
+      "We'll give you an honest assessment of your revenue potential",
+    ]},
+    { num: "2", title: "Site Audit & Revenue Analysis", subtitle: "", bullets: [
+      "Our team analyzes your current ad setup, page speed, and revenue data",
+      "We identify optimization opportunities and projected revenue uplift",
+      "You receive a detailed proposal with expected results",
+    ]},
+    { num: "3", title: "Technical Integration", subtitle: "", bullets: [
+      "We handle all the technical work \u2014 you don't need developers",
+      "We add our optimized ad tags to your Google Ad Manager (GAM) account",
+      "If you don't have GAM, we set one up for you at no cost",
+      "Average integration time: 2-3 business days",
+    ]},
+    { num: "4", title: "Testing & Optimization", subtitle: "", bullets: [
+      "We run A/B tests to find the optimal ad configuration for your site",
+      "Header bidding connections are activated and tuned",
+      "We monitor performance closely during the first 2-4 weeks",
+    ]},
+    { num: "5", title: "Go Live & Ongoing Optimization", subtitle: "", bullets: [
+      "Your optimized setup goes fully live",
+      "Revenue dashboard access is activated with real-time data",
+      "Continuous optimization \u2014 we never stop improving your performance",
+      "Regular check-ins with your dedicated account manager",
+    ]},
+  ];
+
+  const hbdrManages = [
+    "Header bidding setup & optimization",
+    "Demand partner management",
+    "Ad layout & placement optimization",
+    "Floor price optimization",
+    "Page speed monitoring",
+    "Ad quality & brand safety",
+    "Revenue reporting & analytics",
+    "GAM account management",
+    "Consent management integration",
+    "Ads.txt & sellers.json management",
+  ];
+
+  const youDo = [
+    "Continue creating great content",
+    "Approve ad placements on your site",
+    "Review your revenue dashboard",
+    "That's it \u2014 we handle everything else",
+  ];
+
+  const requirements = [
+    { title: "Quality Content", desc: "Original, regularly updated content that provides value to readers" },
+    { title: "Minimum Traffic", desc: "Generally 100,000+ monthly page views (we make exceptions for high-quality niche sites)" },
+    { title: "Clean Traffic", desc: "Legitimate, organic traffic without bots or invalid activity" },
+    { title: "Google Compliance", desc: "Site must comply with Google Ad Manager and AdSense policies" },
+    { title: "User Experience", desc: "Willingness to maintain a good user experience alongside monetization" },
+  ];
+
+  const pubFaqs = [
+    { q: "How much does it cost to work with HBDR?", a: "Nothing upfront. HBDR operates on a revenue-share model. We take a percentage of the incremental revenue we generate \u2014 meaning we only make money when you make more money. There are no setup fees, no monthly minimums, and no hidden charges." },
+    { q: "Will HBDR's ads slow down my site?", a: "No. We prioritize page speed and use lazy loading, asynchronous ad loading, and optimized code to minimize any impact. Most publishers see no change in Core Web Vitals after integration." },
+    { q: "Do I need a Google Ad Manager (GAM) account?", a: "Not necessarily. If you already have one, we integrate directly into it. If you don't, we can set one up for you at no cost as part of our onboarding process." },
+    { q: "Can I keep my existing ad partners?", a: "Absolutely. We work alongside your existing setup and add our demand on top. We never ask you to remove existing revenue sources unless they're actively hurting performance." },
+    { q: "What if I'm not happy with the results?", a: "We operate on month-to-month agreements with no lock-in contracts. If you're not seeing the results you want, you can part ways at any time. That said, our publisher retention rate is over 95% because we deliver." },
+    { q: "How quickly will I see revenue improvements?", a: "Most publishers see measurable improvements within the first 2-4 weeks. Full optimization typically takes 30-60 days as we run tests and tune the setup for your specific audience and content." },
+    { q: "What kind of reporting do I get?", a: "You get access to our real-time analytics dashboard with breakdowns by ad unit, geography, device, demand source, and more. We also provide weekly and monthly summary reports." },
+    { q: "Do you work with sites outside the US?", a: "Yes. We work with publishers globally and have demand partners that cover traffic from virtually every country." },
+  ];
+
+  const content = `
+  ${renderPageHero("For Publishers", "Publisher Solutions", "From day one to full optimization, HBDR makes ad monetization effortless. Here's everything you need to know about working with us.")}
+
+  <section class="py-24 lg:py-32" data-testid="publishers-why-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Why Publishers Choose HBDR</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${valueProps.map((v, i) => `
+        <div class="glass-card p-8 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="publisher-value-${i}">
+          <h3 class="text-xl font-semibold text-white mb-3">${v.title}</h3>
+          <p class="text-white/40 leading-relaxed">${v.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="publishers-onboarding-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Getting Started Is Simple</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Our onboarding process is designed to be fast and hassle-free. Most publishers are live within 5-7 business days.</p>
+      </div>
+      <div class="max-w-3xl mx-auto space-y-6">
+        ${onboardingSteps.map((step, i) => `
+        <div class="relative flex gap-6 animate-on-scroll stagger-${(i % 5) + 1}" data-testid="onboarding-step-${i}">
+          ${i < onboardingSteps.length - 1 ? `<div class="absolute left-7 top-[72px] bottom-0 w-px bg-gradient-to-b from-[var(--accent)]/30 to-transparent"></div>` : ""}
+          <div class="flex-shrink-0">
+            <div class="step-number">${step.num}</div>
+          </div>
+          <div class="glass-card p-6 flex-1">
+            <h3 class="text-xl font-semibold text-white mb-1">${step.title}</h3>
+            ${step.subtitle ? `<span class="text-[var(--accent)] text-sm font-medium">${step.subtitle}</span>` : ""}
+            <ul class="mt-3 space-y-2">
+              ${step.bullets.map(b => `<li class="flex items-start gap-2 text-white/40 text-sm leading-relaxed">
+                <svg class="w-4 h-4 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                ${b}
+              </li>`).join("")}
+            </ul>
+          </div>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="publishers-handle-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">We Do the Heavy Lifting</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="glass-card p-8 animate-on-scroll stagger-1" data-testid="publishers-hbdr-manages">
+          <h3 class="text-xl font-semibold text-white mb-6">What HBDR Manages</h3>
+          <ul class="space-y-3">
+            ${hbdrManages.map(item => `
+            <li class="flex items-start gap-3 text-white/40 leading-relaxed">
+              <svg class="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              ${item}
+            </li>`).join("")}
+          </ul>
+        </div>
+        <div class="glass-card p-8 animate-on-scroll stagger-2" data-testid="publishers-you-do">
+          <h3 class="text-xl font-semibold text-white mb-6">What You Do</h3>
+          <ul class="space-y-3">
+            ${youDo.map(item => `
+            <li class="flex items-start gap-3 text-white/40 leading-relaxed">
+              <svg class="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              ${item}
+            </li>`).join("")}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="publishers-requirements-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Who We Work With</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">HBDR works with publishers of all sizes, from independent blogs to enterprise media companies. Here's what we look for:</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${requirements.map((r, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 5) + 1}" data-testid="publisher-req-${i}">
+          <h3 class="text-lg font-semibold text-white mb-2">${r.title}</h3>
+          <p class="text-white/40 text-sm leading-relaxed">${r.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="publishers-faq-section">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Common Publisher Questions</h2>
+      </div>
+      <div class="space-y-3" x-data="{ openFaq: null }">
+        ${pubFaqs.map((faq, i) => {
+          const faqId = `pub-faq-${i}`;
+          return `
+        <div class="glass-card overflow-hidden animate-on-scroll stagger-${(i % 4) + 1}" data-testid="${faqId}">
+          <button
+            @click="openFaq = openFaq === '${faqId}' ? null : '${faqId}'"
+            class="w-full text-left p-6 flex items-center justify-between gap-4 cursor-pointer"
+            data-testid="button-${faqId}"
+          >
+            <span class="font-semibold text-white/90">${faq.q}</span>
+            <svg class="w-5 h-5 text-white/40 flex-shrink-0 transition-transform duration-300" :class="openFaq === '${faqId}' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div x-show="openFaq === '${faqId}'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div class="px-6 pb-6 text-white/40 leading-relaxed border-t border-white/5 pt-4">${faq.a}</div>
+          </div>
+        </div>`;
+        }).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderStatsSection()}
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Ready to grow your ad revenue?", "Get Started")}`;
+
+  return renderLayout({
+    title: "For Publishers - HBDR",
+    description: "Everything publishers need to know about partnering with HBDR. From onboarding to optimization, we make ad monetization simple.",
+    canonicalPath: "/publishers",
+    bodyContent: content,
+  });
+}
+
+export function renderAdvertisersPage(): string {
+  const dealTypes = [
+    {
+      title: "Private Marketplace Deals (PMPs)",
+      what: "Invitation-only auctions where select advertisers bid on premium inventory before it hits the open exchange",
+      benefits: [
+        "Access to premium, brand-safe inventory at priority pricing",
+        "Curated publisher packages by vertical (news, entertainment, sports, tech, finance, etc.)",
+        "Custom audience targeting using first-party publisher data",
+        "Full transparency on where your ads run",
+        "Higher viewability and engagement vs. open exchange",
+      ],
+      how: "Work with our team to define your targeting criteria, budget, and preferred publishers. We build a custom PMP deal ID that you activate in your DSP of choice.",
+    },
+    {
+      title: "Programmatic Guaranteed (PG)",
+      what: "Fixed-price, guaranteed impressions bought programmatically — combining the efficiency of programmatic with the certainty of a direct deal",
+      benefits: [
+        "Guaranteed impression volume at a fixed CPM",
+        "Premium placements (homepage takeovers, high-impact units, etc.)",
+        "No auction competition — your creative runs guaranteed",
+        "Programmatic efficiency with direct-deal certainty",
+        "First-look access before PMP and open auction",
+      ],
+      how: "Agree on CPM, volume, targeting, and flight dates with our team. We set up the PG deal in Google Ad Manager, and you activate it in your DSP. Delivery is guaranteed.",
+    },
+    {
+      title: "Direct Sales & Direct Placements",
+      what: "Traditional direct-sold campaigns placed directly into our publishers' Google Ad Manager (GAM) accounts — no DSP required",
+      benefits: [
+        "Run campaigns directly in publisher GAM accounts for maximum control",
+        "Custom ad formats (skins, interstitials, native, rich media, video)",
+        "Sponsorship and takeover opportunities",
+        "Direct relationship — no intermediary fees",
+        "Custom reporting and optimization by our ad ops team",
+      ],
+      how: "Share your campaign brief, creative assets, and targeting requirements. Our ad operations team traffics the campaign directly into the publisher's GAM, manages delivery, provides reporting, and optimizes throughout the flight.",
+    },
+  ];
+
+  const inventoryStats = [
+    "Billions of monthly impressions across our publisher network",
+    "Display, Video, Native, and Rich Media formats available",
+    "Desktop, Mobile, Tablet, CTV, and In-App inventory",
+    "Premium verticals: News, Entertainment, Sports, Technology, Finance, Lifestyle, Gaming, Health",
+    "Global reach with strong US, UK, EU, LATAM, and APAC coverage",
+    "All inventory is ads.txt authorized and sellers.json verified",
+  ];
+
+  const brandSafetyFeatures = [
+    "All publishers vetted and approved by HBDR's quality team",
+    "TAG (Trustworthy Accountability Group) certified",
+    "IAS and DoubleVerify integration for viewability and brand safety",
+    "Full ads.txt and sellers.json compliance across all publishers",
+    "Content category and keyword-level blocking available",
+    "GDPR and CCPA compliant with consent management in place",
+    "Transparent reporting with placement-level data",
+  ];
+
+  const steps = [
+    { num: "1", title: "Share Your Brief", desc: "Tell us about your campaign goals, target audience, budget, and preferred formats" },
+    { num: "2", title: "Receive a Proposal", desc: "We'll put together a custom media plan with recommended publishers, deal types, and pricing" },
+    { num: "3", title: "Activate Your Campaign", desc: "We set up deal IDs or traffic your creative directly — your campaign is live within days" },
+    { num: "4", title: "Optimize & Report", desc: "Our team monitors performance, provides regular reports, and optimizes for your KPIs" },
+  ];
+
+  const content = `
+  ${renderPageHero("For Advertisers", "Advertiser Solutions", "Access premium, brand-safe publisher inventory through Private Marketplace deals, Programmatic Guaranteed campaigns, and direct placements across HBDR's publisher network.")}
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="advertisers-intro-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Premium Access to Quality Inventory</h2>
+        <p class="text-lg text-white/40 max-w-3xl mx-auto leading-relaxed">HBDR manages monetization for thousands of premium publisher sites across verticals. Advertisers can access this inventory through several buying methods — each designed to deliver performance, transparency, and brand safety.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="advertisers-deal-types-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Flexible Deal Structures</h2>
+      </div>
+      <div class="space-y-8">
+        ${dealTypes.map((deal, i) => `
+        <div class="glass-card p-8 animate-on-scroll stagger-${i + 1}" data-testid="advertiser-deal-${i}">
+          <h3 class="text-2xl font-bold text-white mb-4">${deal.title}</h3>
+          <div class="mb-6">
+            <span class="text-sm font-semibold text-[var(--accent)] uppercase tracking-wider">What it is</span>
+            <p class="text-white/40 leading-relaxed mt-2">${deal.what}</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-sm font-semibold text-[var(--accent)] uppercase tracking-wider">Benefits</span>
+            <ul class="mt-3 space-y-2">
+              ${deal.benefits.map(b => `
+              <li class="flex items-start gap-3 text-white/40 leading-relaxed">
+                <svg class="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                ${b}
+              </li>`).join("")}
+            </ul>
+          </div>
+          <div>
+            <span class="text-sm font-semibold text-[var(--accent)] uppercase tracking-wider">How it works</span>
+            <p class="text-white/40 leading-relaxed mt-2">${deal.how}</p>
+          </div>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="advertisers-inventory-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Our Inventory at a Glance</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${inventoryStats.map((stat, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="advertiser-inventory-${i}">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <p class="text-white/60 leading-relaxed">${stat}</p>
+          </div>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="advertisers-brand-safety-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Brand Safety First</h2>
+        <p class="text-lg text-white/40 max-w-3xl mx-auto leading-relaxed">Every layer of our platform is built with brand safety and transparency at its core.</p>
+      </div>
+      <div class="glass-card p-8 animate-on-scroll" data-testid="advertisers-brand-safety-card">
+        <ul class="space-y-4">
+          ${brandSafetyFeatures.map(f => `
+          <li class="flex items-start gap-3 text-white/40 leading-relaxed">
+            <svg class="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            ${f}
+          </li>`).join("")}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="advertisers-getting-started-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">How to Get Started</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${steps.map((s, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${i + 1}" data-testid="advertiser-step-${i}">
+          <div class="step-number mb-4">${s.num}</div>
+          <h3 class="text-lg font-semibold text-white mb-2">${s.title}</h3>
+          <p class="text-white/40 text-sm leading-relaxed">${s.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Ready to reach premium audiences?", "Contact Our Sales Team")}`;
+
+  return renderLayout({
+    title: "For Advertisers - HBDR",
+    description: "Access premium publisher inventory through HBDR. Run PMPs, Programmatic Guaranteed deals, and direct campaigns across our network.",
+    canonicalPath: "/advertisers",
+    bodyContent: content,
+  });
+}
+
+export function renderTrustCompliancePage(): string {
+  const supplyChainCards = [
+    { title: "ads.txt Management", desc: "Every publisher in our network maintains an up-to-date ads.txt file listing HBDR as an authorized seller. We proactively monitor and manage ads.txt entries to prevent unauthorized inventory reselling and ensure buyers always know they're purchasing legitimate inventory." },
+    { title: "sellers.json Compliance", desc: "HBDR maintains a complete and transparent sellers.json file, providing buyers with full visibility into who is selling inventory on our platform. Every publisher relationship is documented and verifiable." },
+    { title: "app-ads.txt for Mobile", desc: "For our in-app publishers, we implement and maintain app-ads.txt to authorize legitimate ad sources and prevent mobile ad fraud across our app inventory." },
+    { title: "SupplyChain Object (schain)", desc: "We pass complete supply chain objects in every bid request, giving DSPs and advertisers full transparency into every node in the supply path from publisher to buyer." },
+  ];
+
+  const antiFraudCards = [
+    { title: "Invalid Traffic (IVT) Detection", desc: "We use multiple layers of fraud detection including pre-bid filtering, real-time monitoring, and post-bid analysis to identify and block bot traffic, click fraud, and other forms of invalid traffic." },
+    { title: "Confiant Integration", desc: "Real-time creative security scanning that detects and blocks malicious ads, forced redirects, and cryptomining scripts before they reach users." },
+    { title: "AdLightning Protection", desc: "Automated malvertising protection that scans every creative for quality, security, and compliance violations in real time." },
+    { title: "TAG Anti-Fraud Certification", desc: "HBDR adheres to TAG's anti-fraud guidelines and participates in industry-wide efforts to combat ad fraud and protect advertiser spend." },
+    { title: "Traffic Quality Monitoring", desc: "Continuous monitoring of traffic patterns across all publisher properties to identify anomalies, suspicious spikes, and potential fraud indicators." },
+  ];
+
+  const privacyCards = [
+    { title: "GDPR Compliance", desc: "Full compliance with the EU General Data Protection Regulation. We implement proper consent collection, data processing agreements, and user rights management across all European traffic." },
+    { title: "CCPA / CPRA Compliance", desc: "Compliance with California Consumer Privacy Act and California Privacy Rights Act, including support for the US Privacy String and Global Privacy Control signals." },
+    { title: "TCF 2.0 Integration", desc: "Integration with IAB Europe's Transparency and Consent Framework, ensuring proper consent signals are passed through the programmatic supply chain." },
+    { title: "CMP Integration", desc: "We work with leading Consent Management Platforms (OneTrust, Cookiebot, Didomi, etc.) to ensure publishers collect and manage user consent properly." },
+    { title: "GPP Support", desc: "Support for IAB Tech Lab's Global Privacy Platform, a unified framework for handling privacy signals across multiple jurisdictions." },
+    { title: "Data Minimization", desc: "We follow data minimization principles — we only collect and process data that is necessary for ad delivery and do not build user profiles or sell personal data." },
+  ];
+
+  const certifications = [
+    { title: "TAG Certified", desc: "Trustworthy Accountability Group certification across anti-fraud, brand safety, and anti-piracy programs" },
+    { title: "IAB Member", desc: "Active member of the Interactive Advertising Bureau, participating in industry standards development" },
+    { title: "IAB Tech Lab", desc: "Compliance with IAB Tech Lab specifications including OpenRTB, ads.txt, sellers.json, and prebid standards" },
+    { title: "Google Certified Publishing Partner (GCPP)", desc: "Certified by Google as a trusted partner for publisher monetization through Google Ad Manager and AdX" },
+    { title: "Prebid Member", desc: "Active participant in the Prebid.org community, contributing to open-source header bidding standards" },
+    { title: "Coalition for Better Ads", desc: "Adherence to the Coalition for Better Ads standards, ensuring ad formats meet user experience guidelines" },
+  ];
+
+  const capabilities = [
+    { title: "Header Bidding", desc: "Client-side and server-side header bidding setup, optimization, and management using Prebid.js and server-to-server integrations" },
+    { title: "Google Ad Manager (GAM)", desc: "Complete GAM account setup, configuration, yield management, and ongoing ad operations" },
+    { title: "Programmatic Monetization", desc: "Open exchange, PMP, PG, and Preferred Deal management across all major SSPs and exchanges" },
+    { title: "Video Advertising", desc: "Instream, outstream, and OTT/CTV video monetization with our custom-built high-performance video player" },
+    { title: "Display & Native", desc: "Standard display, rich media, and native ad format optimization for maximum RPMs" },
+    { title: "In-App Monetization", desc: "Mobile app ad monetization across banner, interstitial, rewarded video, and native formats" },
+    { title: "Identity Solutions", desc: "Implementation of UID2, LiveRamp, ID5, and other identity solutions for the cookieless future" },
+    { title: "Ad Quality & Safety", desc: "Malvertising protection, creative scanning, and brand safety controls across all inventory" },
+    { title: "Consent Management", desc: "GDPR/CCPA/GPP compliant consent collection and signal propagation" },
+    { title: "Analytics & Reporting", desc: "Real-time revenue dashboard with granular breakdowns by every dimension" },
+    { title: "Ad Layout Optimization", desc: "Data-driven ad placement and layout testing to maximize revenue without hurting UX" },
+    { title: "Floor Price Management", desc: "Dynamic and rule-based floor pricing strategies to capture maximum value from every impression" },
+  ];
+
+  const publishersWeServe = [
+    "News & Media companies",
+    "Entertainment & Lifestyle sites",
+    "Sports publishers",
+    "Technology & SaaS blogs",
+    "Finance & Investing platforms",
+    "Gaming & Esports sites",
+    "Education & Reference portals",
+    "Health & Wellness publishers",
+    "E-commerce & Shopping sites",
+    "Independent bloggers & content creators",
+    "Mobile app developers",
+    "CTV & OTT content providers",
+  ];
+
+  const advertisersWeServe = [
+    "Brand advertisers seeking premium placements",
+    "Performance marketers driving conversions",
+    "Agencies managing multi-brand campaigns",
+    "Direct-to-consumer (DTC) brands",
+    "Enterprise B2B companies",
+    "Regional and local businesses seeking targeted reach",
+  ];
+
+  const content = `
+  ${renderPageHero("Trust & Compliance", "Trust & Compliance", "At HBDR, trust isn't just a value — it's the foundation of everything we build. We maintain the highest standards of transparency, compliance, and security across all our operations.")}
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="trust-commitment-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Built on Trust</h2>
+        <p class="text-lg text-white/40 max-w-3xl mx-auto leading-relaxed">HBDR operates in one of the most complex ecosystems in digital advertising. With billions of ad transactions happening daily, trust and compliance aren't optional — they're essential. HBDR is committed to maintaining the highest standards across every aspect of our operations, from how we manage publisher inventory to how we handle user data.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="trust-supply-chain-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Supply Chain Transparency</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-6">
+        ${supplyChainCards.map((c, i) => `
+        <div class="glass-card p-8 animate-on-scroll stagger-${i + 1}" data-testid="trust-supply-${i}">
+          <h3 class="text-xl font-semibold text-white mb-3">${c.title}</h3>
+          <p class="text-white/40 leading-relaxed">${c.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="trust-anti-fraud-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Anti-Fraud & Traffic Quality</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${antiFraudCards.map((c, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="trust-fraud-${i}">
+          <h3 class="text-lg font-semibold text-white mb-3">${c.title}</h3>
+          <p class="text-white/40 text-sm leading-relaxed">${c.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="trust-privacy-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Privacy & Data Protection</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${privacyCards.map((c, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="trust-privacy-${i}">
+          <h3 class="text-lg font-semibold text-white mb-3">${c.title}</h3>
+          <p class="text-white/40 text-sm leading-relaxed">${c.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="trust-certifications-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Industry Partnerships & Certifications</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${certifications.map((c, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="trust-cert-${i}">
+          <div class="w-10 h-10 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">${c.title}</h3>
+          <p class="text-white/40 text-sm leading-relaxed">${c.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="trust-capabilities-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">What HBDR Does</h2>
+        <p class="text-lg text-white/40 max-w-3xl mx-auto leading-relaxed">HBDR is a full-service ad technology and ad operations company serving publishers and advertisers across every channel, format, and device.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${capabilities.map((c, i) => `
+        <div class="glass-card p-6 animate-on-scroll stagger-${(i % 6) + 1}" data-testid="trust-capability-${i}">
+          <h3 class="text-lg font-semibold text-white mb-2">${c.title}</h3>
+          <p class="text-white/40 text-sm leading-relaxed">${c.desc}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="trust-who-we-serve-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Serving Every Type of Publisher & Advertiser</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="glass-card p-8 animate-on-scroll stagger-1" data-testid="trust-publishers-served">
+          <h3 class="text-xl font-semibold text-white mb-6">Publishers We Serve</h3>
+          <ul class="space-y-3">
+            ${publishersWeServe.map(item => `
+            <li class="flex items-start gap-3 text-white/40 leading-relaxed">
+              <svg class="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              ${item}
+            </li>`).join("")}
+          </ul>
+        </div>
+        <div class="glass-card p-8 animate-on-scroll stagger-2" data-testid="trust-advertisers-served">
+          <h3 class="text-xl font-semibold text-white mb-6">Advertisers We Serve</h3>
+          <ul class="space-y-3">
+            ${advertisersWeServe.map(item => `
+            <li class="flex items-start gap-3 text-white/40 leading-relaxed">
+              <svg class="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              ${item}
+            </li>`).join("")}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Ready to work with a trusted partner?", "Get In Touch")}`;
+
+  return renderLayout({
+    title: "Trust & Compliance - HBDR",
+    description: "HBDR's commitment to transparency, compliance, and trust in ad technology. Learn about our certifications, policies, and industry partnerships.",
+    canonicalPath: "/trust",
     bodyContent: content,
   });
 }
