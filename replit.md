@@ -40,6 +40,16 @@ Brand logo: Hexagonal "H" mark in green/white (attached_assets/HBDR_Logo_Pack_al
   - `GET /solutions/manage-inventory` — Manage Inventory solution page
   - `GET /solutions/open-bidding` — Open Bidding solution page
   - `GET /solutions/ad-exchange-adx` — Ad Exchange AdX solution page
+  - `GET /dashboard` — Analytics Dashboard page (links to dashboard.hbdr.com)
+  - `GET /solutions/video-player` — Video Player solution page
+  - `GET /partners` — Partners & Integrations page (DSPs, SSPs, identity, compliance tech)
+  - `GET /publishers` — For Publishers page (onboarding, getting started, FAQ)
+  - `GET /advertisers` — For Advertisers page (PMPs, PG deals, direct sales)
+  - `GET /trust` — Trust & Compliance page (certifications, capabilities, compliance)
+  - `GET /privacy-policy` — Privacy Policy page
+  - `GET /terms` — Terms & Conditions page
+  - `GET /gdpr-cookie-policy` — GDPR & Cookie Policy page
+  - `GET /support` — FAQ & Support page (with support contact form)
   - `GET /blog` — Blog listing page (published posts only)
   - `GET /blog/:slug` — Individual blog post page
   - `GET /admin/blog` — Blog admin/CMS panel (list all posts)
@@ -55,7 +65,7 @@ Brand logo: Hexagonal "H" mark in green/white (attached_assets/HBDR_Logo_Pack_al
 
 ### Frontend (Server-Rendered)
 - Multi-page site rendered by `server/template.ts` using shared layout (renderLayout helper)
-- Pages: Homepage, About, How It Works, Careers, Press, Contact, 9 Solution pages (Header Bidding, Display Ads, CTV & OTT, In-App Ads, MCM, Manage Account, Manage Inventory, Open Bidding, Ad Exchange AdX), Blog (listing + individual posts)
+- Pages: Homepage, About, How It Works, Careers, Press, Contact, Dashboard (analytics), Partners & Integrations, For Publishers, For Advertisers, Trust & Compliance, 10 Solution pages (Header Bidding, Display Ads, Video Player, CTV & OTT, In-App Ads, MCM, Manage Account, Manage Inventory, Open Bidding, Ad Exchange AdX), Blog (listing + individual posts), Privacy Policy, Terms & Conditions, GDPR & Cookie Policy, FAQ & Support
 - Navigation has Solutions dropdown (desktop hover, mobile expandable) linking to all solution pages
 - Blog CMS admin panel at /admin/blog for creating, editing, and deleting posts
 - No build step needed - all CSS/JS loaded via CDN
@@ -85,18 +95,27 @@ Brand logo: Hexagonal "H" mark in green/white (attached_assets/HBDR_Logo_Pack_al
 ### Project Structure
 ```
 server/
-  index.ts           # Hono server entry point
+  index.ts           # Hono server entry point (Node.js local dev)
   routes.ts          # Route registration (page + API)
   template.ts        # Layout + all page templates (renderLayout, renderPage, renderAboutPage, etc.)
   storage.ts         # Storage interface and in-memory implementation
 shared/
   schema.ts          # Drizzle schema + Zod validation
+worker.ts            # Cloudflare Workers entry point
+wrangler.toml        # Workers configuration
+tsconfig.worker.json # TypeScript config for Worker build
+public/assets/       # Static assets served by Workers
 client/              # Legacy React app (not used in current stack)
 ```
 
 ### Build & Development
 - **Development**: `npm run dev` runs `tsx server/index.ts` which starts Hono server on port 5000
 - **Key**: No frontend build step. All styling/JS via CDN. Template is a TypeScript function returning HTML string.
+
+### Deployment
+- **GitHub**: Code is pushed to https://github.com/mattortolani/hbdr-website
+- **Cloudflare Workers**: `wrangler deploy` deploys the site. Uses `worker.ts` as entry point with `[assets]` serving static files from `public/`.
+- **Static assets**: Logo images in `public/assets/` are served by Cloudflare Workers Static Assets before reaching the worker.
 
 ## External Dependencies
 
