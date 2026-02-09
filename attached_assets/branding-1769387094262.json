@@ -1,0 +1,93 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "__gilroy_836f9f",
+      "count": 83
+    },
+    {
+      "family": "__gilroy_Fallback_836f9f",
+      "count": 83
+    }
+  ],
+  "colors": {
+    "primary": "#2DCC01",
+    "accent": "#6B7280",
+    "background": "#FFFFFF",
+    "textPrimary": "#0D0D0D",
+    "link": "#6B7280"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "__gilroy_836f9f",
+      "heading": "__gilroy_836f9f"
+    },
+    "fontStacks": {
+      "body": [
+        "__gilroy_836f9f",
+        "__gilroy_Fallback_836f9f"
+      ],
+      "heading": [
+        "__gilroy_836f9f",
+        "__gilroy_Fallback_836f9f"
+      ],
+      "paragraph": [
+        "__gilroy_836f9f",
+        "__gilroy_Fallback_836f9f"
+      ]
+    },
+    "fontSizes": {
+      "h1": "109.2px",
+      "h2": "74.88px",
+      "body": "14.04px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "0px"
+  },
+  "components": {
+    "input": {
+      "background": "#F4F3F3",
+      "textColor": "#363430",
+      "borderColor": null,
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "File saved at: attached_assets/favicon.ico",
+    "ogImage": "File saved at: attached_assets/ogImage.svg"
+  },
+  "__framework_hints": [],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Strong indicators: header logo linking to homepage, header location, visible, top-left position, src contains logo, class contains logo, reasonable size, SVG format. Score: 113 (clear winner by 55 points)",
+    "confidence": 0.9
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": -1,
+      "text": "N/A",
+      "reasoning": "LLM failed"
+    },
+    "secondary": {
+      "index": -1,
+      "text": "N/A",
+      "reasoning": "LLM failed"
+    },
+    "confidence": 0
+  },
+  "confidence": {
+    "buttons": 0,
+    "colors": 0,
+    "overall": 0
+  }
+}

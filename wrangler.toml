@@ -1,0 +1,11 @@
+name = "hbdr-website"
+main = "worker.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+tsconfig = "tsconfig.worker.json"
+
+[assets]
+directory = "./public"
+
+[vars]
+ENVIRONMENT = "production"

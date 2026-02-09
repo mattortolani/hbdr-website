@@ -1,0 +1,83 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "sans-serif",
+      "count": 89
+    },
+    {
+      "family": "Rubik",
+      "count": 67
+    },
+    {
+      "family": "Karla",
+      "count": 22
+    }
+  ],
+  "colors": {
+    "primary": "#FC5000",
+    "accent": "#061A3D",
+    "background": "#FFFFFF",
+    "textPrimary": "#061A3D",
+    "link": "#061A3D"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Karla",
+      "heading": "Karla"
+    },
+    "fontStacks": {
+      "body": [
+        "Karla",
+        "sans-serif"
+      ],
+      "heading": [
+        "Karla",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "Rubik",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "16px",
+      "h2": "60px",
+      "body": "16px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "8px"
+  },
+  "components": {},
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "File saved at: attached_assets/favicon.png",
+    "ogImage": null
+  },
+  "__framework_hints": [],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Strong indicators: header logo linking to homepage, header location, visible, reasonable size, SVG format. Score: 93 (clear winner by 60 points)",
+    "confidence": 0.9
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": -1,
+      "text": "N/A",
+      "reasoning": "LLM failed"
+    },
+    "secondary": {
+      "index": -1,
+      "text": "N/A",
+      "reasoning": "LLM failed"
+    },
+    "confidence": 0
+  },
+  "confidence": {
+    "buttons": 0,
+    "colors": 0,
+    "overall": 0
+  }
+}
