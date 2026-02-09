@@ -1,13 +1,17 @@
 import { type User, type InsertUser, type ContactLead, type InsertContactLead, type BlogPost, type InsertBlogPost } from "@shared/schema";
 
+let idCounter = 0;
 function generateId(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.random() * 16 | 0;
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
+  try {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+  } catch {}
+  idCounter++;
+  const timestamp = Date.now().toString(36);
+  const counter = idCounter.toString(36).padStart(4, '0');
+  const random = Math.random().toString(36).substring(2, 8);
+  return `${timestamp}-${counter}-${random}`;
 }
 
 export interface IStorage {
@@ -285,4 +289,16 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+let _storage: MemStorage | null = null;
+export const storage: IStorage = new Proxy({} as IStorage, {
+  get(_target, prop) {
+    if (!_storage) {
+      _storage = new MemStorage();
+    }
+    const value = (_storage as any)[prop];
+    if (typeof value === 'function') {
+      return value.bind(_storage);
+    }
+    return value;
+  }
+});
