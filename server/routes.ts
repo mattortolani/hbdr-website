@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { storage } from "./storage";
 import { insertContactLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { fromError } from "zod-validation-error";
-import { renderPage, renderAboutPage, renderHowItWorksPage, renderCareersPage, renderPressPage, renderContactPage, renderBlogPage, renderBlogPostPage, renderBlogAdminPage, renderBlogEditorPage, renderHeaderBiddingPage, renderDisplayAdsPage, renderCtvOttPage, renderInAppAdsPage, renderMcmPage, renderManageAccountPage, renderManageInventoryPage, renderOpenBiddingPage, renderAdExchangePage } from "./template";
+import { renderPage, renderAboutPage, renderHowItWorksPage, renderCareersPage, renderPressPage, renderContactPage, renderBlogPage, renderBlogPostPage, renderBlogAdminPage, renderBlogEditorPage, renderHeaderBiddingPage, renderDisplayAdsPage, renderCtvOttPage, renderInAppAdsPage, renderMcmPage, renderManageAccountPage, renderManageInventoryPage, renderOpenBiddingPage, renderAdExchangePage, renderPrivacyPolicyPage, renderTermsPage, renderGdprCookiePolicyPage, renderFaqSupportPage, renderDashboardPage, renderVideoPlayerPage, renderPartnersPage, renderPublishersPage, renderAdvertisersPage, renderTrustCompliancePage } from "./template";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -40,6 +40,18 @@ export function registerRoutes(app: Hono) {
   app.get("/solutions/manage-inventory", (c) => c.html(renderManageInventoryPage()));
   app.get("/solutions/open-bidding", (c) => c.html(renderOpenBiddingPage()));
   app.get("/solutions/ad-exchange-adx", (c) => c.html(renderAdExchangePage()));
+
+  app.get("/dashboard", (c) => c.html(renderDashboardPage()));
+  app.get("/solutions/video-player", (c) => c.html(renderVideoPlayerPage()));
+  app.get("/partners", (c) => c.html(renderPartnersPage()));
+  app.get("/publishers", (c) => c.html(renderPublishersPage()));
+  app.get("/advertisers", (c) => c.html(renderAdvertisersPage()));
+  app.get("/trust", (c) => c.html(renderTrustCompliancePage()));
+
+  app.get("/privacy-policy", (c) => c.html(renderPrivacyPolicyPage()));
+  app.get("/terms", (c) => c.html(renderTermsPage()));
+  app.get("/gdpr-cookie-policy", (c) => c.html(renderGdprCookiePolicyPage()));
+  app.get("/support", (c) => c.html(renderFaqSupportPage()));
 
   app.get("/blog", async (c) => {
     const posts = await storage.getBlogPosts(true);
