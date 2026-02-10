@@ -4,13 +4,13 @@ import { insertContactLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { fromError } from "zod-validation-error";
 import { checkRateLimit, getClientIp } from "./rateLimit";
 import { sendContactNotification } from "./email";
-import { renderPage, renderAboutPage, renderHowItWorksPage, renderCareersPage, renderPressPage, renderContactPage, renderBlogPage, renderBlogPostPage, renderBlogAdminPage, renderBlogEditorPage, renderHeaderBiddingPage, renderDisplayAdsPage, renderCtvOttPage, renderInAppAdsPage, renderMcmPage, renderManageAccountPage, renderManageInventoryPage, renderOpenBiddingPage, renderAdExchangePage, renderPrivacyPolicyPage, renderTermsPage, renderGdprCookiePolicyPage, renderFaqSupportPage, renderDashboardPage, renderVideoPlayerPage, renderPartnersPage, renderPublishersPage, renderAdvertisersPage, renderTrustCompliancePage } from "./template";
+import { renderPage, renderAboutPage, renderHowItWorksPage, renderCareersPage, renderPressPage, renderContactPage, renderBlogPage, renderBlogPostPage, renderBlogAdminPage, renderBlogEditorPage, renderHeaderBiddingPage, renderDisplayAdsPage, renderCtvOttPage, renderInAppAdsPage, renderMcmPage, renderManageAccountPage, renderManageInventoryPage, renderOpenBiddingPage, renderAdExchangePage, renderPrivacyPolicyPage, renderTermsPage, renderGdprCookiePolicyPage, renderFaqSupportPage, renderDashboardPage, renderVideoPlayerPage, renderPartnersPage, renderPublishersPage, renderAdvertisersPage, renderTrustCompliancePage, SITE_URL } from "./template";
 import { renderPublisherToolsPage } from "./toolsTemplate";
 import { renderAdminLoginPage, renderAdminLeadsPage } from "./adminTemplate";
+import { sanitizeHtml, sanitizeText } from "./sanitize";
 import * as fs from "fs";
 import * as path from "path";
 
-const SESSION_SECRET = process.env.SESSION_SECRET || "hbdr-admin-fallback-secret";
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "hbdr2025!";
 
@@ -38,25 +38,6 @@ function isAuthenticated(cookieHeader: string | undefined): boolean {
     return false;
   }
   return true;
-}
-
-function sanitizeHtml(html: string): string {
-  let result = html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/on\w+\s*=\s*[^\s>]*/gi, '')
-    .replace(/javascript\s*:/gi, 'blocked:')
-    .replace(/data\s*:/gi, 'blocked:')
-    .replace(/vbscript\s*:/gi, 'blocked:');
-  return result;
-}
-
-function sanitizeText(text: string): string {
-  return text.replace(/[<>"'&]/g, (char) => {
-    const entities: Record<string, string> = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
-    return entities[char] || char;
-  });
 }
 
 export function registerRoutes(app: Hono) {
@@ -89,6 +70,37 @@ export function registerRoutes(app: Hono) {
   app.get("/terms", (c) => c.html(renderTermsPage()));
   app.get("/gdpr-cookie-policy", (c) => c.html(renderGdprCookiePolicyPage()));
   app.get("/support", (c) => c.html(renderFaqSupportPage()));
+
+  // SEO routes
+  app.get("/robots.txt", (c) => {
+    return c.text(`User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`);
+  });
+
+  app.get("/sitemap.xml", (c) => {
+    const pages = [
+      "/", "/about", "/how-it-works", "/careers", "/press", "/contact",
+      "/solutions/header-bidding", "/solutions/display-ads", "/solutions/ctv-ott",
+      "/solutions/in-app-ads", "/solutions/mcm", "/solutions/manage-account",
+      "/solutions/manage-inventory", "/solutions/open-bidding", "/solutions/ad-exchange-adx",
+      "/solutions/video-player", "/dashboard", "/partners", "/publishers",
+      "/advertisers", "/trust", "/tools", "/blog",
+      "/privacy-policy", "/terms", "/gdpr-cookie-policy", "/support",
+    ];
+    const urls = pages.map(p => `  <url><loc>${SITE_URL}${p}</loc></url>`).join("\n");
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+    return new Response(xml, {
+      headers: { "Content-Type": "application/xml" },
+    });
+  });
 
   // Blog routes
   app.get("/blog", async (c) => {
