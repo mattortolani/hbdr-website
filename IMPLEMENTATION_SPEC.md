@@ -4,805 +4,512 @@
 
 The finished HBDR website is a production-grade marketing site with the following characteristics:
 
-### Complete Feature Set
 - **26 server-rendered pages** with consistent glassmorphism design, SEO metadata, and responsive layouts
-- **Blog CMS** with authenticated admin panel, persistent storage, rich text editing, image uploads, draft/publish workflow, pagination, search, and category filtering that actually works
-- **Contact form** with server-side validation, persistent lead storage, email notification forwarding, rate limiting, and CAPTCHA/bot protection
-- **SEO optimization** with sitemap.xml, robots.txt, absolute OG image URLs, structured data (JSON-LD), and canonical URLs on every page
-- **Legal pages** with real Privacy Policy, Terms of Service, and Cookie Policy content (NOW DONE)
-- **404/500 error pages** with branded design matching the site aesthetic
-
-### Error Handling & Recovery
-- Try/catch on every async boundary with meaningful error responses
-- Structured error logging with request IDs
-- Graceful degradation when storage fails
-- User-friendly error states in all forms
-
-### Security
-- Authentication on all `/admin/*` routes (session-based or token-based)
-- CSRF protection on all mutation endpoints
-- Rate limiting on contact form and blog API
-- Content Security Policy headers
-- Proper HTML sanitization using a battle-tested library (not regex)
-- Input validation on every user-facing endpoint
-
-### Observability
-- Structured logging with timestamps and request IDs
-- Health check endpoint (`GET /health`)
-- Error tracking integration
-
-### Performance
-- Static asset caching with proper Cache-Control headers
-- Gzip/Brotli compression
-- Lazy loading for below-fold content
-- Optimized image assets (WebP, proper dimensions)
-
-### Testing
-- Unit tests for storage layer, validation schemas, and sanitization
-- Integration tests for all API endpoints
-- E2E smoke tests for critical user flows
-
-### CI/CD
-- Automated linting and type checking on PR
-- Automated test execution
-- Staged deployment (dev -> staging -> production)
-- Rollback capability
+- **Blog CMS** with authentication, persistent storage, category filtering, rich text editor, and content moderation
+- **Contact form** with validation, spam protection, email notifications to sales team, and persistent lead storage
+- **Cloudflare Workers deployment** with a single shared route file (no duplication), proper security headers, and a staging environment
+- **Comprehensive error handling** with branded 404/500 pages, structured logging, and graceful degradation
+- **Security hardened**: input validation on every endpoint, proper HTML sanitization, authentication on admin routes, rate limiting, CSRF protection, CSP headers
+- **SEO optimized**: absolute OG image URLs, sitemap.xml, robots.txt, canonical URLs, JSON-LD structured data
+- **Tested**: E2E tests using the existing data-testid attributes, API endpoint tests, HTML validation
+- **CI/CD**: GitHub Actions running type-check + tests on PR, automated Workers deployment on merge to main
 
 ---
 
 ## Section 2: Current State Audit
 
 | Module/Feature | Status | What Exists | What's Missing |
-|---|---|---|---|
-| **Homepage** | 🔧 PARTIAL | Full layout with hero, features, stats, testimonials, CTA, contact form section. All content renders correctly. | Hardcoded stats, broken social links (`#`), no analytics |
-| **About Page** | 🔧 PARTIAL | Full layout with team section, values, mission, stats. | Hardcoded team data, no real team photos |
-| **How It Works Page** | ✅ DONE | Complete 3-step process, FAQ with Alpine.js accordion, CTA section | - |
-| **Careers Page** | 🔧 PARTIAL | Full layout with benefits, open positions, culture sections | Job listings are hardcoded in template, no application form |
-| **Press Page** | 🔧 PARTIAL | Press releases listed, media contact section, brand assets section | Press releases hardcoded, no downloadable media kit |
-| **Contact Page** | 🔧 PARTIAL | Form with name/email/company/impressions/message fields, Alpine.js state management, success/error states | No email notification, no CAPTCHA, no rate limiting, data not persisted |
-| **Blog Listing** | ⚠️ BROKEN | Page renders with post cards, category filter buttons exist | Category filter buttons change Alpine state but never filter the DOM -- all posts always visible regardless of selection |
-| **Blog Post View** | 🔧 PARTIAL | Individual post rendering with content, tags, author, back link | No related posts, no social share buttons, raw HTML content = XSS risk |
-| **Blog Admin Panel** | ⚠️ BROKEN | CRUD interface exists with list/create/edit/delete | No authentication -- publicly accessible. No image upload. No rich text editor. Data lost on restart |
-| **Blog API (CRUD)** | 🔧 PARTIAL | POST/PUT/DELETE endpoints with Zod validation, slug uniqueness check | No auth, no rate limiting, no pagination, regex-based HTML sanitizer bypassable |
-| **Contact API** | 🔧 PARTIAL | POST endpoint with Zod validation, success/error HTML responses | No rate limiting, no email forwarding, no CAPTCHA, no persistent storage |
-| **Contact Leads API** | ⚠️ BROKEN | GET /api/contact returns all leads as JSON | Completely unauthenticated -- anyone can view all submitted contact data |
-| **10 Solution Pages** | 🔧 PARTIAL | Header Bidding, Display Ads, Video Player, CTV/OTT, In-App, MCM, Manage Account, Manage Inventory, Open Bidding, Ad Exchange AdX -- all render with overview, features, stats, CTA | Content is marketing copy only, no interactive demos or calculators |
-| **Privacy Policy Page** | ✅ DONE | Full legal privacy policy with data collection, use, sharing, GDPR/CCPA rights, cookie info, contact details | - |
-| **Terms & Conditions Page** | ✅ DONE | Full legal terms covering acceptance, services, accounts, payment, IP, liability, termination, governing law (FL) | - |
-| **GDPR & Cookie Policy Page** | ✅ DONE | GDPR rights, data subject rights, cookie table (9 cookies), consent management info, DPO contact | - |
-| **FAQ & Support Page** | 🔧 PARTIAL | 4 FAQ categories (15 items), support channels, support request form | Support form sends wrong fields to /api/contact (schema mismatch -- sends `monthlyPageviews` instead of `impressions`) |
-| **Dashboard Page** | ✅ DONE | Analytics Dashboard marketing page with data dimensions, revenue views, platform features | Links to external `https://dashboard.hbdr.com` (not verified) |
-| **Partners Page** | ✅ DONE | SSP (16), DSP (8), Identity (6), Compliance (7), Technology (8) partners listed by name | - |
-| **Publishers Page** | ✅ DONE | Value props, 5 onboarding steps, managed vs self-serve comparison, requirements, 8 FAQs | - |
-| **Advertisers Page** | ✅ DONE | 3 deal types (PMP, PG, Direct), inventory stats, brand safety features, getting-started steps | - |
-| **Trust & Compliance Page** | ✅ DONE | Supply chain, anti-fraud, privacy sections, 6 certifications, 12 capabilities | - |
-| **Navigation** | ✅ DONE | Desktop nav with Solutions dropdown (10 items incl. Video Player) + Company dropdown (9 items) + standalone Publisher/Advertiser/Partners links. Mobile nav with hamburger + expandable submenus | - |
-| **Footer** | 🔧 PARTIAL | 4-column layout: Solutions, Company, Resources (7 real links), Legal (3 real links), social icons, scroll-to-top button | Social icons (LinkedIn, Twitter/X) still point to `#` |
-| **SEO Meta Tags** | 🔧 PARTIAL | Title, description, og:title, og:description, og:type, og:image, twitter:card on every page | og:image uses relative URL (breaks social previews), no canonical `<link>`, no JSON-LD structured data, no sitemap.xml, no robots.txt |
-| **Static Asset Serving** | 🔧 PARTIAL | `/assets/:filename` serves from `attached_assets/` in dev, `public/assets/` for Workers | File-based serving with fs.readFileSync (blocks event loop), basic MIME type detection |
-| **Cloudflare Worker** | ⚠️ BROKEN | `worker.ts` duplicates route logic from `routes.ts` instead of importing it. **Now 10 pages behind routes.ts** -- missing Privacy Policy, Terms, GDPR, Support, Dashboard, Video Player, Partners, Publishers, Advertisers, Trust | Deploying to Workers will 404 on 10 pages. Any route change requires updating two files. Worker has no static asset fallback |
-| **Data Persistence** | ⚠️ BROKEN | In-memory Maps with seeded blog posts | All data lost on restart. No database. Schema defines PostgreSQL tables via Drizzle but no DB connection exists |
-| **Authentication** | 🔲 PLANNED | `users` table defined in schema.ts, passport/passport-local in dependencies | Zero auth implementation. Schema exists but nothing uses it |
-| **HTML Sanitization** | ⚠️ BROKEN | Regex-based sanitizeHtml() strips script/style tags and event handlers | Duplicated in 2 files, regex approach bypassable, does not handle edge cases (nested tags, encoded entities, SVG-based XSS) |
-| **Design System** | ✅ DONE | Consistent glassmorphism with CSS custom properties, glass-card/glass-btn/glass-input classes, animations | - |
-| **Mobile Responsiveness** | ✅ DONE | All pages responsive via Tailwind breakpoints, mobile nav, touch-friendly | - |
-| **Error Handling** | 🔧 PARTIAL | Try/catch on API routes with console.error and generic 500 responses | No request IDs, no structured logging, no user-friendly error pages, no 404 page |
-| **Testing** | 📋 REQUIRED | Nothing exists | No unit tests, integration tests, or E2E tests |
-| **CI/CD** | 📋 REQUIRED | Nothing exists | No automated pipeline, manual deployment only |
-| **Rate Limiting** | 📋 REQUIRED | Nothing exists | No rate limiting on any endpoint |
-| **CSRF Protection** | 📋 REQUIRED | Nothing exists | No CSRF tokens on any forms |
-| **Logging** | 🔧 PARTIAL | Hono logger middleware for request logging, console.error for errors | No structured format, no request IDs, no log levels |
-| **Health Check** | 📋 REQUIRED | Nothing exists | No health check endpoint |
-| **Privacy Policy Page** | ✅ DONE | Full legal page at `/privacy-policy` with comprehensive content | - |
-| **Terms of Service Page** | ✅ DONE | Full legal page at `/terms` with comprehensive content | - |
-| **Sitemap & Robots** | 📋 REQUIRED | Nothing exists | No sitemap.xml, no robots.txt |
-| **404 Error Page** | 📋 REQUIRED | Nothing exists | Hono default plain text "404 Not Found" |
+|----------------|--------|-------------|----------------|
+| **Homepage** | 🔧 PARTIAL | Full hero, solutions grid, comparison table, testimonials, stats, logo carousel | Stats hardcoded, no analytics, Tailwind CDN play mode (not production-ready) |
+| **About Page** | ✅ DONE | Mission, timeline (2000-2025), team values, CTA | - |
+| **How It Works Page** | ✅ DONE | 3-step process, 6 FAQs with accordion, CTA | - |
+| **Careers Page** | ✅ DONE | Benefits (7), open positions (6), CTA | Positions likely placeholder data |
+| **Press Page** | ✅ DONE | Press releases (6), media contact info | - |
+| **Contact Page** | 🔧 PARTIAL | Contact form with Alpine.js validation and submission | Leads stored in-memory only, never forwarded (email/webhook), no spam protection, no rate limiting |
+| **9 Solution Pages** | ✅ DONE | Header Bidding, Display Ads, CTV/OTT, In-App, MCM, Manage Account, Manage Inventory, Open Bidding, Ad Exchange AdX | - |
+| **Video Player Page** | ✅ DONE | Instream, outstream, floating/sticky, mobile formats, revenue engine, specs | - |
+| **Privacy Policy** | ✅ DONE | Full privacy policy with GDPR/CCPA rights, data practices, DPO contact | - |
+| **Terms & Conditions** | ✅ DONE | Full T&C with Florida governing law | - |
+| **GDPR & Cookie Policy** | ✅ DONE | GDPR rights, cookie table (10 cookies), consent management | - |
+| **FAQ & Support Page** | 🔧 PARTIAL | 15 FAQs in 4 categories, support channels, support form | **Support form sends wrong fields** -- schema mismatch with /api/contact |
+| **Dashboard Page** | ✅ DONE | Marketing page with features, data dimensions, links to dashboard.hbdr.com | External link unverified |
+| **Partners Page** | ✅ DONE | 45 named partners across SSP, DSP, identity, compliance, tech categories | - |
+| **Publishers Page** | ✅ DONE | Value props, 5-step onboarding, requirements, 8 FAQs | - |
+| **Advertisers Page** | ✅ DONE | 3 deal types, inventory stats, brand safety, getting-started steps | - |
+| **Trust & Compliance Page** | ✅ DONE | Supply chain, anti-fraud, privacy, certifications, capabilities | - |
+| **Navigation** | ✅ DONE | Solutions dropdown (10), Company dropdown (9), Publisher/Advertiser/Partners standalone, mobile hamburger | - |
+| **Footer** | 🔧 PARTIAL | Resources (7 real links), Legal (3 real links), Solutions, Company columns, scroll-to-top | LinkedIn and Twitter/X social icons still `href="#"` |
+| **SEO Meta Tags** | 🔧 PARTIAL | title, description, og:title, og:description, og:type, og:image, twitter:card on every page | og:image uses relative URL, no canonical link, no JSON-LD, no sitemap.xml, no robots.txt |
+| **Blog Listing** | 🔧 PARTIAL | Blog page with post cards, category filter buttons, active styling | **Category filters broken**: buttons update Alpine state but posts aren't filtered |
+| **Blog Post View** | ✅ DONE | Individual post with prose styling, author, date, category, related CTA | - |
+| **Blog Admin** | ⚠️ BROKEN | Full CRUD admin panel (list, create, edit, delete) | **No authentication** -- publicly accessible. Anyone can modify all blog content |
+| **Blog Editor** | 🔧 PARTIAL | Form with title, slug, excerpt, content (textarea), author, category, tags, publish toggle | No rich text editor, no preview, no image upload |
+| **Blog API** | 🔧 PARTIAL | POST/PUT/DELETE /api/blog with Zod validation, slug uniqueness | No auth, regex sanitization bypassable, published is string not boolean |
+| **Contact API** | 🔧 PARTIAL | POST /api/contact with Zod validation, HTML success/error response | No auth on GET /api/contact (PII exposure), leads lost on restart, no email forwarding |
+| **Cloudflare Worker** | ⚠️ BROKEN | worker.ts with 16 of 26 page routes + all API routes | **Missing 10 page routes**. sanitizeHtml duplicated. Cannot import from routes.ts. |
+| **Authentication** | 📋 REQUIRED | Schema defines users table, IStorage has user methods, MemStorage has users Map | No login page, no session handling, no middleware, no password hashing. Users Map never populated |
+| **Data Persistence** | 📋 REQUIRED | IStorage interface designed for swappable backends. Drizzle pgTable definitions exist in schema.ts | Only MemStorage (in-memory Maps) implemented. No database connection, no migration scripts |
+| **Error Pages** | 📋 REQUIRED | Not mentioned anywhere | No 404 page, no 500 page. Hono returns plain text |
+| **Testing** | 📋 REQUIRED | data-testid attributes on key elements | No test framework, no test files, no CI |
+| **CI/CD** | 📋 REQUIRED | wrangler.toml configured | No GitHub Actions, no automated deploy, no staging |
+| **Rate Limiting** | 📋 REQUIRED | Not mentioned anywhere | No rate limiting on any endpoint |
+| **CSRF Protection** | 📋 REQUIRED | Not mentioned anywhere | No CSRF tokens, no same-origin checks |
+| **Security Headers** | 📋 REQUIRED | Not mentioned anywhere | No CSP, no HSTS, no X-Frame-Options |
+| **HTML Sanitization** | ⚠️ BROKEN | Regex-based sanitizeHtml() in routes.ts and worker.ts | Regex HTML sanitization is fundamentally bypassable |
 
 ---
 
 ## Section 3: Dependency & Security Audit
 
-### Actually Used Dependencies
+### Runtime Dependencies
 
 | Package | Version | Status | Notes |
 |---------|---------|--------|-------|
 | hono | ^4.11.9 | OK | Active, well-maintained |
-| @hono/node-server | ^1.19.9 | OK | Official Hono package |
 | zod | ^3.24.2 | OK | Active, well-maintained |
 | zod-validation-error | ^3.4.0 | OK | Active |
-| @cloudflare/workers-types | ^4.20260207.0 | OK | Type definitions only |
-| wrangler | ^4.63.0 | OK | Cloudflare CLI |
-| tsx | ^4.20.5 | OK | Dev-only TypeScript runner |
-| esbuild | ^0.25.0 | OK | Build tool |
-| typescript | 5.6.3 | OK | Language |
+| drizzle-orm | ^0.39.3 | OK | Active. Only pgTable/type exports used -- no DB connection |
+| drizzle-zod | ^0.7.0 | OK | Active. createInsertSchema used |
 
-### Unused Dependencies (Should Be Removed)
-~50+ packages are installed but never imported. See ARCHITECTURE.md "Unused Dependencies" section for the full list. Key categories:
-- **React ecosystem** (react, react-dom, 20+ Radix UI packages, tanstack query, etc.)
-- **Express ecosystem** (express, express-session, passport, passport-local)
-- **Database** (drizzle-orm, drizzle-zod, drizzle-kit, pg, connect-pg-simple)
-- **Misc** (@octokit/rest, ws, date-fns, framer-motion, recharts, etc.)
+### Missing Dependencies
+
+| Package | Required By | Impact |
+|---------|------------|--------|
+| @hono/node-server | server/index.ts | **Dev server will crash** after npm install |
+| tsx | npm run dev (removed) | No way to run dev server without reinstating script |
+
+### Dev Dependencies
+
+| Package | Version | Status | Notes |
+|---------|---------|--------|-------|
+| @cloudflare/workers-types | ^4.20260207.0 | OK | Current |
+| wrangler | ^4.63.0 | OK | Current |
+| typescript | 5.6.3 | OK | Stable release |
+
+### CDN Dependencies (no version pinning)
+
+| Library | Loaded Version | Risk |
+|---------|---------------|------|
+| Tailwind CSS | Latest via cdn.tailwindcss.com | **HIGH**: Play CDN is explicitly not for production. Loads full Tailwind JIT at runtime. Performance and reliability risk |
+| DaisyUI | 4.12.14 | LOW: Version pinned |
+| HTMX | 2.0.4 | LOW: Version pinned, but **never used** |
+| Alpine.js | 3.14.8 | LOW: Version pinned |
+| Alpine.js Intersect | 3.14.8 | LOW: Version pinned |
+| Figtree font | Latest | LOW: Google Fonts are stable |
+| Instrument Serif font | Latest | LOW: Google Fonts are stable |
 
 ### Security Issues
 
 | Issue | Severity | Details |
 |-------|----------|---------|
-| No authentication on admin | **CRITICAL** | `/admin/blog`, `/api/blog` POST/PUT/DELETE, `/api/contact` GET are all publicly accessible |
-| Regex-based HTML sanitization | **HIGH** | `sanitizeHtml()` uses regex to strip dangerous HTML. Regex-based sanitization is fundamentally flawed and bypassable with mixed case, encoding tricks, or nested constructs |
-| No CSRF protection | **HIGH** | All mutation endpoints accept requests from any origin with no token verification |
-| No rate limiting | **MEDIUM** | Contact form and blog API can be spammed without limit |
-| No CSP headers | **MEDIUM** | No Content-Security-Policy header. Uses `<script src="https://cdn.tailwindcss.com">` which requires `unsafe-eval` in CSP |
-| Raw HTML rendering | **HIGH** | Blog post `content` field is rendered directly into page HTML via `${post.content}`. Even with sanitization, this is a persistent XSS vector |
-| GET /api/contact exposes all leads | **HIGH** | Any visitor can `GET /api/contact` and see all submitted contact form data (names, emails, companies, messages) |
-| No input length limits | **LOW** | Blog content, messages have no max length -- potential for large payload abuse |
-
-### Missing Security Practices
-- No HTTPS enforcement (Cloudflare handles this at the edge, but no redirect in app)
-- No Helmet-style security headers (X-Frame-Options, X-Content-Type-Options, etc.)
-- No input sanitization on contact form fields (names, company names)
-- No secure cookie configuration (no cookies used currently, but relevant when auth is added)
+| No authentication | CRITICAL | Admin panel and contact lead API publicly accessible |
+| PII exposure via GET /api/contact | CRITICAL | All submitted contact leads (names, emails, companies) readable by anyone |
+| Regex HTML sanitization | HIGH | sanitizeHtml() uses regex to strip dangerous HTML. Regex parsing of HTML is inherently unreliable. Bypassable via encoding, case tricks, mutation XSS |
+| No CSRF protection | HIGH | POST endpoints accept any origin. No token validation |
+| No rate limiting | HIGH | APIs can be spammed without limit |
+| No CSP header | MEDIUM | No Content-Security-Policy. XSS has no browser-side mitigation |
+| No SRI on CDN scripts | MEDIUM | CDN compromise could inject arbitrary code into every page |
+| Tailwind Play CDN | MEDIUM | Not intended for production use per Tailwind docs |
+| No HTTPS enforcement | LOW | No HSTS header. Cloudflare handles HTTPS but browser-side enforcement missing |
 
 ---
 
 ## Section 4: Implementation Phases
 
-### Phase 0: Critical Fixes
-**Goal**: Fix anything broken that blocks other work or poses immediate security risk.
+### Phase 0: Critical Fixes (unblock development and deployment)
 
-1. Add basic auth to admin routes (blocks any safe blog management)
-2. Replace regex sanitizeHtml with a proper library
-3. Protect GET /api/contact behind auth
-4. Fix blog category filter functionality
-5. Deduplicate worker.ts route logic (import from shared source)
+**Goal**: Make the project installable, runnable, and deployable without data loss on critical pages.
 
-### Phase 1: Complete Core
-**Goal**: All 🔧 PARTIAL items become ✅ DONE. All ⚠️ BROKEN items become ✅ DONE or removed.
+1. Add `@hono/node-server` to package.json dependencies
+2. Generate package-lock.json via `npm install`
+3. Add `"dev": "npx tsx server/index.ts"` script back to package.json
+4. Sync worker.ts with routes.ts (add 10 missing page route imports and registrations)
+5. Fix support form schema mismatch in renderFaqSupportPage()
 
-1. Add persistent storage (Cloudflare D1 or KV for Workers, SQLite/PostgreSQL for Node)
-2. Create 404 error page with branded design
-3. Fix footer links (add real legal pages or remove broken links)
-4. Fix OG image URLs to be absolute
-5. Add sitemap.xml and robots.txt
-6. Add blog post pagination
-7. Clean up unused dependencies from package.json
+### Phase 1: Complete Core (all PARTIAL → DONE, all BROKEN → DONE)
 
-### Phase 2: Harden
-**Goal**: Error handling, input validation, and edge cases.
+**Goal**: Every feature works correctly for primary use cases.
 
-1. Add CSRF protection to all mutation endpoints
-2. Add rate limiting to contact form and blog API
-3. Add structured error logging with request IDs
-4. Add CSP headers
-5. Add input length limits on all text fields
-6. Add proper error pages (500, 403)
-7. Validate and sanitize all user inputs (not just blog content)
+1. Fix blog category filters (add x-show to post cards)
+2. Add basic auth middleware to admin routes and contact lead GET
+3. Deduplicate routes: refactor routes.ts into importable function, have worker.ts import it
+4. Replace regex sanitizeHtml with a real HTML sanitizer library (e.g., sanitize-html or DOMPurify)
+5. Add branded 404 and 500 error pages
+6. Fix OG image URLs to be absolute
+7. Add sitemap.xml and robots.txt routes
+8. Remove HTMX CDN script (loaded but never used)
+9. Clean up orphaned files (components.json, client/, script/build.ts)
+10. Update README.md to reflect current state
 
-### Phase 3: Optimize
-**Goal**: Performance, caching, bundle size.
+### Phase 2: Harden (error handling, validation, edge cases)
 
-1. Remove ~50 unused npm dependencies (reduce install size dramatically)
-2. Add proper Cache-Control headers for static assets
-3. Optimize images (convert JPEG logos to WebP, proper dimensions)
-4. Split template.ts monolith into separate page files
-5. Add gzip/brotli compression middleware
+**Goal**: Robust error handling, proper validation, and graceful degradation.
+
+1. Add try/catch with structured error responses to all async route handlers
+2. Add Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, HSTS headers via Hono middleware
+3. Add rate limiting middleware (per-IP) on contact and blog API endpoints
+4. Add CSRF protection (origin checking or token-based)
+5. Add SRI hashes to CDN script/link tags
+6. Add input length limits to prevent oversized payloads
+7. Add request logging with correlation IDs
+8. Handle malformed JSON gracefully (currently throws unhandled)
+
+### Phase 3: Optimize (performance, caching, bundle)
+
+**Goal**: Production-grade performance.
+
+1. Replace Tailwind Play CDN with built CSS file (proper Tailwind build step)
+2. Add Cache-Control headers for static pages (or use Cloudflare cache rules)
+3. Lazy-load below-fold images
+4. Add image optimization (convert JPEGs to WebP, add srcset)
+5. Minify inline CSS in renderHead()
+6. Consider splitting template.ts into per-page modules for maintainability
 
 ### Phase 4: Production Infrastructure
-**Goal**: CI/CD, environments, monitoring.
 
-1. Add GitHub Actions CI pipeline (lint, type-check, test)
-2. Add health check endpoint
-3. Configure staging environment
-4. Add automated Cloudflare Workers deployment
-5. Set up error monitoring/alerting
+**Goal**: Reliable deployment pipeline with monitoring.
+
+1. Add GitHub Actions CI: TypeScript type-check on every PR
+2. Add GitHub Actions CD: Deploy to Cloudflare Workers on merge to main
+3. Set up staging environment (separate Workers project)
+4. Add persistent storage (Cloudflare D1 or KV, implementing IStorage)
+5. Add health check endpoint (GET /api/health)
+6. Set up email forwarding for contact leads (Cloudflare Email Workers or webhook)
 
 ### Phase 5: Enterprise Grade
-**Goal**: Full observability, admin tooling, compliance.
 
-1. Add comprehensive test suite (unit + integration)
-2. Add admin dashboard for contact lead management
-3. Add privacy policy and terms of service pages with real content
-4. Add cookie consent banner
-5. Add structured data (JSON-LD) for SEO
-6. Add analytics integration
+**Goal**: Production-ready for real business traffic.
+
+1. Add full authentication system (login, sessions, password hashing)
+2. Add rate limiting per API key for future API consumers
+3. Add audit logging for admin actions
+4. Add comprehensive E2E test suite using data-testid attributes
+5. Add admin dashboard with contact lead management
+6. Add blog image upload and management
+7. Add rich text editor for blog content
+8. Add analytics integration
 
 ---
 
 ## Section 5: Task Breakdown
 
-### Task 0-1: Add Basic Authentication to Admin Routes
+### Task 0-1: Add Missing Dependencies and Restore Dev Workflow
 **Status**: 🔲 Not Started
-**Phase**: Phase 0 - Critical Fixes
-**Priority**: High
-**Complexity**: M (1-4hr)
-**Depends On**: None
-**Files**: `server/routes.ts`, `worker.ts`, `server/storage.ts`, `shared/schema.ts`
-
-**Context**: The blog admin panel at `/admin/blog`, `/admin/blog/new`, `/admin/blog/edit/:id`, and all blog mutation API endpoints (`POST /api/blog`, `PUT /api/blog/:id`, `DELETE /api/blog/:id`) are completely unauthenticated. Anyone on the internet can create, edit, or delete blog posts. The `GET /api/contact` endpoint also exposes all submitted contact leads to any visitor.
-
-**Requirements**:
-1. Add a Hono middleware that checks for a valid admin session or API key on all routes matching `/admin/*` and `/api/blog` (POST/PUT/DELETE) and `/api/contact` (GET)
-2. Implement a simple login page at `/admin/login` that accepts a username/password
-3. Store admin credentials as environment variables (`ADMIN_USERNAME`, `ADMIN_PASSWORD`) -- not hardcoded
-4. Use Hono's built-in `basicAuth` middleware or a session-cookie approach
-5. Redirect unauthenticated requests to `/admin/login`
-6. For Cloudflare Workers, use `wrangler secret` for credentials and `c.env` to access them
-
-**Acceptance Criteria**:
-- [ ] Visiting `/admin/blog` without auth redirects to `/admin/login`
-- [ ] `POST /api/blog` without auth returns 401
-- [ ] `GET /api/contact` without auth returns 401
-- [ ] Valid credentials allow access to admin panel
-- [ ] Credentials are read from environment variables, not hardcoded
-
-**Implementation Notes**: Hono has a built-in `basicAuth` middleware that works on both Node.js and Cloudflare Workers. This is the simplest approach for an MVP. The `users` table already exists in `shared/schema.ts` but implementing full session auth is out of scope for this task -- basic auth is sufficient.
-
----
-
-### Task 0-2: Replace Regex-Based HTML Sanitizer with a Proper Library
-**Status**: 🔲 Not Started
-**Phase**: Phase 0 - Critical Fixes
+**Phase**: Phase 0 -- Critical Fixes
 **Priority**: High
 **Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `server/routes.ts`, `worker.ts`
-
-**Context**: The `sanitizeHtml()` function in both `routes.ts` (lines 9-21) and `worker.ts` (lines 19-29) uses regex to strip `<script>`, `<style>`, event handler attributes, and `javascript:` URIs. Regex-based HTML sanitization is fundamentally flawed -- it can be bypassed with mixed-case tags (`<ScRiPt>`), HTML entity encoding (`&#x3C;script>`), or nested/malformed constructs. Blog post content is rendered directly into page HTML as `${post.content}`, making this a persistent XSS vulnerability.
-
-**Requirements**:
-1. Install `sanitize-html` (npm package, works in both Node.js and Workers) or `isomorphic-dompurify`
-2. Create a shared `server/sanitize.ts` module exporting a `sanitizeHtml(html: string): string` function
-3. Configure the sanitizer to allow the same tags currently in the `allowedTags` array in routes.ts: `h1-h6, p, a, ul, ol, li, strong, em, b, i, br, blockquote, pre, code, img, span, div, hr, table, thead, tbody, tr, th, td`
-4. Allow `href`, `src`, `alt`, `class`, `target`, `rel`, `width`, `height` attributes
-5. Strip everything else (scripts, event handlers, iframes, objects, embeds)
-6. Import this shared module in both `routes.ts` and `worker.ts`, replacing the inline regex functions
-7. Remove the duplicated inline `sanitizeHtml()` functions from both files
-
-**Acceptance Criteria**:
-- [ ] `sanitizeHtml('<script>alert(1)</script>')` returns empty string or stripped content
-- [ ] `sanitizeHtml('<img src=x onerror=alert(1)>')` returns `<img src="x">` (no onerror)
-- [ ] `sanitizeHtml('<ScRiPt>alert(1)</ScRiPt>')` returns empty string (case-insensitive)
-- [ ] `sanitizeHtml('<p>Hello <strong>world</strong></p>')` returns the input unchanged
-- [ ] Only one `sanitizeHtml` implementation exists (in `server/sanitize.ts`)
-- [ ] Both `routes.ts` and `worker.ts` import from the same module
-
-**Implementation Notes**: `sanitize-html` is the most common choice and works in Node.js. For Cloudflare Workers compatibility, verify it doesn't depend on Node.js-specific APIs (it should be fine since it's pure JS). If not, consider `xss` npm package which is also pure JS.
-
----
-
-### Task 0-3: Protect Contact Leads API Endpoint
-**Status**: 🔲 Not Started
-**Phase**: Phase 0 - Critical Fixes
-**Priority**: High
-**Complexity**: S (< 1hr)
-**Depends On**: Task 0-1
-**Files**: `server/routes.ts`, `worker.ts`
-
-**Context**: `GET /api/contact` at `routes.ts:191-199` returns all submitted contact leads as JSON with no authentication. This exposes names, email addresses, company names, and messages of everyone who has submitted the contact form.
-
-**Requirements**:
-1. Apply the same auth middleware from Task 0-1 to the `GET /api/contact` route
-2. Unauthenticated requests should return `401 { message: "Unauthorized" }`
-3. Apply the same change in `worker.ts`
-
-**Acceptance Criteria**:
-- [ ] `GET /api/contact` without auth returns 401
-- [ ] `GET /api/contact` with valid admin auth returns the leads array
-- [ ] Change is applied in both `routes.ts` and `worker.ts`
-
-**Implementation Notes**: This is a one-liner if Task 0-1's auth middleware is implemented as a reusable Hono middleware.
-
----
-
-### Task 0-4: Fix Blog Category Filter
-**Status**: 🔲 Not Started
-**Phase**: Phase 0 - Critical Fixes
-**Priority**: Medium
-**Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `server/template.ts`
-
-**Context**: In `renderBlogPage()` (template.ts around line 1930), the blog listing page has category filter buttons that use Alpine.js `x-data="{ activeCategory: '' }"`. Clicking a button changes `activeCategory` state, but no `x-show` or `x-if` directive on the post cards references this state. All posts are always visible regardless of which category filter is selected.
-
-**Requirements**:
-1. Move the `x-data="{ activeCategory: '' }"` from the filter button container to a parent element that wraps both the filters and the post grid
-2. Add `x-show="!activeCategory || activeCategory === '${post.category}'"` to each blog post `<article>` element in `renderBlogPage()`
-3. Add `x-transition` to the articles for smooth show/hide
-
-**Acceptance Criteria**:
-- [ ] Clicking "All Posts" shows all blog posts
-- [ ] Clicking a category (e.g., "Industry Trends") shows only posts in that category
-- [ ] Clicking the same category again deselects it and shows all posts
-- [ ] Posts smoothly transition when filtered
-
-**Implementation Notes**: The Alpine.js state and button logic already work correctly -- the only missing piece is connecting the state to the post visibility. This is a template-only change.
-
----
-
-### Task 0-5: Deduplicate Worker Route Logic
-**Status**: 🔲 Not Started
-**Phase**: Phase 0 - Critical Fixes
-**Priority**: High
-**Complexity**: M (1-4hr)
-**Depends On**: None
-**Files**: `worker.ts`, `server/routes.ts`
-
-**Context**: `worker.ts` (177 lines) re-implements route handlers from `server/routes.ts` (212 lines) but is now **10 pages behind**. The worker is missing all routes for: Privacy Policy, Terms, GDPR & Cookie Policy, FAQ & Support, Dashboard, Video Player, Partners, Publishers, Advertisers, and Trust & Compliance. The `sanitizeHtml()` function is also duplicated. This means the production Cloudflare Workers deployment will 404 on 10 pages, including legal pages linked from every page's footer.
-
-**Requirements**:
-1. Refactor `server/routes.ts` so that route registration logic is independent of the Node.js `fs` module (the only Node-specific code is the `/assets/:filename` handler)
-2. Extract the `/assets/:filename` handler as a separate, conditionally-registered route
-3. Modify `worker.ts` to import and call `registerRoutes(app)` from `server/routes.ts`
-4. Remove all duplicated route definitions from `worker.ts`
-5. Ensure the worker still works (no Node.js-only imports at the top level of shared code)
-
-**Acceptance Criteria**:
-- [ ] `worker.ts` is reduced to ~10 lines: import Hono, import registerRoutes, create app, register routes, export default app
-- [ ] All route logic exists in exactly one place (`server/routes.ts`)
-- [ ] `npm run dev` still works (Node.js dev server)
-- [ ] `npx wrangler dev` still works (Workers local dev)
-- [ ] No `fs` or `path` imports at the top level of `routes.ts` (conditionally imported or behind a platform check)
-
-**Implementation Notes**: The `/assets/:filename` route uses `fs.readFileSync` and `path.join` which don't exist in Workers. Two approaches: (a) Dynamically import `fs`/`path` only inside the route handler and only register the route when not in Workers, or (b) Move the static asset route to a separate file and only import it in `server/index.ts`. Option (b) is cleaner.
-
----
-
-### Task 1-1: Add Persistent Storage
-**Status**: 🔲 Not Started
-**Phase**: Phase 1 - Complete Core
-**Priority**: High
-**Complexity**: L (4hr+)
-**Depends On**: Task 0-5
-**Files**: `server/storage.ts`, `shared/schema.ts`, `wrangler.toml`
-
-**Context**: All data is stored in in-memory JavaScript Maps. Blog posts are seeded on startup but any user-created posts, edits, or contact submissions are lost when the server restarts or the Worker cold-starts. The `shared/schema.ts` file already defines PostgreSQL table schemas via Drizzle ORM but no database connection exists.
-
-**Requirements**:
-1. For Cloudflare Workers: Add Cloudflare D1 (SQLite) binding in `wrangler.toml`
-2. Create a `D1Storage` class implementing the existing `IStorage` interface
-3. Create migration scripts to set up the `blog_posts` and `contact_leads` tables in D1
-4. For Node.js dev: Use `better-sqlite3` as a local SQLite database to mirror D1's behavior
-5. Keep `MemStorage` as a fallback (useful for testing) but make persistent storage the default
-6. Seed blog posts only if the database is empty (first run)
-7. Update the storage export to use environment detection: D1 in Workers, SQLite in Node.js dev
-
-**Acceptance Criteria**:
-- [ ] Blog posts persist across server restarts in both dev and production
-- [ ] Contact leads persist across server restarts
-- [ ] Seed data is only inserted on first run (empty database)
-- [ ] `IStorage` interface is unchanged (existing code works without modification)
-- [ ] `npx wrangler dev` works with D1 local mode
-- [ ] `npm run dev` works with local SQLite
-
-**Implementation Notes**: Cloudflare D1 uses SQLite syntax. The Drizzle ORM schemas in `shared/schema.ts` define PostgreSQL-specific types (`pgTable`). For D1, you'd either switch to Drizzle's SQLite adapter or write raw SQL migrations. Since the schema is simple (2 tables, no joins, no complex queries), raw SQL migrations are simpler and avoid the Drizzle dependency entirely. Consider removing Drizzle and using D1's native API directly.
-
----
-
-### Task 1-2: Create Branded 404 Error Page
-**Status**: 🔲 Not Started
-**Phase**: Phase 1 - Complete Core
-**Priority**: Medium
-**Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `server/template.ts`, `server/routes.ts`, `worker.ts`
-
-**Context**: Requesting any undefined route returns Hono's default "404 Not Found" plain text response. This is a poor user experience on a polished marketing site.
-
-**Requirements**:
-1. Add a `renderNotFoundPage()` function to `template.ts` that uses `renderLayout()` with a branded 404 page
-2. Include the standard nav/footer, a large "404" heading, a "Page not found" message, and a "Go Home" button linking to `/`
-3. Register a catch-all route `app.notFound()` in `routes.ts` that returns `c.html(renderNotFoundPage(), 404)`
-
-**Acceptance Criteria**:
-- [ ] Visiting `/nonexistent-page` shows a branded 404 page with nav and footer
-- [ ] HTTP status code is 404 (not 200)
-- [ ] "Go Home" button links to `/`
-- [ ] Page matches the site's glassmorphism design
-
-**Implementation Notes**: Hono's `app.notFound((c) => ...)` handler catches all unmatched routes. Place it after all other route registrations.
-
----
-
-### Task 1-3: Fix Footer Links
-**Status**: 🔲 Not Started
-**Phase**: Phase 1 - Complete Core
-**Priority**: Medium
-**Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `server/template.ts`
-
-**Context**: In `renderFooter()` (template.ts lines 567-643), several link groups point to `"#"`: social media icons (LinkedIn, Twitter/X, email), Resources column (Case Studies, Documentation, Support, FAQ), and Legal column (Privacy Policy, Terms of Service, Cookie Policy, GDPR). These are dead links that look unprofessional.
-
-**Requirements**:
-1. Remove the Resources column links that have no corresponding pages (Case Studies, Documentation, Support, FAQ) or replace them with `/blog` and `/contact` where appropriate
-2. Remove the Legal column links that have no corresponding pages, or create stub pages for them (Privacy Policy, Terms, Cookie Policy, GDPR)
-3. For social media links: either set them to real HBDR social media URLs (if they exist) or remove the social icons entirely
-4. Keep the email social icon and link it to `mailto:contact@hbdr.com`
-
-**Acceptance Criteria**:
-- [ ] No links in the footer point to `"#"`
-- [ ] Every footer link either navigates to a real page or has been removed
-- [ ] Email icon links to `mailto:contact@hbdr.com`
-
-**Implementation Notes**: This is a template-only change. If real social URLs aren't available, removing the icons is better than leaving broken `#` links.
-
----
-
-### Task 1-4: Fix OG Image URLs
-**Status**: 🔲 Not Started
-**Phase**: Phase 1 - Complete Core
-**Priority**: Medium
-**Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `server/template.ts`
-
-**Context**: In `renderHead()` (template.ts line 21), `<meta property="og:image">` uses a relative URL: `/assets/HBDR_Logo_Pack_all_sizes_-_2_1770577514801.jpeg`. Social media crawlers (Facebook, Twitter, LinkedIn) require absolute URLs to fetch OG images. The current relative URL means social previews show no image.
-
-**Requirements**:
-1. Add a `siteUrl` configuration (e.g., `https://hbdr.com` or read from environment variable `SITE_URL`)
-2. Prepend `siteUrl` to the `og:image` meta content to make it absolute
-3. Also fix `og:url` to be a full absolute URL (currently `${options.canonicalPath || '/'}` which is relative)
-4. Add a `<link rel="canonical">` tag using the absolute URL
-
-**Acceptance Criteria**:
-- [ ] `og:image` contains a full URL starting with `https://`
-- [ ] `og:url` contains a full URL starting with `https://`
-- [ ] A `<link rel="canonical">` tag is present on every page
-- [ ] The site URL is configurable via environment variable, not hardcoded
-
-**Implementation Notes**: For Cloudflare Workers, the site URL can be set as a `[vars]` in `wrangler.toml`. For dev, it can default to `http://localhost:5000`.
-
----
-
-### Task 1-5: Add sitemap.xml and robots.txt
-**Status**: 🔲 Not Started
-**Phase**: Phase 1 - Complete Core
-**Priority**: Medium
-**Complexity**: S (< 1hr)
-**Depends On**: Task 1-4
-**Files**: `server/routes.ts`
-
-**Context**: The site has no `sitemap.xml` or `robots.txt`, which are basic SEO requirements. Search engines rely on these to discover and index pages.
-
-**Requirements**:
-1. Add a `GET /sitemap.xml` route that generates an XML sitemap containing all page URLs (homepage, about, how-it-works, careers, press, contact, all 9 solution pages, blog listing)
-2. Include dynamic blog post URLs by querying `storage.getBlogPosts(true)` for published posts
-3. Add a `GET /robots.txt` route that allows all crawlers and references the sitemap URL
-4. Block `/admin/*` paths in robots.txt
-5. Use the `SITE_URL` from Task 1-4 for absolute URLs
-
-**Acceptance Criteria**:
-- [ ] `GET /sitemap.xml` returns valid XML with all page URLs
-- [ ] Blog post URLs are dynamically included in the sitemap
-- [ ] `GET /robots.txt` returns valid robots.txt content
-- [ ] `/admin/*` is disallowed in robots.txt
-- [ ] Both endpoints return correct Content-Type headers
-
-**Implementation Notes**: The sitemap should be generated dynamically (not a static file) so blog posts are always up to date. Set `Content-Type: application/xml` for the sitemap and `Content-Type: text/plain` for robots.txt.
-
----
-
-### Task 1-6: Add Blog Pagination
-**Status**: 🔲 Not Started
-**Phase**: Phase 1 - Complete Core
-**Priority**: Low
-**Complexity**: M (1-4hr)
-**Depends On**: None
-**Files**: `server/template.ts`, `server/routes.ts`, `server/storage.ts`
-
-**Context**: The blog listing page renders all posts at once. As the number of posts grows, this page will become very long and slow.
-
-**Requirements**:
-1. Add `page` and `limit` query parameters to `GET /blog` (default: page=1, limit=12)
-2. Update `storage.getBlogPosts()` to accept `offset` and `limit` parameters
-3. Add pagination UI to `renderBlogPage()`: Previous/Next buttons, current page indicator
-4. Generate pagination links as standard `<a>` tags (not Alpine.js) for SEO crawlability
-
-**Acceptance Criteria**:
-- [ ] `/blog` shows first 12 posts
-- [ ] `/blog?page=2` shows posts 13-24
-- [ ] Previous/Next buttons navigate between pages
-- [ ] Page 1 has no Previous button; last page has no Next button
-- [ ] URL updates when navigating pages (standard link navigation, not JS)
-
-**Implementation Notes**: Keep it simple -- server-rendered pagination with full page reloads. No infinite scroll or client-side pagination needed.
-
----
-
-### Task 1-7: Remove Unused Dependencies
-**Status**: 🔲 Not Started
-**Phase**: Phase 1 - Complete Core (also Phase 3 - Optimize)
-**Priority**: Medium
-**Complexity**: M (1-4hr)
 **Depends On**: None
 **Files**: `package.json`
 
-**Context**: `package.json` lists ~70 dependencies, of which ~10 are actually used. The rest are remnants of a prior React/Express/PostgreSQL architecture that was abandoned in favor of the current Hono/Alpine.js stack. This wastes disk space, increases install time, and creates confusion about the actual tech stack.
+**Context**: `@hono/node-server` is imported in `server/index.ts:1` but was accidentally removed from package.json during the dependency cleanup. There is no lockfile and no node_modules. The `dev` script was also removed, so there's no way to run the dev server.
 
 **Requirements**:
-1. Remove all React packages: `react`, `react-dom`, `@tanstack/react-query`, `react-hook-form`, `@hookform/resolvers`, `react-day-picker`, `react-icons`, `react-resizable-panels`, `recharts`, `framer-motion`, `next-themes`, `lucide-react`, `cmdk`, `embla-carousel-react`, `input-otp`, `vaul`, `wouter`
-2. Remove all Radix UI packages (20+ `@radix-ui/react-*` packages)
-3. Remove unused styling packages: `class-variance-authority`, `clsx`, `tailwind-merge`, `tailwindcss-animate`, `tw-animate-css`
-4. Remove unused backend packages: `express`, `express-session`, `passport`, `passport-local`, `connect-pg-simple`, `memorystore`, `pg`, `ws`, `@octokit/rest`, `date-fns`, `@jridgewell/trace-mapping`
-5. Remove unused devDependencies: `@vitejs/plugin-react`, `vite`, `@replit/vite-plugin-*`, `@tailwindcss/vite`, `@tailwindcss/typography`, `autoprefixer`, `postcss`, `@types/express`, `@types/express-session`, `@types/passport`, `@types/passport-local`, `@types/react`, `@types/react-dom`, `@types/ws`, `@types/connect-pg-simple`
-6. If Drizzle is not used for persistent storage (see Task 1-1), also remove `drizzle-orm`, `drizzle-zod`, `drizzle-kit`
-7. Remove `components.json` (shadcn/ui config with no corresponding components)
-8. Remove `client/` directory (contains only an orphaned `favicon.png`)
-9. Update package name from `rest-express` to `hbdr-website`
-10. Remove the `db:push` script from package.json
-11. Run `npm install` to regenerate a clean `package-lock.json`
+1. Add `"@hono/node-server": "^1.13.0"` to dependencies in package.json
+2. Add `"tsx": "^4.0.0"` to devDependencies in package.json
+3. Add scripts: `"dev": "npx tsx server/index.ts"`, `"check": "npx tsc --noEmit"`
+4. Run `npm install` to generate node_modules and package-lock.json
+5. Commit the generated package-lock.json
 
 **Acceptance Criteria**:
-- [ ] `package.json` contains only packages that are actually imported in the codebase
-- [ ] `npm install` completes successfully
-- [ ] `npm run dev` starts the server without errors
-- [ ] `npm run check` (TypeScript) passes without errors
-- [ ] Package name is `hbdr-website`
-- [ ] `components.json` is deleted
-- [ ] `client/` directory is deleted
+- [ ] `npm install` completes without errors
+- [ ] `npm run dev` starts the server on port 5000
+- [ ] `npm run check` runs TypeScript type checking
+- [ ] package-lock.json exists and is committed
 
-**Implementation Notes**: Run `npx depcheck` before and after to verify. Be careful not to remove packages that are indirect dependencies of used packages. The Drizzle decision depends on Task 1-1's approach.
+**Implementation Notes**: The dev script previously used `tsx server/index.ts` which is a TypeScript execution tool. tsx must be a devDependency. Do NOT add back any of the 60+ previously-removed unused dependencies.
 
 ---
 
-### Task 2-1: Add CSRF Protection
+### Task 0-2: Sync Worker.ts with Routes.ts
 **Status**: 🔲 Not Started
-**Phase**: Phase 2 - Harden
+**Phase**: Phase 0 -- Critical Fixes
+**Priority**: High
+**Complexity**: S (< 1hr)
+**Depends On**: None
+**Files**: `worker.ts`
+
+**Context**: worker.ts is the Cloudflare Workers production entry point but is missing 10 page routes that exist in routes.ts. Deploying to Workers will 404 on Privacy Policy, Terms, GDPR/Cookie Policy, FAQ/Support, Dashboard, Video Player, Partners, Publishers, Advertisers, and Trust & Compliance. The legal pages are linked from every page's footer -- all visitors can encounter these broken links.
+
+**Requirements**:
+1. Add these imports to worker.ts from `./server/template`: `renderPrivacyPolicyPage`, `renderTermsPage`, `renderGdprCookiePolicyPage`, `renderFaqSupportPage`, `renderDashboardPage`, `renderVideoPlayerPage`, `renderPartnersPage`, `renderPublishersPage`, `renderAdvertisersPage`, `renderTrustCompliancePage`
+2. Add these route registrations after the existing solution routes:
+   - `app.get("/dashboard", (c) => c.html(renderDashboardPage()));`
+   - `app.get("/solutions/video-player", (c) => c.html(renderVideoPlayerPage()));`
+   - `app.get("/partners", (c) => c.html(renderPartnersPage()));`
+   - `app.get("/publishers", (c) => c.html(renderPublishersPage()));`
+   - `app.get("/advertisers", (c) => c.html(renderAdvertisersPage()));`
+   - `app.get("/trust", (c) => c.html(renderTrustCompliancePage()));`
+   - `app.get("/privacy-policy", (c) => c.html(renderPrivacyPolicyPage()));`
+   - `app.get("/terms", (c) => c.html(renderTermsPage()));`
+   - `app.get("/gdpr-cookie-policy", (c) => c.html(renderGdprCookiePolicyPage()));`
+   - `app.get("/support", (c) => c.html(renderFaqSupportPage()));`
+
+**Acceptance Criteria**:
+- [ ] worker.ts imports all 29 render functions from template.ts
+- [ ] worker.ts has all 26 page GET routes matching routes.ts
+- [ ] `npx tsc --noEmit -p tsconfig.worker.json` passes
+
+**Implementation Notes**: Match the exact route patterns and handler signatures from routes.ts lines 44-54.
+
+---
+
+### Task 0-3: Fix Support Form Schema Mismatch
+**Status**: 🔲 Not Started
+**Phase**: Phase 0 -- Critical Fixes
+**Priority**: High
+**Complexity**: S (< 1hr)
+**Depends On**: None
+**Files**: `server/template.ts`
+
+**Context**: The FAQ/Support page (`renderFaqSupportPage()`) has a support request form that submits to `/api/contact`. The form maps fields incorrectly: it sends `website: ''` and `monthlyPageviews: ''`, but the Zod schema expects `impressions` (required, must be min 1 char) and has no `website` or `monthlyPageviews` field. The form will fail validation.
+
+**Requirements**:
+1. In `renderFaqSupportPage()` around line 4014-4021, update the fetch body to:
+   - Remove `website` field (not in schema)
+   - Change `monthlyPageviews` to `impressions` with a default value like `"N/A - Support Request"`
+   - Keep `company` field mapping (subject + priority is acceptable)
+2. Verify the form submission works by checking the Zod schema in `shared/schema.ts` -- all required fields must be present
+
+**Acceptance Criteria**:
+- [ ] Support form submission at `/support` does not return a 400 validation error
+- [ ] All required fields (name, email, company, impressions, message) are sent in the POST body
+- [ ] The `impressions` field has a valid value (not empty string)
+
+**Implementation Notes**: The contact form on `/contact` works correctly -- it sends `impressions` from a dropdown. The support form should follow the same pattern but can use a hardcoded value since impressions aren't relevant for support requests.
+
+---
+
+### Task 1-1: Fix Blog Category Filters
+**Status**: 🔲 Not Started
+**Phase**: Phase 1 -- Complete Core
+**Priority**: Medium
+**Complexity**: S (< 1hr)
+**Depends On**: None
+**Files**: `server/template.ts`
+
+**Context**: The blog listing page (`renderBlogPage()`) around line 1994 has category filter buttons that update Alpine.js `activeCategory` state. The buttons have active/inactive styling. But the blog post cards are rendered without any `x-show` directive, so clicking a category button changes the button appearance but doesn't filter any posts.
+
+**Requirements**:
+1. Add `x-show="!activeCategory || activeCategory === '${post.category}'"` to each blog post card's container element
+2. Ensure the "All" button sets `activeCategory` to `''` (it already does)
+3. Add `x-transition` for smooth show/hide animation
+
+**Acceptance Criteria**:
+- [ ] Clicking a category button shows only posts in that category
+- [ ] Clicking "All" shows all posts
+- [ ] Posts animate smoothly when filtering
+
+**Implementation Notes**: The Alpine.js state `activeCategory` is already managed correctly at line 2024. Each post card is generated in a `.map()` call. Add the `x-show` to the outer div of each card.
+
+---
+
+### Task 1-2: Add Basic Auth to Admin Routes
+**Status**: 🔲 Not Started
+**Phase**: Phase 1 -- Complete Core
 **Priority**: High
 **Complexity**: M (1-4hr)
 **Depends On**: Task 0-1
-**Files**: `server/routes.ts`, `server/template.ts`
+**Files**: `server/routes.ts`, `worker.ts`, `wrangler.toml`
 
-**Context**: All mutation endpoints (`POST /api/contact`, `POST /api/blog`, `PUT /api/blog/:id`, `DELETE /api/blog/:id`) accept requests from any origin with no CSRF token. An attacker could craft a malicious page that submits forms to these endpoints using a logged-in admin's session.
+**Context**: The blog admin panel (`/admin/blog/*`), blog API (`POST/PUT/DELETE /api/blog/*`), and contact leads API (`GET /api/contact`) are completely unauthenticated. Anyone can create, edit, or delete blog posts, and anyone can read all submitted contact leads (PII).
 
 **Requirements**:
-1. Implement CSRF token generation and validation using Hono middleware
-2. Generate a CSRF token per session and include it as a hidden field in the contact form and blog editor form
-3. Validate the CSRF token on all POST/PUT/DELETE requests
-4. Return 403 with `{ message: "Invalid CSRF token" }` on validation failure
-5. For API-only consumers (if any), support `X-CSRF-Token` header as alternative
+1. Add a `ADMIN_PASSWORD` environment variable to `wrangler.toml` (for Workers) and document it for dev
+2. Create a Hono middleware function that checks for HTTP Basic Auth with username `admin` and password from env
+3. Apply the middleware to these routes: `/admin/blog*`, `POST /api/blog`, `PUT /api/blog/:id`, `DELETE /api/blog/:id`, `GET /api/contact`
+4. Return 401 with `WWW-Authenticate: Basic` header when auth is missing or wrong
 
 **Acceptance Criteria**:
-- [ ] Contact form includes a hidden CSRF token field
-- [ ] Blog editor form includes a hidden CSRF token field
-- [ ] POST/PUT/DELETE requests without a valid CSRF token return 403
-- [ ] Forms with valid CSRF tokens submit successfully
-- [ ] Token is rotated per session
+- [ ] Visiting `/admin/blog` without credentials shows browser's Basic Auth prompt
+- [ ] Entering correct credentials grants access
+- [ ] Entering wrong credentials returns 401
+- [ ] Blog listing (`GET /blog`) and individual posts (`GET /blog/:slug`) remain public
+- [ ] POST /api/contact (submit form) remains public
+- [ ] Auth works in both dev server (routes.ts) and worker (worker.ts)
 
-**Implementation Notes**: For Cloudflare Workers (stateless), consider the double-submit cookie pattern or a signed token approach since there's no server-side session store. Alternatively, use `hono/csrf` middleware which implements the Origin/Referer header check pattern.
+**Implementation Notes**: HTTP Basic Auth is simple but effective for a single-admin site. The password should be set as an environment variable, not hardcoded. For dev, use a `.dev.vars` file (already gitignored). For Workers, set via `wrangler secret put ADMIN_PASSWORD`.
+
+---
+
+### Task 1-3: Deduplicate Routes (routes.ts / worker.ts)
+**Status**: 🔲 Not Started
+**Phase**: Phase 1 -- Complete Core
+**Priority**: High
+**Complexity**: M (1-4hr)
+**Depends On**: Task 0-2
+**Files**: `server/routes.ts`, `worker.ts`
+
+**Context**: worker.ts re-implements every route from routes.ts instead of importing `registerRoutes()`. This caused the 10-page drift. The only reason worker.ts can't directly import routes.ts is the `/assets/:filename` route uses Node.js `fs` and `path` modules.
+
+**Requirements**:
+1. In routes.ts, make the `/assets/:filename` route conditional: only register it if `typeof process !== 'undefined'` or behind a parameter
+2. Move `sanitizeHtml()` from both files to a new `server/sanitize.ts` module
+3. Modify worker.ts to import and call `registerRoutes(app)` instead of reimplementing routes
+4. Remove all duplicate route code from worker.ts
+
+**Acceptance Criteria**:
+- [ ] worker.ts has fewer than 30 lines of code (import + app setup + export)
+- [ ] Routes exist in exactly one place (routes.ts)
+- [ ] sanitizeHtml exists in exactly one place (server/sanitize.ts)
+- [ ] Dev server still works (fs/path route works in Node.js)
+- [ ] Worker still works (no fs/path references in Worker context)
+- [ ] Adding a new route requires editing only routes.ts
+
+**Implementation Notes**: The simplest approach is to have `registerRoutes` accept an optional config parameter like `{ serveStaticFiles: boolean }` and only register the `/assets/:filename` route when true. worker.ts calls `registerRoutes(app, { serveStaticFiles: false })`, index.ts calls `registerRoutes(app, { serveStaticFiles: true })`.
+
+---
+
+### Task 1-4: Replace Regex HTML Sanitizer
+**Status**: 🔲 Not Started
+**Phase**: Phase 1 -- Complete Core
+**Priority**: High
+**Complexity**: M (1-4hr)
+**Depends On**: Task 1-3
+**Files**: `server/sanitize.ts` (from Task 1-3), `package.json`
+
+**Context**: `sanitizeHtml()` uses regex to strip `<script>`, `<style>`, `on*` event handlers, and dangerous URL schemes. Regex HTML parsing is a known anti-pattern -- it cannot handle nested contexts, encoding variations, or mutation XSS. The routes.ts version even declares `allowedTags` and `allowedAttrs` arrays that it never uses.
+
+**Requirements**:
+1. Install `sanitize-html` npm package (works in both Node.js and Workers)
+2. Replace the regex implementation in `server/sanitize.ts` with `sanitize-html` using an allowlist of safe tags and attributes
+3. Allow: h1-h6, p, a (href, target, rel), ul, ol, li, strong, em, b, i, br, blockquote, pre, code, img (src, alt, width, height), span, div, hr, table, thead, tbody, tr, th, td
+4. Disallow: script, style, iframe, form, input, all event handlers (on*)
+
+**Acceptance Criteria**:
+- [ ] Blog posts can contain safe HTML (headings, paragraphs, links, lists, images)
+- [ ] `<script>alert(1)</script>` is stripped from blog content
+- [ ] `<img src=x onerror=alert(1)>` has the onerror removed
+- [ ] `<a href="javascript:alert(1)">` has the href removed or blocked
+- [ ] Existing seeded blog post content renders identically
+
+**Implementation Notes**: `sanitize-html` is the standard Node.js HTML sanitizer. Ensure it works in the Cloudflare Workers environment -- if not, use `isomorphic-dompurify` or a WASM-based alternative.
+
+---
+
+### Task 1-5: Add Error Pages and Clean Up Orphans
+**Status**: 🔲 Not Started
+**Phase**: Phase 1 -- Complete Core
+**Priority**: Medium
+**Complexity**: M (1-4hr)
+**Depends On**: None
+**Files**: `server/template.ts`, `server/routes.ts`, `worker.ts`, `components.json` (delete), `client/` (delete), `script/build.ts` (delete), `README.md`, `tsconfig.json`
+
+**Context**: Unmatched routes return Hono's default "404 Not Found" plain text. Several orphaned files from the abandoned React+Express SPA still exist. README.md is outdated.
+
+**Requirements**:
+1. Add `renderNotFoundPage()` to template.ts -- branded 404 page with glassmorphism design
+2. Add `app.notFound()` handler in routes.ts that serves the 404 page
+3. Add `app.onError()` handler in routes.ts that serves a branded 500 page
+4. Delete orphaned files: `components.json`, `client/` directory, `script/build.ts`
+5. Update README.md to list all 26 pages and current tech stack
+6. Fix tsconfig.json: remove `client/src/**/*` from includes, remove `"vite/client"` from types
+7. Remove HTMX CDN script from renderHead() (loaded but never used)
+
+**Acceptance Criteria**:
+- [ ] Visiting `/nonexistent` shows a branded 404 page, not plain text
+- [ ] Server errors show a branded 500 page
+- [ ] `components.json`, `client/`, `script/build.ts` are deleted
+- [ ] README.md lists all 26 pages
+- [ ] tsconfig.json only references existing directories
+- [ ] HTMX script tag removed from renderHead()
+
+---
+
+### Task 1-6: Fix OG Images and Add SEO Files
+**Status**: 🔲 Not Started
+**Phase**: Phase 1 -- Complete Core
+**Priority**: Medium
+**Complexity**: M (1-4hr)
+**Depends On**: Task 0-1
+**Files**: `server/template.ts`, `server/routes.ts`, `wrangler.toml`
+
+**Context**: `og:image` uses a relative URL (`/assets/HBDR_Logo_Pack_all_sizes_-_2_...jpeg`) that social media crawlers can't resolve. There's no sitemap.xml or robots.txt for 26 pages.
+
+**Requirements**:
+1. Add a `SITE_URL` var to wrangler.toml (default `https://hbdr-website.<subdomain>.workers.dev`)
+2. Accept `SITE_URL` in renderHead() options or as a constant
+3. Prepend SITE_URL to og:image and og:url meta tags
+4. Add `GET /sitemap.xml` route returning XML with all 26 page URLs
+5. Add `GET /robots.txt` route allowing all crawlers, disallowing `/admin/*`
+
+**Acceptance Criteria**:
+- [ ] `og:image` contains an absolute URL starting with https://
+- [ ] `og:url` contains an absolute URL
+- [ ] `/sitemap.xml` returns valid XML with all page URLs
+- [ ] `/robots.txt` returns text with Allow/Disallow rules
+
+---
+
+### Task 2-1: Add Security Headers
+**Status**: 🔲 Not Started
+**Phase**: Phase 2 -- Harden
+**Priority**: High
+**Complexity**: S (< 1hr)
+**Depends On**: None
+**Files**: `server/routes.ts`
+
+**Context**: No security headers are set on any response. This leaves the site vulnerable to clickjacking, MIME sniffing, and has no browser-side XSS mitigation.
+
+**Requirements**:
+1. Add a Hono middleware that sets on every response:
+   - `X-Content-Type-Options: nosniff`
+   - `X-Frame-Options: DENY`
+   - `Referrer-Policy: strict-origin-when-cross-origin`
+   - `Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.tailwindcss.com unpkg.com cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com; font-src fonts.gstatic.com cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'`
+   - `Strict-Transport-Security: max-age=31536000; includeSubDomains` (production only)
+
+**Acceptance Criteria**:
+- [ ] Every response includes all 5 security headers
+- [ ] Page still loads correctly with CDN scripts and fonts
+- [ ] Alpine.js still works (requires 'unsafe-inline' and 'unsafe-eval')
 
 ---
 
 ### Task 2-2: Add Rate Limiting
 **Status**: 🔲 Not Started
-**Phase**: Phase 2 - Harden
+**Phase**: Phase 2 -- Harden
 **Priority**: High
 **Complexity**: M (1-4hr)
-**Depends On**: None
-**Files**: `server/routes.ts`, `worker.ts`
+**Depends On**: Task 0-1
+**Files**: `server/routes.ts`, `package.json`
 
-**Context**: The contact form and blog API have no rate limiting. A bot could submit thousands of contact form entries or create/delete blog posts at high volume.
+**Context**: No rate limiting exists on any endpoint. The contact form and blog API can be spammed without limit.
 
 **Requirements**:
-1. Add rate limiting middleware to `POST /api/contact`: max 5 requests per IP per 15 minutes
-2. Add rate limiting middleware to blog mutation endpoints: max 30 requests per IP per 15 minutes
-3. For Node.js dev: use an in-memory rate limiter (Map-based with TTL)
-4. For Cloudflare Workers: use Workers KV or the Rate Limiting API
-5. Return 429 with `{ message: "Too many requests. Please try again later." }` and `Retry-After` header
+1. Add per-IP rate limiting middleware using Hono's built-in or a compatible library
+2. Limit POST /api/contact to 5 requests per minute per IP
+3. Limit POST/PUT/DELETE /api/blog to 20 requests per minute per IP
+4. Return 429 Too Many Requests with a meaningful error message
 
 **Acceptance Criteria**:
-- [ ] 6th contact form submission within 15 minutes returns 429
+- [ ] 6th contact form submission within 1 minute returns 429
 - [ ] Rate limit resets after the window expires
-- [ ] Rate limit is per-IP, not global
-- [ ] `Retry-After` header is included in 429 responses
-- [ ] Rate limiting works in both Node.js and Workers environments
-
-**Implementation Notes**: Hono has a rate-limiting middleware in `hono/rate-limit` for simple cases. For Workers, Cloudflare's built-in Rate Limiting (in the dashboard) is more robust than in-Worker implementations.
+- [ ] GET endpoints are not rate limited (or have a much higher limit)
 
 ---
 
-### Task 2-3: Add Structured Error Logging
+### Task 4-1: Add Persistent Storage
 **Status**: 🔲 Not Started
-**Phase**: Phase 2 - Harden
-**Priority**: Medium
-**Complexity**: M (1-4hr)
-**Depends On**: None
-**Files**: `server/routes.ts`, `server/index.ts`, `worker.ts`
-
-**Context**: Current error handling uses `console.error("Error creating blog post:", error)` which outputs unstructured text. There are no request IDs, no log levels, and no correlation between request and error.
-
-**Requirements**:
-1. Add a request ID middleware that generates a UUID for each request and attaches it to the Hono context
-2. Create a `logger` utility that outputs structured JSON logs: `{ timestamp, requestId, level, message, error?, path?, method? }`
-3. Replace all `console.error` calls with the structured logger
-4. Include the request ID in all error responses: `{ message: "Internal server error", requestId: "abc-123" }`
-5. Add the request ID as an `X-Request-Id` response header
-
-**Acceptance Criteria**:
-- [ ] Every request gets a unique ID visible in `X-Request-Id` header
-- [ ] Error responses include `requestId` in the JSON body
-- [ ] Server logs are structured JSON with timestamp, level, requestId
-- [ ] All existing `console.error` calls are replaced with structured logging
-
-**Implementation Notes**: Hono's context (`c`) can carry request-scoped data via `c.set('requestId', uuid)`. The structured logger should be a simple function, not a heavyweight library.
-
----
-
-### Task 2-4: Add Content Security Policy Headers
-**Status**: 🔲 Not Started
-**Phase**: Phase 2 - Harden
-**Priority**: Medium
-**Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `server/routes.ts` or `server/index.ts`
-
-**Context**: No CSP headers are sent with responses. The site loads scripts from CDNs (tailwindcss.com, unpkg.com, cdn.jsdelivr.net, fonts.googleapis.com) and uses inline `<style>` blocks. Without CSP, injected scripts can execute freely.
-
-**Requirements**:
-1. Add a Hono middleware that sets the `Content-Security-Policy` header on all HTML responses
-2. Allow scripts from: `cdn.tailwindcss.com`, `unpkg.com`, `cdn.jsdelivr.net` and `'unsafe-eval'` (required by Tailwind CDN's JIT compiler)
-3. Allow styles from: `cdn.jsdelivr.net`, `fonts.googleapis.com`, and `'unsafe-inline'` (required for inline styles)
-4. Allow fonts from: `fonts.gstatic.com`
-5. Allow images from: `'self'` and `data:` (for inline SVG data URIs)
-6. Set `frame-ancestors 'none'` to prevent clickjacking
-7. Also add `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`
-
-**Acceptance Criteria**:
-- [ ] `Content-Security-Policy` header is present on all HTML responses
-- [ ] The site renders correctly with CSP enabled (no console errors)
-- [ ] `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` headers are present
-- [ ] Injecting a `<script>` via blog content is blocked by CSP
-
-**Implementation Notes**: Use Hono's `secureHeaders` middleware as a starting point. The Tailwind CDN JIT compiler requires `'unsafe-eval'` which weakens CSP -- this is a known trade-off of using Tailwind via CDN. Moving to a build-time Tailwind setup would eliminate this need but is a larger change.
-
----
-
-### Task 2-5: Add Input Length Limits
-**Status**: 🔲 Not Started
-**Phase**: Phase 2 - Harden
-**Priority**: Low
-**Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `shared/schema.ts`
-
-**Context**: Blog post content, titles, and contact form messages have no maximum length constraints. A malicious user could submit megabytes of content in a single field.
-
-**Requirements**:
-1. Add `.max()` constraints to all Zod schema string fields:
-   - `name`: max 200 characters
-   - `email`: max 254 characters (RFC 5321 limit)
-   - `company`: max 200 characters
-   - `impressions`: max 50 characters
-   - `message`: max 5000 characters
-   - Blog `title`: max 500 characters
-   - Blog `slug`: max 200 characters
-   - Blog `excerpt`: max 1000 characters
-   - Blog `content`: max 100000 characters (~100KB)
-   - Blog `author`: max 200 characters
-   - Blog `category`: max 100 characters
-   - Blog `tags`: max 500 characters
-2. Add `maxlength` attributes to corresponding HTML input elements in `template.ts`
-
-**Acceptance Criteria**:
-- [ ] Submitting a blog post with content > 100KB returns a 400 validation error
-- [ ] Submitting a contact form with message > 5000 chars returns a 400 validation error
-- [ ] HTML inputs have `maxlength` attributes matching the schema limits
-- [ ] Error messages clearly indicate the maximum length
-
-**Implementation Notes**: Zod's `.max()` method: `z.string().max(200, "Name must be 200 characters or less")`.
-
----
-
-### Task 3-1: Split Template Monolith
-**Status**: 🔲 Not Started
-**Phase**: Phase 3 - Optimize
-**Priority**: Medium
+**Phase**: Phase 4 -- Production Infrastructure
+**Priority**: High
 **Complexity**: L (4hr+)
-**Depends On**: None
-**Files**: `server/template.ts` (source), new files in `server/templates/`
+**Depends On**: Task 1-3
+**Files**: `server/storage.ts`, `shared/schema.ts`, `wrangler.toml`, new migration files
 
-**Context**: `server/template.ts` is 5212 lines containing every page template, shared layout components, and utility functions. This makes the file extremely difficult to navigate, maintain, or modify. Adding a new page means scrolling through thousands of lines of unrelated HTML.
-
-**Requirements**:
-1. Create a `server/templates/` directory
-2. Extract shared components: `server/templates/layout.ts` (renderHead, renderNav, renderFooter, renderScripts, renderLayout), `server/templates/components.ts` (renderContactFormSection, renderStatsSection, renderPageHero, renderCTASection)
-3. Extract each page into its own file: `server/templates/home.ts`, `server/templates/about.ts`, `server/templates/how-it-works.ts`, `server/templates/careers.ts`, `server/templates/press.ts`, `server/templates/contact.ts`, `server/templates/blog.ts`, `server/templates/solutions/header-bidding.ts`, etc.
-4. Create `server/templates/index.ts` that re-exports all page render functions (preserving the existing import interface)
-5. Update `server/routes.ts` imports to use the new barrel export
-6. Delete the original `server/template.ts`
-
-**Acceptance Criteria**:
-- [ ] No single template file exceeds 400 lines
-- [ ] All existing page render functions are exported with the same names
-- [ ] `server/routes.ts` and `worker.ts` import paths are updated
-- [ ] All pages render identically to before the refactor
-- [ ] Shared components (nav, footer, layout) are reused from a single source
-
-**Implementation Notes**: Use a barrel export (`server/templates/index.ts`) so that import statements in routes.ts need minimal changes. The shared `LayoutOptions` interface and helper functions should be in `layout.ts` and imported by individual page templates.
-
----
-
-### Task 4-1: Add Health Check Endpoint
-**Status**: 🔲 Not Started
-**Phase**: Phase 4 - Production Infrastructure
-**Priority**: Medium
-**Complexity**: S (< 1hr)
-**Depends On**: None
-**Files**: `server/routes.ts`
-
-**Context**: There is no health check endpoint for monitoring. Uptime monitoring services need a simple endpoint to ping.
+**Context**: All data is stored in in-memory Maps. Blog posts reset to 5 seeded posts on every restart. Contact leads are silently lost. The `IStorage` interface is already designed for swappable backends.
 
 **Requirements**:
-1. Add `GET /health` route that returns `200 { status: "ok", timestamp: "...", uptime: process.uptime() }`
-2. Optionally check storage connectivity (if persistent storage is implemented)
-3. Return `503 { status: "unhealthy", error: "..." }` if storage is unreachable
+1. Create a `D1Storage` class implementing `IStorage` using Cloudflare D1 (SQLite)
+2. Create SQL migration scripts from the Drizzle schema in `shared/schema.ts`
+3. Add D1 database binding to `wrangler.toml`
+4. Modify storage.ts to use D1Storage in production, MemStorage in development
+5. Seed blog posts on first D1 migration only (not on every cold start)
 
 **Acceptance Criteria**:
-- [ ] `GET /health` returns 200 with JSON body when healthy
-- [ ] Response includes `status`, `timestamp` fields
-- [ ] Endpoint responds in < 50ms
+- [ ] Blog posts persist across Worker restarts
+- [ ] Contact leads persist across Worker restarts
+- [ ] Dev server still works with MemStorage
+- [ ] Seeded blog posts appear in D1 after migration
+- [ ] IStorage interface is unchanged (no breaking changes to routes)
 
-**Implementation Notes**: Keep it minimal. No authentication required on health checks.
-
----
-
-### Task 4-2: Add GitHub Actions CI Pipeline
-**Status**: 🔲 Not Started
-**Phase**: Phase 4 - Production Infrastructure
-**Priority**: Medium
-**Complexity**: M (1-4hr)
-**Depends On**: Task 5-1 (tests exist to run)
-**Files**: `.github/workflows/ci.yml` (new)
-
-**Context**: There is no CI/CD pipeline. Code changes are not automatically validated.
-
-**Requirements**:
-1. Create `.github/workflows/ci.yml` with jobs for:
-   - `npm install`
-   - `npm run check` (TypeScript type checking)
-   - `npm test` (when tests exist)
-2. Trigger on push to `main` and on pull requests
-3. Use Node.js 20.x
-4. Cache `node_modules` for faster runs
-
-**Acceptance Criteria**:
-- [ ] CI runs on every push to main and every PR
-- [ ] TypeScript errors fail the build
-- [ ] Test failures fail the build
-- [ ] Pipeline completes in < 5 minutes
-
-**Implementation Notes**: Start with type checking only. Add test execution once Task 5-1 is complete.
-
----
-
-### Task 5-1: Add Core Test Suite
-**Status**: 🔲 Not Started
-**Phase**: Phase 5 - Enterprise Grade
-**Priority**: Medium
-**Complexity**: L (4hr+)
-**Depends On**: Task 0-2, Task 1-1
-**Files**: New files in `tests/` directory
-
-**Context**: There are zero tests in the project. No unit tests, integration tests, or E2E tests.
-
-**Requirements**:
-1. Set up Vitest as the test runner (compatible with TypeScript, fast, minimal config)
-2. Write unit tests for:
-   - `sanitizeHtml()`: verify it strips scripts, event handlers, and dangerous attributes
-   - `MemStorage`: verify CRUD operations for blog posts and contact leads
-   - Zod schemas: verify validation accepts valid data and rejects invalid data
-3. Write integration tests for:
-   - `GET /` returns 200 and contains expected HTML
-   - `POST /api/contact` with valid data returns success
-   - `POST /api/contact` with invalid data returns 400
-   - `POST /api/blog` with valid data returns 201
-   - `GET /blog/:slug` returns the correct blog post
-   - `GET /nonexistent` returns 404
-4. Add a `test` script to `package.json`: `"test": "vitest run"`
-
-**Acceptance Criteria**:
-- [ ] `npm test` runs and passes all tests
-- [ ] Sanitization edge cases are covered (mixed case, encoded entities, nested tags)
-- [ ] All API endpoints have at least one happy-path and one error-path test
-- [ ] Tests run in < 10 seconds
-
-**Implementation Notes**: Hono has built-in test utilities (`app.request()`) that make integration testing straightforward without starting a server. Use `describe`/`it` blocks organized by module.
+**Implementation Notes**: Cloudflare D1 is SQLite-compatible, which maps well to the Drizzle pgTable definitions (will need minor type adjustments). The `IStorage` interface was designed for exactly this kind of swap.

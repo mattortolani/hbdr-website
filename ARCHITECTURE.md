@@ -2,261 +2,331 @@
 
 ## System Overview
 
-HBDR Website is a server-rendered marketing site for HBDR, an ad-tech company specializing in header bidding and publisher monetization. It is a 26-page website with a blog CMS, built on the Hono framework (Node.js) with server-side HTML template generation. All pages are rendered as complete HTML strings on the server with no client-side JavaScript framework -- interactivity is handled via Alpine.js and native browser APIs.
+HBDR Website is a server-rendered marketing site for HBDR, an ad-tech company specializing in header bidding and publisher monetization. It is a 26-page website with a blog CMS and contact form lead capture, built on the Hono framework (TypeScript). All pages are rendered as complete HTML strings on the server -- there is no client-side JavaScript framework. Alpine.js handles interactivity (accordions, mobile nav, form submissions) and Tailwind CSS + DaisyUI provide styling via CDN.
+
+---
 
 ## Component Map
 
 ```
-                           +-----------------------+
-                           |    Cloudflare Worker   |  (worker.ts - production)
-                           |    or Node.js Server   |  (server/index.ts - dev)
-                           +-----------+-----------+
-                                       |
-                              Hono Router (routes.ts)
-                                       |
-          +----------------------------+----------------------------+
-          |                            |                            |
-   Static Pages              Blog CRUD API              Contact Form API
-   (GET /, /about,            (GET/POST/PUT/DELETE       (POST /api/contact)
-    /solutions/*,              /api/blog/*)
-    /publishers,
-    /advertisers,
-    /partners,
-    /trust,
-    /dashboard,
-    /privacy-policy,
-    /terms,
-    /gdpr-cookie-policy,
-    /support, etc.)
-          |                            |                            |
-   Template Functions          Storage Layer                Storage Layer
-   (template.ts)              (storage.ts)                (storage.ts)
-          |                            |                            |
-   renderLayout()          MemStorage (in-memory Map)    MemStorage (in-memory Map)
-   renderHomePage()               |                            |
-   render*Page() (26)      blogPosts Map             contactSubmissions Map
-          |
-   HTML string with:
-   - Tailwind CSS (CDN)
-   - Alpine.js (CDN)
-   - HTMX (CDN, barely used)
-   - Inline SVG icons
-   - Google Fonts (Inter)
+                        ┌─────────────────────────────────┐
+                        │         Client Browser          │
+                        │  Alpine.js + Tailwind CSS (CDN) │
+                        └────────────┬────────────────────┘
+                                     │ HTTP
+                        ┌────────────▼────────────────────┐
+                        │       Hono HTTP Router          │
+                        │  (routes.ts OR worker.ts)       │
+                        └──┬──────────┬──────────┬────────┘
+                           │          │          │
+              ┌────────────▼──┐  ┌────▼─────┐  ┌▼──────────────┐
+              │  Page Routes  │  │ Blog API │  │ Contact API   │
+              │  26 GET pages │  │ CRUD     │  │ POST/GET      │
+              └────────────┬──┘  └────┬─────┘  └┬──────────────┘
+                           │          │          │
+              ┌────────────▼──────────▼──────────▼──────────────┐
+              │              template.ts (5212 lines)           │
+              │  renderLayout() + 29 render*() functions        │
+              │  renderHead() / renderNav() / renderFooter()    │
+              └────────────────────────┬────────────────────────┘
+                                       │
+              ┌────────────────────────▼────────────────────────┐
+              │            storage.ts (MemStorage)              │
+              │  IStorage interface + in-memory Maps            │
+              │  blogPosts Map | contactLeads Map | users Map   │
+              └────────────────────────────────────────────────┘
+                                       │
+              ┌────────────────────────▼────────────────────────┐
+              │            schema.ts (Zod + Drizzle)            │
+              │  insertContactLeadSchema | insertBlogPostSchema │
+              │  Type exports: User, ContactLead, BlogPost      │
+              └─────────────────────────────────────────────────┘
 ```
+
+### Dual Entry Points (CRITICAL DRIFT)
+
+```
+Node.js Dev (server/index.ts)           Cloudflare Workers (worker.ts)
+────────────────────────────            ────────────────────────────
+imports registerRoutes(app)             RE-IMPLEMENTS all routes inline
+  from routes.ts                          (not imported from routes.ts)
+26 page routes ✅                       16 page routes only ⚠️
+5 API routes ✅                         5 API routes ✅
+/assets/:filename handler ✅            (served by wrangler [assets]) ✅
+sanitizeHtml() in routes.ts            sanitizeHtml() DUPLICATED in worker.ts
+```
+
+**worker.ts is missing 10 page routes**: `/privacy-policy`, `/terms`, `/gdpr-cookie-policy`, `/support`, `/dashboard`, `/solutions/video-player`, `/partners`, `/publishers`, `/advertisers`, `/trust`
+
+---
 
 ## Tech Stack
 
-### Runtime & Framework
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| Node.js | 20.x (Replit default) | Development runtime |
-| Hono | 4.11.9 | HTTP framework (routes, middleware) |
-| @hono/node-server | 1.19.9 | Node.js adapter for Hono |
-| TypeScript | 5.6.3 | Language |
-| tsx | 4.20.5 | TypeScript execution (dev) |
+### Runtime Dependencies (package.json)
 
-### Frontend (CDN-loaded, no build step)
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| Tailwind CSS | 3.x (CDN) | Utility-first CSS |
-| Alpine.js | 3.x (CDN) | Lightweight interactivity (FAQ toggles, mobile menu, form state) |
-| HTMX | 2.0.4 (CDN) | Declared in `<head>` but barely used in practice |
-| Google Fonts (Inter) | CDN | Typography |
+| Package | Version | Purpose | Actually Used? |
+|---------|---------|---------|----------------|
+| hono | ^4.11.9 | HTTP framework (routing, middleware, responses) | YES |
+| zod | ^3.24.2 | Schema validation for blog posts and contact leads | YES |
+| zod-validation-error | ^3.4.0 | Human-readable Zod error messages | YES |
+| drizzle-orm | ^0.39.3 | ORM table definitions used only for schema/type generation | PARTIAL -- only pgTable definitions used for createInsertSchema. No DB connection. |
+| drizzle-zod | ^0.7.0 | Generates Zod schemas from Drizzle table defs | YES (createInsertSchema) |
 
-### Build & Deploy
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| esbuild | 0.25.0 | Bundles worker.ts for Cloudflare Workers |
-| wrangler | 4.63.0 | Cloudflare Workers deployment CLI |
+### Dev Dependencies
 
-### Validation
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| Zod | 3.24.2 | Schema validation for blog posts and contact form |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| @cloudflare/workers-types | ^4.20260207.0 | TypeScript types for Workers runtime |
+| wrangler | ^4.63.0 | Cloudflare Workers CLI (build + deploy) |
+| typescript | 5.6.3 | TypeScript compiler (type checking only) |
 
-### Unused Dependencies (Installed but not imported anywhere)
-These are remnants of a prior React/Express SPA architecture that was abandoned:
+### Missing from package.json but imported
 
-**React ecosystem (completely unused):**
-react, react-dom, @tanstack/react-query, react-hook-form, @hookform/resolvers, react-day-picker, react-icons, react-resizable-panels, recharts, wouter, framer-motion, next-themes, lucide-react, cmdk, embla-carousel-react, input-otp, vaul
+| Package | Imported Where | Purpose |
+|---------|---------------|---------|
+| @hono/node-server | server/index.ts line 1 | `serve()` function for Node.js HTTP server |
 
-**Radix UI (completely unused):**
-@radix-ui/react-accordion, @radix-ui/react-alert-dialog, @radix-ui/react-aspect-ratio, @radix-ui/react-avatar, @radix-ui/react-checkbox, @radix-ui/react-collapsible, @radix-ui/react-context-menu, @radix-ui/react-dialog, @radix-ui/react-dropdown-menu, @radix-ui/react-hover-card, @radix-ui/react-label, @radix-ui/react-menubar, @radix-ui/react-navigation-menu, @radix-ui/react-popover, @radix-ui/react-progress, @radix-ui/react-radio-group, @radix-ui/react-scroll-area, @radix-ui/react-select, @radix-ui/react-separator, @radix-ui/react-slider, @radix-ui/react-slot, @radix-ui/react-switch, @radix-ui/react-tabs, @radix-ui/react-toast, @radix-ui/react-toggle, @radix-ui/react-toggle-group, @radix-ui/react-tooltip
+### CDN Dependencies (loaded at runtime in browser)
 
-**Styling utilities (unused):**
-class-variance-authority, clsx, tailwind-merge, tailwindcss-animate, tw-animate-css
+| Library | Version | CDN |
+|---------|---------|-----|
+| Tailwind CSS | Latest (CDN play) | cdn.tailwindcss.com |
+| DaisyUI | 4.12.14 | cdn.jsdelivr.net |
+| HTMX | 2.0.4 | unpkg.com (loaded but never used) |
+| Alpine.js | 3.14.8 | cdn.jsdelivr.net |
+| Alpine.js Intersect | 3.14.8 | cdn.jsdelivr.net |
+| Figtree font | Latest | fonts.googleapis.com |
+| Instrument Serif font | Latest | fonts.googleapis.com |
 
-**Database & Auth (unused - in-memory storage used instead):**
-drizzle-orm, drizzle-zod, drizzle-kit, pg, connect-pg-simple, passport, passport-local, express-session, memorystore
+### Orphaned Files
 
-**Other unused:**
-express, ws, @octokit/rest, date-fns, @jridgewell/trace-mapping
+| File | Original Purpose | Status |
+|------|-----------------|--------|
+| `components.json` | shadcn/ui component config (references `client/src`, `tailwind.config.ts`) | Orphaned. No React, no shadcn, no tailwind.config.ts exists |
+| `client/public/favicon.png` | React SPA favicon | Orphaned. Orange checkered icon, not HBDR branding |
+| `script/build.ts` | esbuild + Vite bundler for prior React+Express architecture | Orphaned. References `vite`, `express`, `passport`, `pg`, etc. that are no longer installed. No "build" script in package.json. |
+| `attached_assets/content-*.md` | Scraped competitor website content (Operative.com, Aditude.com) | Reference material, not used in code |
+| `attached_assets/branding-*.json` | Scraped competitor branding analysis | Reference material, not used in code |
+| `attached_assets/logo.svg` | SVG logo from competitor scrape | Not used; HBDR uses JPEG logos |
+| `attached_assets/ogImage.svg` | SVG OG image from competitor scrape | Not used |
 
-**Unused devDependencies:**
-@vitejs/plugin-react, vite, @replit/vite-plugin-cartographer, @replit/vite-plugin-dev-banner, @replit/vite-plugin-runtime-error-modal, @tailwindcss/vite, @tailwindcss/typography, autoprefixer, postcss, @types/express, @types/express-session, @types/passport, @types/passport-local, @types/react, @types/react-dom, @types/ws, @types/connect-pg-simple
+---
 
 ## Data Flow
 
 ### Page Request (e.g., GET /about)
-1. Request hits Hono router in `routes.ts` (or `worker.ts` in production -- **note: worker.ts is 10 pages behind**)
-2. Route handler calls `renderAboutPage()` from `template.ts`
-3. `renderAboutPage()` builds HTML content string using template literals
-4. Content is wrapped by `renderLayout()` which adds `<html>`, `<head>`, nav, footer
-5. Complete HTML string returned as `text/html` response with 200 status
+
+```
+Browser                  Hono Router              template.ts
+───────                  ───────────              ───────────
+GET /about ────────────► app.get("/about") ──────► renderAboutPage()
+                                                    │
+                                                    ├── builds content HTML string
+                                                    │
+                                                    ├── calls renderLayout({
+                                                    │     title, description,
+                                                    │     canonicalPath, bodyContent
+                                                    │   })
+                                                    │
+                                                    ├──── renderHead() → <html><head>...</head>
+                                                    ├──── renderNav()  → <nav>...</nav>
+                                                    ├──── bodyContent  → page HTML
+                                                    ├──── renderFooter() → <footer>...</footer>
+                                                    ├──── renderScripts() → <script>...</script>
+                                                    │
+                              c.html(fullHTML) ◄─────┘
+                                     │
+Browser ◄──────────── 200 text/html ─┘
+```
 
 ### Blog Post Creation (POST /api/blog)
-1. JSON body received by Hono route handler
-2. Body parsed and validated against Zod `insertBlogPostSchema`
-3. `storage.createBlogPost()` called -- generates UUID, sets timestamps
-4. Post stored in in-memory `Map<string, BlogPost>`
-5. JSON response with created post returned
-6. **Data is lost on server restart** (no persistence)
+
+```
+Browser (Admin Editor)   Hono Router              storage.ts
+──────────────────────   ───────────              ──────────
+POST /api/blog ─────────► app.post("/api/blog")
+  { title, slug,              │
+    content, ... }            ├── c.req.json() → parse body
+                              ├── insertBlogPostSchema.safeParse()
+                              │     → 400 if invalid
+                              ├── storage.getBlogPostBySlug()
+                              │     → 400 if duplicate
+                              ├── sanitizeHtml(content)
+                              │     → strip <script>, onerror=, etc.
+                              ├── storage.createBlogPost()
+                              │     → generates UUID, sets dates
+                              │     → stores in blogPosts Map
+                              │
+                         201 JSON ◄─┘
+```
 
 ### Contact Form Submission (POST /api/contact)
-1. JSON body received by route handler
-2. Validated against Zod `insertContactSubmissionSchema`
-3. HTML content sanitized via `sanitizeHtml()` (basic regex-based)
-4. `storage.createContactSubmission()` stores in in-memory Map
-5. JSON success response returned
-6. **Data is lost on server restart** (no persistence)
 
-### Blog Listing (GET /blog)
-1. Route handler calls `storage.getBlogPosts()`
-2. Returns all posts from in-memory Map, sorted by `publishedAt` descending
-3. Posts filtered to `published === "true"` only
-4. `renderBlogPage(posts)` generates HTML with post cards
-5. HTML returned as response
+```
+Browser (Contact Page)   Hono Router              storage.ts
+──────────────────────   ───────────              ──────────
+POST /api/contact ──────► app.post("/api/contact")
+  { name, email,              │
+    company, impressions,     ├── c.req.json() → parse body
+    message }                 ├── insertContactLeadSchema.safeParse()
+                              │     → 400 JSON if invalid
+                              ├── storage.createContactLead()
+                              │     → generates UUID, sets createdAt
+                              │     → stores in contactLeads Map
+                              │
+                         200 HTML fragment ◄─┘
+                         (success message)
+```
+
+---
 
 ## File Structure
 
 ```
 hbdr-website/
-+-- server/
-|   +-- index.ts          # Dev server entry point (Hono + @hono/node-server, port 5000)
-|   +-- routes.ts         # All HTTP route definitions (pages + API endpoints)
-|   +-- storage.ts        # In-memory data storage (MemStorage class with Maps)
-|   +-- template.ts       # ALL HTML templates (5212 lines, monolithic)
-+-- shared/
-|   +-- schema.ts         # Zod schemas for blogPosts and contactSubmissions
-+-- worker.ts             # Cloudflare Workers entry point (duplicates route setup)
-+-- script/
-|   +-- build.ts          # esbuild script to bundle worker.ts for CF Workers
-+-- public/
-|   +-- assets/           # Static files served at /assets/* (favicons, logo images)
-+-- attached_assets/      # Source branding files (logos, content specs, branding JSON)
-+-- client/
-|   +-- public/
-|       +-- favicon.png   # Orphaned file from prior React SPA architecture
-+-- .local/               # Replit agent state files (not version-controlled content)
-+-- .upm/
-|   +-- store.json        # Replit package manager state
-+-- package.json          # Dependencies (heavily bloated with unused packages)
-+-- package-lock.json     # Lock file
-+-- tsconfig.json         # TypeScript config (targets ES2022, JSX react-jsx)
-+-- tsconfig.worker.json  # TypeScript config for Cloudflare Worker build
-+-- wrangler.toml         # Cloudflare Workers config (name: hbdr-website)
-+-- components.json       # shadcn/ui config (unused -- no React components exist)
-+-- replit.md             # Replit project documentation
-+-- README.md             # Basic project README
-+-- .gitignore            # Standard Node.js gitignore
+├── server/
+│   ├── index.ts              # Node.js dev server entry. Hono + @hono/node-server, port 5000.
+│   │                         # Imports registerRoutes from routes.ts.
+│   ├── routes.ts             # ALL route handlers (213 lines). 26 page GETs + 5 API endpoints.
+│   │                         # Contains sanitizeHtml(). Imports all 29 render functions.
+│   │                         # Uses Node.js fs/path for /assets/:filename static file serving.
+│   ├── storage.ts            # IStorage interface + MemStorage class (305 lines).
+│   │                         # In-memory Maps for users, contactLeads, blogPosts.
+│   │                         # Proxy-based lazy initialization. Seeds 5 blog posts on construction.
+│   │                         # Custom UUID generator with crypto.randomUUID() fallback.
+│   └── template.ts           # ALL 26 page templates + shared components (5212 lines).
+│                              # 29 exported render functions + ~10 private helpers.
+│                              # Contains ALL CSS in renderHead() (lines 50-530).
+│                              # Contains renderNav(), renderFooter(), renderScripts().
+│                              # Contains renderLayout(), renderPageHero(), renderStatsSection(),
+│                              #   renderCTASection(), renderContactFormSection().
+│
+├── shared/
+│   └── schema.ts             # Drizzle pgTable defs + Zod validation schemas (73 lines).
+│                              # Defines: users, contactLeads, blogPosts tables.
+│                              # Exports: insertContactLeadSchema, insertBlogPostSchema.
+│                              # Exports types: User, InsertUser, ContactLead, InsertContactLead,
+│                              #   BlogPost, InsertBlogPost.
+│
+├── worker.ts                 # Cloudflare Workers entry (177 lines). DUPLICATES routes.
+│                              # ⚠️ MISSING 10 PAGE ROUTES. Only has 16 of 26 pages.
+│                              # Contains its own sanitizeHtml() copy.
+│                              # Does NOT import registerRoutes -- reimplements everything.
+│
+├── script/
+│   └── build.ts              # ORPHANED. esbuild + Vite bundler for prior React+Express stack.
+│
+├── public/assets/            # Static files served by Cloudflare Workers.
+├── attached_assets/          # Source branding files served by dev server at /assets/:filename.
+├── client/public/favicon.png # ORPHANED. Non-HBDR favicon from prior React SPA.
+├── components.json           # ORPHANED. shadcn/ui config.
+├── package.json              # 5 deps + 3 devDeps. Missing @hono/node-server. No lockfile.
+├── tsconfig.json             # Main TS config. References phantom client/src/ and vite/client.
+├── tsconfig.worker.json      # Worker-specific TS config. Targets ES2022.
+├── wrangler.toml             # Cloudflare Workers config. Serves public/ as static assets.
+└── README.md                 # OUTDATED. Says "16+ pages", lists only 9 solution pages.
 ```
+
+---
 
 ## External Integrations
 
-| Service | How Authed | What It Does |
-|---------|-----------|--------------|
-| Tailwind CSS CDN | None (public CDN) | CSS framework loaded via `<script src="https://cdn.tailwindcss.com">` |
-| Alpine.js CDN | None (public CDN) | Lightweight JS framework for interactivity |
-| HTMX CDN | None (public CDN) | Declared in head but barely used |
-| Google Fonts CDN | None (public CDN) | Inter font family |
-| Cloudflare Workers | Wrangler CLI (API token) | Production deployment target |
+| Service | How Used | Auth | Notes |
+|---------|----------|------|-------|
+| Cloudflare Workers | Production hosting via `wrangler deploy` | Wrangler CLI OAuth | Worker name: `hbdr-website` |
+| CDN (jsdelivr, unpkg, googleapis) | Runtime CSS/JS/font loading | None (public CDN) | No SRI hashes |
+| `https://dashboard.hbdr.com` | External link from Dashboard page | N/A | Status unknown |
 
-There are **no** third-party API integrations, payment providers, analytics services, email providers, or database connections. The contact form submits data that is stored in memory and never forwarded anywhere.
+There are no webhooks, no third-party API calls, no email integrations, no payment processors, no analytics services, and no database connections.
+
+---
 
 ## State Management
 
-| State | Where It Lives | Persistence |
-|-------|---------------|-------------|
-| Blog posts | In-memory `Map<string, BlogPost>` in `MemStorage` | **None** -- lost on restart |
-| Contact submissions | In-memory `Map<string, ContactSubmission>` in `MemStorage` | **None** -- lost on restart |
-| Blog editor form state | Alpine.js `x-data` in browser | Browser session only |
-| Contact form state | Alpine.js `x-data` in browser | Browser session only |
-| FAQ accordion state | Alpine.js `x-data` in browser | Browser session only |
-| Mobile menu state | Alpine.js `x-data` in browser | Browser session only |
-| Blog category filter | Alpine.js `x-data` in browser | Browser session only (non-functional -- see Known Issues) |
+| State Type | Where | Persistence | Contents |
+|------------|-------|-------------|----------|
+| Blog posts | `MemStorage.blogPosts` Map | Lost on restart. Reseeded with 5 sample posts. | id, title, slug, excerpt, content, etc. |
+| Contact leads | `MemStorage.contactLeads` Map | Lost on restart. Never forwarded. | id, name, email, company, impressions, message, createdAt |
+| Users | `MemStorage.users` Map | Lost on restart. Never populated. | id, username, password |
+| Alpine.js UI state | Browser `x-data` | Lost on page navigation | Form fields, mobile nav, FAQ accordions |
+
+---
 
 ## Security Model
 
 ### Authentication
-**There is none.** The blog admin panel at `/admin/blog`, `/admin/blog/new`, and `/admin/blog/edit/:id` is completely open to the public. Anyone can create, edit, and delete blog posts.
+**None.** There is no login, no sessions, no cookies, no JWT, no API keys. Every endpoint is public, including the full blog admin panel and `GET /api/contact` (PII exposure).
 
 ### Input Validation
-- Blog post creation/update: Zod schema validation on required fields
-- Contact form: Zod schema validation on required fields
-- HTML sanitization: Basic regex-based `sanitizeHtml()` function strips `<script>`, `<iframe>`, `<object>`, `<embed>`, `<link>`, and event handler attributes (e.g., `onclick`, `onerror`)
+- Contact leads: Zod validation (name min 2, valid email, company min 2, impressions min 1).
+- Blog posts: Zod validation (title min 3, slug regex, excerpt min 10, content min 20, author min 2, category min 2).
+- Blog HTML content: Regex-based `sanitizeHtml()` -- **bypassable**.
 
-### Security Gaps
-- **No authentication** on admin routes
-- **No CSRF protection** on any forms or API endpoints
-- **No rate limiting** on API endpoints (contact form, blog CRUD)
-- **No Content Security Policy (CSP) headers**
-- **sanitizeHtml is duplicated** in both `routes.ts` and `worker.ts` with identical logic -- changes to one won't propagate to the other
-- **sanitizeHtml is regex-based** and likely bypassable with edge cases (e.g., mixed case tags, nested tags, Unicode tricks)
-- **No CORS configuration** (Hono default: no CORS headers)
-- **Blog content field accepts raw HTML** and renders it directly in templates -- XSS risk despite sanitization
-- **Delete endpoint uses GET-style inline onclick** with `fetch()` -- no confirmation token, no CSRF
+### Security Headers
+None. No CORS, no CSP, no X-Frame-Options, no X-Content-Type-Options, no HSTS.
 
-### Secrets Handling
-There are no secrets, API keys, or environment variables in use. The application has no external service integrations.
+### Secrets
+None. No environment variables used in application code.
+
+---
 
 ## Infrastructure
 
-### Development
-- **Platform**: Replit (evidenced by `.upm/`, `.local/state/replit/`, `replit.md`)
-- **Dev server**: `tsx server/index.ts` on port 5000
-- **Hot reload**: None (manual restart required)
-
-### Production
-- **Target**: Cloudflare Workers (configured in `wrangler.toml`)
-- **Build**: `tsx script/build.ts` -- uses esbuild to bundle `worker.ts` into `dist/worker.js`
-- **Worker name**: `hbdr-website`
-- **Compatibility date**: `2025-04-01`
-- **Domain**: Not configured in wrangler.toml (uses default `*.workers.dev`)
+| Environment | Entry Point | Static Assets | Status |
+|-------------|------------|--------------|--------|
+| Development | server/index.ts | attached_assets/ | Requires installing missing @hono/node-server |
+| Production | worker.ts | public/ via [assets] | **BROKEN** -- missing 10 page routes |
 
 ### CI/CD
-**There is none.** No GitHub Actions, no automated testing, no staging environment. Deployment is presumably manual via `npx wrangler deploy`.
+**None.** No GitHub Actions, no automated testing, no staging. Manual deploy via `npx wrangler deploy`.
 
-### Environments
-| Environment | Details |
-|-------------|---------|
-| Development | Replit + tsx, port 5000 |
-| Staging | Does not exist |
-| Production | Cloudflare Workers (manual deploy) |
+---
 
 ## Known Issues
 
 ### Critical
-1. **No data persistence**: All blog posts and contact submissions are stored in-memory Maps. Every server restart or Cloudflare Worker cold start loses all data.
-2. **No authentication on admin panel**: `/admin/blog` is publicly accessible. Anyone can CRUD blog posts.
-3. **XSS risk in blog content**: Blog posts accept raw HTML content rendered directly into pages. The `sanitizeHtml()` function is regex-based and likely bypassable.
-4. **sanitizeHtml() is duplicated**: Identical function exists in both `routes.ts:9-21` and `worker.ts:19-29`. Any fix must be applied to both files.
-5. **worker.ts is 10 pages behind routes.ts**: New pages (Privacy Policy, Terms, GDPR, Support, Dashboard, Video Player, Partners, Publishers, Advertisers, Trust) exist in routes.ts but NOT in worker.ts. Deploying to Cloudflare Workers will 404 on all these pages, including legal pages linked from every page's footer.
+1. **No authentication on admin panel** -- `/admin/blog` and all blog/contact APIs are publicly accessible.
+2. **worker.ts is 10 pages behind routes.ts** -- Deploying to Workers breaks 10 pages including legal pages linked from every footer.
+3. **No data persistence** -- In-memory Maps. Contact leads and blog posts lost on every restart.
+4. **XSS risk in blog content** -- Regex `sanitizeHtml()` is bypassable. Content rendered as raw innerHTML.
+5. **sanitizeHtml() duplicated** -- In both `routes.ts:9-21` and `worker.ts:19-29`. The routes.ts version declares unused `allowedTags`/`allowedAttrs` arrays.
+6. **@hono/node-server missing from package.json** -- Dev server will crash after `npm install`.
+7. **No lockfile** -- No `package-lock.json`. Builds are non-reproducible.
 
 ### Significant
-6. **Massive dependency bloat**: 60+ packages installed, ~10 actually used. `node_modules` is enormous with React, Radix UI, Express, Drizzle, Passport, etc. that are never imported.
-7. **template.ts is a 5212-line monolith**: All 26 page templates in a single file. No separation of concerns, extremely hard to maintain. Grew 55% since initial build.
-8. **Blog category filters don't work**: The Alpine.js `x-data="{ activeCategory: '' }"` state on the blog listing page is never connected to actual DOM filtering logic. Clicking a category button changes state but posts are not filtered.
-9. **`published` field is a string**: `"true"/"false"` instead of a boolean. Fragile string comparisons throughout.
-10. **Support form schema mismatch**: The `/support` page form submits to `/api/contact` but sends `website` and `monthlyPageviews` fields that don't exist in the Zod schema (expects `impressions`). Will fail validation.
+8. **Blog category filters broken** -- Filter buttons update Alpine.js state but no `x-show` on post cards.
+9. **Support form schema mismatch** -- `/support` form sends `website`/`monthlyPageviews` not in Zod schema.
+10. **`published` is a string** -- `"true"`/`"false"` instead of boolean.
+11. **script/build.ts is dead code** -- References packages that no longer exist. No build script in package.json.
 
 ### Minor
-11. **Social icon links are broken**: LinkedIn and Twitter/X icons in footer point to `"#"`. (Resources and Legal footer links are now fixed with real page links.)
-12. **OG image URL is relative**: `<meta property="og:image" content="/assets/HBDR_Logo_Pack_all_sizes_-_8_1770577514801.jpeg">` -- social media crawlers need absolute URLs.
-13. **Hardcoded stats**: Stats section shows "1T+ Ads Served", "500+ Publishers", "40-60% Revenue Uplift", "$2B+ Revenue Generated" -- hardcoded in template, not configurable.
-14. **No 404 page**: Unmatched routes return Hono's default "404 Not Found" text, not a branded error page.
-15. **No sitemap.xml or robots.txt**: Missing basic SEO files.
-16. **`components.json` is orphaned**: shadcn/ui configuration file with no corresponding React components.
-17. **`client/public/favicon.png` is orphaned**: Leftover from prior React SPA architecture.
-18. **Package name is `rest-express`**: Does not match the project (HBDR website using Hono, not Express).
-19. **`db:push` script references Drizzle**: `"db:push": "drizzle-kit push"` -- no database exists.
-20. **External dashboard link unverified**: Dashboard page links to `https://dashboard.hbdr.com` -- not verified if live.
+12. **Social icon links** -- LinkedIn and Twitter/X icons point to `#`.
+13. **OG image URL is relative** -- Social media previews won't show images.
+14. **README.md outdated** -- Says "16+ pages", missing 10 new pages.
+15. **tsconfig.json phantom paths** -- References `client/src/**/*` and `vite/client` types that don't exist.
+16. **components.json orphaned** -- shadcn/ui config for non-existent React setup.
+17. **No SRI hashes on CDN scripts** -- Compromised CDN could inject code.
+18. **No error pages** -- 404/500 return plain text.
+19. **No sitemap.xml or robots.txt** -- Missing SEO files.
+20. **HTMX loaded but never used** -- CDN-loaded on every page, zero `hx-*` attributes in templates.
+21. **Fonts changed** -- Code uses Figtree/Instrument Serif, docs say Inter.
+
+---
+
+## Git History Analysis
+
+The git log reveals this project's evolution:
+
+1. **Initial commit** (`27dd4a4`): Scaffolded as a React+Express+Drizzle+PostgreSQL SPA (hence the original 60+ dependencies, `components.json`, `client/` directory).
+
+2. **Architecture pivot** (`64ad6ed`): Completely rewritten as server-rendered Hono with HTML template literals. React, Express, Vite, and all frontend build tooling abandoned. The pivot was thorough in server code but left behind orphaned configs.
+
+3. **Documentation** (`cf6ee79`): Comprehensive docs merged via PR #1.
+
+4. **Major content expansion** (`8c8d44e`-`9eb4b9e`): 10 new pages added. Nav restructured with Company dropdown. Footer links fixed. BUT worker.ts was NOT updated with the new routes.
+
+5. **package.json cleanup** (`ca3a878`): Dependency purge from ~70 to 5+3 packages. Name changed to `hbdr-website`. Dev/build/check scripts removed. `@hono/node-server` accidentally removed.
+
+6. **Lockfile deleted** (`9866842`): package-lock.json explicitly removed.
+
+The abandoned React+Express SPA approach is well-documented in the remnant files. It was abandoned because a marketing site doesn't need client-side rendering -- SSR with Alpine.js is simpler and faster.
