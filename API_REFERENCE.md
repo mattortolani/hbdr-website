@@ -37,6 +37,16 @@ All page routes return `200` with full HTML documents (nav, content, footer).
 | GET | `/solutions/manage-inventory` | Manage Inventory solution page |
 | GET | `/solutions/open-bidding` | Open Bidding solution page |
 | GET | `/solutions/ad-exchange-adx` | Ad Exchange AdX solution page |
+| GET | `/solutions/video-player` | Video Player solution page |
+| GET | `/dashboard` | Analytics Dashboard product page (links to dashboard.hbdr.com) |
+| GET | `/partners` | Partners & Integrations (SSP, DSP, identity, compliance, tech) |
+| GET | `/publishers` | For Publishers (value props, onboarding, FAQs) |
+| GET | `/advertisers` | For Advertisers (deal types, inventory, brand safety) |
+| GET | `/trust` | Trust & Compliance (supply chain, anti-fraud, privacy, certs) |
+| GET | `/privacy-policy` | Privacy Policy (legal page) |
+| GET | `/terms` | Terms & Conditions (legal page) |
+| GET | `/gdpr-cookie-policy` | GDPR & Cookie Policy (legal page) |
+| GET | `/support` | FAQ & Support (4 FAQ categories + support form) |
 
 ---
 

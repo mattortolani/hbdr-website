@@ -5,11 +5,11 @@
 The finished HBDR website is a production-grade marketing site with the following characteristics:
 
 ### Complete Feature Set
-- **16+ server-rendered pages** with consistent glassmorphism design, SEO metadata, and responsive layouts
+- **26 server-rendered pages** with consistent glassmorphism design, SEO metadata, and responsive layouts
 - **Blog CMS** with authenticated admin panel, persistent storage, rich text editing, image uploads, draft/publish workflow, pagination, search, and category filtering that actually works
 - **Contact form** with server-side validation, persistent lead storage, email notification forwarding, rate limiting, and CAPTCHA/bot protection
 - **SEO optimization** with sitemap.xml, robots.txt, absolute OG image URLs, structured data (JSON-LD), and canonical URLs on every page
-- **Legal pages** with real Privacy Policy, Terms of Service, and Cookie Policy content
+- **Legal pages** with real Privacy Policy, Terms of Service, and Cookie Policy content (NOW DONE)
 - **404/500 error pages** with branded design matching the site aesthetic
 
 ### Error Handling & Recovery
@@ -66,12 +66,21 @@ The finished HBDR website is a production-grade marketing site with the followin
 | **Blog API (CRUD)** | 🔧 PARTIAL | POST/PUT/DELETE endpoints with Zod validation, slug uniqueness check | No auth, no rate limiting, no pagination, regex-based HTML sanitizer bypassable |
 | **Contact API** | 🔧 PARTIAL | POST endpoint with Zod validation, success/error HTML responses | No rate limiting, no email forwarding, no CAPTCHA, no persistent storage |
 | **Contact Leads API** | ⚠️ BROKEN | GET /api/contact returns all leads as JSON | Completely unauthenticated -- anyone can view all submitted contact data |
-| **9 Solution Pages** | 🔧 PARTIAL | Header Bidding, Display Ads, CTV/OTT, In-App, MCM, Manage Account, Manage Inventory, Open Bidding, Ad Exchange AdX -- all render with overview, features, stats, CTA | Content is marketing copy only, no interactive demos or calculators |
-| **Navigation** | ✅ DONE | Desktop nav with Solutions dropdown (hover), mobile nav with hamburger + expandable solutions, scroll shadow effect | - |
-| **Footer** | 🔧 PARTIAL | 6-column layout with Solutions, Company, Resources, Legal links, social icons, copyright | Social links point to `#`, Resources links (Case Studies, Documentation, Support, FAQ) point to `#`, Legal links (Privacy Policy, Terms, Cookie Policy, GDPR) point to `#` |
+| **10 Solution Pages** | 🔧 PARTIAL | Header Bidding, Display Ads, Video Player, CTV/OTT, In-App, MCM, Manage Account, Manage Inventory, Open Bidding, Ad Exchange AdX -- all render with overview, features, stats, CTA | Content is marketing copy only, no interactive demos or calculators |
+| **Privacy Policy Page** | ✅ DONE | Full legal privacy policy with data collection, use, sharing, GDPR/CCPA rights, cookie info, contact details | - |
+| **Terms & Conditions Page** | ✅ DONE | Full legal terms covering acceptance, services, accounts, payment, IP, liability, termination, governing law (FL) | - |
+| **GDPR & Cookie Policy Page** | ✅ DONE | GDPR rights, data subject rights, cookie table (9 cookies), consent management info, DPO contact | - |
+| **FAQ & Support Page** | 🔧 PARTIAL | 4 FAQ categories (15 items), support channels, support request form | Support form sends wrong fields to /api/contact (schema mismatch -- sends `monthlyPageviews` instead of `impressions`) |
+| **Dashboard Page** | ✅ DONE | Analytics Dashboard marketing page with data dimensions, revenue views, platform features | Links to external `https://dashboard.hbdr.com` (not verified) |
+| **Partners Page** | ✅ DONE | SSP (16), DSP (8), Identity (6), Compliance (7), Technology (8) partners listed by name | - |
+| **Publishers Page** | ✅ DONE | Value props, 5 onboarding steps, managed vs self-serve comparison, requirements, 8 FAQs | - |
+| **Advertisers Page** | ✅ DONE | 3 deal types (PMP, PG, Direct), inventory stats, brand safety features, getting-started steps | - |
+| **Trust & Compliance Page** | ✅ DONE | Supply chain, anti-fraud, privacy sections, 6 certifications, 12 capabilities | - |
+| **Navigation** | ✅ DONE | Desktop nav with Solutions dropdown (10 items incl. Video Player) + Company dropdown (9 items) + standalone Publisher/Advertiser/Partners links. Mobile nav with hamburger + expandable submenus | - |
+| **Footer** | 🔧 PARTIAL | 4-column layout: Solutions, Company, Resources (7 real links), Legal (3 real links), social icons, scroll-to-top button | Social icons (LinkedIn, Twitter/X) still point to `#` |
 | **SEO Meta Tags** | 🔧 PARTIAL | Title, description, og:title, og:description, og:type, og:image, twitter:card on every page | og:image uses relative URL (breaks social previews), no canonical `<link>`, no JSON-LD structured data, no sitemap.xml, no robots.txt |
 | **Static Asset Serving** | 🔧 PARTIAL | `/assets/:filename` serves from `attached_assets/` in dev, `public/assets/` for Workers | File-based serving with fs.readFileSync (blocks event loop), basic MIME type detection |
-| **Cloudflare Worker** | ⚠️ BROKEN | `worker.ts` duplicates all route logic from `routes.ts` instead of importing it | Any route change requires updating two files. Worker entry has no static asset fallback for CSS/JS CDN failures |
+| **Cloudflare Worker** | ⚠️ BROKEN | `worker.ts` duplicates route logic from `routes.ts` instead of importing it. **Now 10 pages behind routes.ts** -- missing Privacy Policy, Terms, GDPR, Support, Dashboard, Video Player, Partners, Publishers, Advertisers, Trust | Deploying to Workers will 404 on 10 pages. Any route change requires updating two files. Worker has no static asset fallback |
 | **Data Persistence** | ⚠️ BROKEN | In-memory Maps with seeded blog posts | All data lost on restart. No database. Schema defines PostgreSQL tables via Drizzle but no DB connection exists |
 | **Authentication** | 🔲 PLANNED | `users` table defined in schema.ts, passport/passport-local in dependencies | Zero auth implementation. Schema exists but nothing uses it |
 | **HTML Sanitization** | ⚠️ BROKEN | Regex-based sanitizeHtml() strips script/style tags and event handlers | Duplicated in 2 files, regex approach bypassable, does not handle edge cases (nested tags, encoded entities, SVG-based XSS) |
@@ -84,8 +93,8 @@ The finished HBDR website is a production-grade marketing site with the followin
 | **CSRF Protection** | 📋 REQUIRED | Nothing exists | No CSRF tokens on any forms |
 | **Logging** | 🔧 PARTIAL | Hono logger middleware for request logging, console.error for errors | No structured format, no request IDs, no log levels |
 | **Health Check** | 📋 REQUIRED | Nothing exists | No health check endpoint |
-| **Privacy Policy Page** | 📋 REQUIRED | Link exists in footer but points to `#` | No actual page or content |
-| **Terms of Service Page** | 📋 REQUIRED | Link exists in footer but points to `#` | No actual page or content |
+| **Privacy Policy Page** | ✅ DONE | Full legal page at `/privacy-policy` with comprehensive content | - |
+| **Terms of Service Page** | ✅ DONE | Full legal page at `/terms` with comprehensive content | - |
 | **Sitemap & Robots** | 📋 REQUIRED | Nothing exists | No sitemap.xml, no robots.txt |
 | **404 Error Page** | 📋 REQUIRED | Nothing exists | Hono default plain text "404 Not Found" |
 
@@ -317,7 +326,7 @@ The finished HBDR website is a production-grade marketing site with the followin
 **Depends On**: None
 **Files**: `worker.ts`, `server/routes.ts`
 
-**Context**: `worker.ts` (178 lines) re-implements every route handler that exists in `server/routes.ts` (200 lines). The only difference is that `worker.ts` doesn't have the `/assets/:filename` route (Workers serve static files via the `[assets]` config in `wrangler.toml`). This means every route change, bug fix, or new page must be applied in two places. The `sanitizeHtml()` function is also duplicated.
+**Context**: `worker.ts` (177 lines) re-implements route handlers from `server/routes.ts` (212 lines) but is now **10 pages behind**. The worker is missing all routes for: Privacy Policy, Terms, GDPR & Cookie Policy, FAQ & Support, Dashboard, Video Player, Partners, Publishers, Advertisers, and Trust & Compliance. The `sanitizeHtml()` function is also duplicated. This means the production Cloudflare Workers deployment will 404 on 10 pages, including legal pages linked from every page's footer.
 
 **Requirements**:
 1. Refactor `server/routes.ts` so that route registration logic is independent of the Node.js `fs` module (the only Node-specific code is the `/assets/:filename` handler)
@@ -691,7 +700,7 @@ The finished HBDR website is a production-grade marketing site with the followin
 **Depends On**: None
 **Files**: `server/template.ts` (source), new files in `server/templates/`
 
-**Context**: `server/template.ts` is 3363 lines containing every page template, shared layout components, and utility functions. This makes the file extremely difficult to navigate, maintain, or modify. Adding a new page means scrolling through thousands of lines of unrelated HTML.
+**Context**: `server/template.ts` is 5212 lines containing every page template, shared layout components, and utility functions. This makes the file extremely difficult to navigate, maintain, or modify. Adding a new page means scrolling through thousands of lines of unrelated HTML.
 
 **Requirements**:
 1. Create a `server/templates/` directory
