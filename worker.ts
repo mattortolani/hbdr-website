@@ -12,10 +12,11 @@ import {
   renderAdExchangePage, renderPrivacyPolicyPage, renderTermsPage,
   renderGdprCookiePolicyPage, renderFaqSupportPage, renderDashboardPage,
   renderVideoPlayerPage, renderPartnersPage, renderPublishersPage,
-  renderAdvertisersPage, renderTrustCompliancePage
+  renderAdvertisersPage, renderTrustCompliancePage, SITE_URL
 } from "./server/template";
 import { renderPublisherToolsPage } from "./server/toolsTemplate";
 import { renderAdminLoginPage, renderAdminLeadsPage } from "./server/adminTemplate";
+import { sanitizeHtml, sanitizeText } from "./server/sanitize";
 
 type Env = {
   DB: D1Database;
@@ -27,25 +28,6 @@ type Env = {
 const app = new Hono<{ Bindings: Env }>();
 
 app.use("*", logger());
-
-function sanitizeHtml(html: string): string {
-  let result = html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/on\w+\s*=\s*[^\s>]*/gi, '')
-    .replace(/javascript\s*:/gi, 'blocked:')
-    .replace(/data\s*:/gi, 'blocked:')
-    .replace(/vbscript\s*:/gi, 'blocked:');
-  return result;
-}
-
-function sanitizeText(text: string): string {
-  return text.replace(/[<>"'&]/g, (char) => {
-    const entities: Record<string, string> = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
-    return entities[char] || char;
-  });
-}
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function checkRateLimit(ip: string): { allowed: boolean } {
@@ -170,6 +152,37 @@ app.get("/privacy-policy", (c) => c.html(renderPrivacyPolicyPage()));
 app.get("/terms", (c) => c.html(renderTermsPage()));
 app.get("/gdpr-cookie-policy", (c) => c.html(renderGdprCookiePolicyPage()));
 app.get("/support", (c) => c.html(renderFaqSupportPage()));
+
+// SEO routes
+app.get("/robots.txt", (c) => {
+  return c.text(`User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`);
+});
+
+app.get("/sitemap.xml", (c) => {
+  const pages = [
+    "/", "/about", "/how-it-works", "/careers", "/press", "/contact",
+    "/solutions/header-bidding", "/solutions/display-ads", "/solutions/ctv-ott",
+    "/solutions/in-app-ads", "/solutions/mcm", "/solutions/manage-account",
+    "/solutions/manage-inventory", "/solutions/open-bidding", "/solutions/ad-exchange-adx",
+    "/solutions/video-player", "/dashboard", "/partners", "/publishers",
+    "/advertisers", "/trust", "/tools", "/blog",
+    "/privacy-policy", "/terms", "/gdpr-cookie-policy", "/support",
+  ];
+  const urls = pages.map(p => `  <url><loc>${SITE_URL}${p}</loc></url>`).join("\n");
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+  return new Response(xml, {
+    headers: { "Content-Type": "application/xml" },
+  });
+});
 
 // Blog routes
 app.get("/blog", async (c) => {

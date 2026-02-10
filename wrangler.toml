@@ -10,6 +10,7 @@ directory = "./public"
 [vars]
 ENVIRONMENT = "production"
 ADMIN_PASSWORD = "hbdr2025!"
+SITE_URL = "https://hbdr.com"
 
 [[d1_databases]]
 binding = "DB"
