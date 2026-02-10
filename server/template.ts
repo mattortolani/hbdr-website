@@ -1,4 +1,4 @@
-interface LayoutOptions {
+export interface LayoutOptions {
   title: string;
   description: string;
   ogTitle?: string;
@@ -309,10 +309,17 @@ function renderHead(options: LayoutOptions): string {
     .stagger-6 { transition-delay: 0.48s; }
 
     .logo-scroll {
-      animation: scrollLogos 35s linear infinite;
+      animation: scrollLogos 40s linear infinite;
+    }
+    .logo-scroll-reverse {
+      animation: scrollLogosReverse 40s linear infinite;
+    }
+    @keyframes scrollLogosReverse {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
     }
 
-    .logo-scroll:hover { animation-play-state: paused; }
+    .logo-scroll:hover, .logo-scroll-reverse:hover { animation-play-state: paused; }
 
     .text-gradient {
       background: linear-gradient(160deg, #ffffff, rgba(255,255,255,0.55));
@@ -573,6 +580,7 @@ function renderNav(): string {
           </div>
           <a href="/publishers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-publishers">Publishers</a>
           <a href="/advertisers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-advertisers">Advertisers</a>
+          <a href="/tools" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-tools">Tools</a>
           <a href="/partners" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-partners">Partners</a>
           <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
             <button class="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1 cursor-pointer" data-testid="link-company">
@@ -622,7 +630,7 @@ function renderNav(): string {
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 -translate-y-2"
-         class="lg:hidden border-t border-white/5 bg-black/90 backdrop-blur-xl"
+         class="lg:hidden border-t border-white/5 bg-black/90 backdrop-blur-xl overflow-y-auto" style="max-height: calc(100vh - 64px); max-height: calc(100dvh - 64px);"
          data-testid="mobile-menu">
       <div class="px-4 py-6 space-y-1" x-data="{ solOpen: false }">
         <button @click="solOpen = !solOpen" class="w-full text-left py-3 text-lg text-white/80 hover:text-white transition-colors flex items-center justify-between cursor-pointer" data-testid="mobile-link-solutions">
@@ -643,6 +651,7 @@ function renderNav(): string {
         </div>
         <a href="/publishers" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-publishers">For Publishers</a>
         <a href="/advertisers" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-advertisers">For Advertisers</a>
+        <a href="/tools" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-tools">Tools</a>
         <a href="/partners" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-partners">Partners</a>
         <a href="/how-it-works" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-how-it-works">How It Works</a>
         <a href="/about" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-about">About</a>
@@ -659,14 +668,6 @@ function renderNav(): string {
 }
 
 function renderFooter(): string {
-  const companyLinks = [
-    { label: "About Us", href: "/about" },
-    { label: "How It Works", href: "/how-it-works" },
-    { label: "Careers", href: "/careers" },
-    { label: "Press", href: "/press" },
-    { label: "Contact", href: "/contact" },
-  ];
-
   return `
   <footer class="pt-16 pb-8" data-testid="footer">
     <div class="glow-line max-w-4xl mx-auto mb-16"></div>
@@ -698,17 +699,28 @@ function renderFooter(): string {
             ${[
               { label: "Header Bidding", href: "/solutions/header-bidding" },
               { label: "Display Ads", href: "/solutions/display-ads" },
+              { label: "Video Player", href: "/solutions/video-player" },
               { label: "In-App Ads", href: "/solutions/in-app-ads" },
               { label: "CTV & OTT", href: "/solutions/ctv-ott" },
               { label: "Open Bidding", href: "/solutions/open-bidding" },
               { label: "Ad Exchange AdX", href: "/solutions/ad-exchange-adx" },
-            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l.label}</a></li>`).join("")}
+              { label: "MCM", href: "/solutions/mcm" },
+              { label: "Manage Account", href: "/solutions/manage-account" },
+              { label: "Manage Inventory", href: "/solutions/manage-inventory" },
+            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors" data-testid="link-footer-${l.href.replace(/\//g, '-').slice(1)}">${l.label}</a></li>`).join("")}
           </ul>
         </div>
         <div>
           <h4 class="font-semibold text-white text-sm mb-4">Company</h4>
           <ul class="space-y-3">
-            ${companyLinks.map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l.label}</a></li>`).join("")}
+            ${[
+              { label: "About Us", href: "/about" },
+              { label: "How It Works", href: "/how-it-works" },
+              { label: "Careers", href: "/careers" },
+              { label: "Press", href: "/press" },
+              { label: "Contact", href: "/contact" },
+              { label: "Dashboard", href: "/dashboard" },
+            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors" data-testid="link-footer-${l.href.slice(1)}">${l.label}</a></li>`).join("")}
           </ul>
         </div>
         <div>
@@ -717,12 +729,12 @@ function renderFooter(): string {
             ${[
               { label: "For Publishers", href: "/publishers" },
               { label: "For Advertisers", href: "/advertisers" },
+              { label: "Revenue Calculators", href: "/tools" },
               { label: "Partners", href: "/partners" },
               { label: "Trust & Compliance", href: "/trust" },
               { label: "Blog", href: "/blog" },
               { label: "FAQ & Support", href: "/support" },
-              { label: "Dashboard", href: "/dashboard" },
-            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l.label}</a></li>`).join("")}
+            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors" data-testid="link-footer-${l.href.slice(1)}">${l.label}</a></li>`).join("")}
           </ul>
         </div>
         <div>
@@ -732,7 +744,7 @@ function renderFooter(): string {
               { label: "Privacy Policy", href: "/privacy-policy" },
               { label: "Terms & Conditions", href: "/terms" },
               { label: "GDPR & Cookie Policy", href: "/gdpr-cookie-policy" },
-            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors">${l.label}</a></li>`).join("")}
+            ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors" data-testid="link-footer-${l.href.slice(1)}">${l.label}</a></li>`).join("")}
           </ul>
         </div>
       </div>
@@ -771,7 +783,7 @@ function renderScripts(): string {
   <style>[x-cloak] { display: none !important; }</style>`;
 }
 
-function renderLayout(options: LayoutOptions): string {
+export function renderLayout(options: LayoutOptions): string {
   return `${renderHead(options)}
 
 <body class="antialiased">
@@ -858,7 +870,7 @@ function renderContactFormSection(): string {
         <div class="lg:col-span-3 animate-on-scroll stagger-2">
           <div id="contact-form-container"
                x-data="{
-                 formData: { name: '', email: '', company: '', impressions: '', message: '' },
+                 formData: { name: '', email: '', company: '', impressions: '', message: '', _hp_website: '', _source: 'contact' },
                  submitting: false,
                  submitted: false,
                  error: false,
@@ -897,6 +909,11 @@ function renderContactFormSection(): string {
 
               <div x-show="error" x-cloak class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
                 Something went wrong. Please try again or email us at contact@hbdr.com
+              </div>
+
+              <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;height:0;width:0;overflow:hidden;" aria-hidden="true" tabindex="-1">
+                <label for="hp_website">Website</label>
+                <input type="text" id="hp_website" name="website" x-model="formData._hp_website" autocomplete="off" tabindex="-1" />
               </div>
 
               <div class="grid sm:grid-cols-2 gap-6">
@@ -1160,25 +1177,118 @@ export function renderPage(): string {
   <section class="py-16 overflow-hidden" data-testid="logo-carousel">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
       <p class="text-center text-white/30 text-sm font-medium uppercase tracking-widest animate-on-scroll">
-        Trusted by Leading Publishers Worldwide
+        Trusted by Leading Advertisers Worldwide
       </p>
     </div>
-    <div class="relative">
-      <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[var(--surface)] to-transparent z-10"></div>
-      <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[var(--surface)] to-transparent z-10"></div>
-      <div class="flex logo-scroll" style="width: max-content;">
-        ${["TechMedia", "AdVantage", "MediaFlow", "PubGrowth", "StreamAds", "ContentPro", "AdRevenue", "MediaMax", "PubTech", "AdSphere", "TechMedia", "AdVantage", "MediaFlow", "PubGrowth", "StreamAds", "ContentPro", "AdRevenue", "MediaMax", "PubTech", "AdSphere"]
-          .map(
-            (name) => `
-          <div class="flex-shrink-0 mx-6">
-            <div class="glass-card px-6 py-3 flex items-center gap-3" style="border-radius: 12px;">
-              <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-xs font-bold text-white/40">${name.substring(0, 2)}</div>
-              <span class="text-sm font-medium text-white/50 whitespace-nowrap">${name}</span>
+    <div class="space-y-4">
+      ${(() => {
+        const row1 = [
+          { name: "Verve", domain: "verve.com", color: "#6C5CE7" },
+          { name: "AppLovin", domain: "applovin.com", color: "#1A73E8" },
+          { name: "Sovrn", domain: "sovrn.com", color: "#00C9A7" },
+          { name: "Xandr", domain: "xandr.com", color: "#E94E77" },
+          { name: "OpenX", domain: "openx.com", color: "#39B54A" },
+          { name: "Index Exchange", domain: "indexexchange.com", color: "#4A90D9" },
+          { name: "Magnite", domain: "magnite.com", color: "#8B5CF6" },
+          { name: "Google AdX", domain: "google.com", color: "#FBBC04" },
+          { name: "TripleLift", domain: "triplelift.com", color: "#00BCD4" },
+          { name: "ShareThrough", domain: "sharethrough.com", color: "#FF6B6B" },
+          { name: "Equativ", domain: "equativ.com", color: "#2ECC71" },
+        ];
+        const row2 = [
+          { name: "BidSwitch", domain: "bidswitch.com", color: "#3498DB" },
+          { name: "InMobi", domain: "inmobi.com", color: "#1ABC9C" },
+          { name: "Amazon Publisher Services", domain: "amazon.com", color: "#FF9900" },
+          { name: "Taboola", domain: "taboola.com", color: "#0066FF" },
+          { name: "Dianomi", domain: "dianomi.com", color: "#E74C3C" },
+          { name: "Criteo", domain: "criteo.com", color: "#F47521" },
+          { name: "PubMatic", domain: "pubmatic.com", color: "#00B8D9" },
+          { name: "MGID", domain: "mgid.com", color: "#9B59B6" },
+          { name: "Digital Turbine", domain: "digitalturbine.com", color: "#2980B9" },
+          { name: "Liftoff", domain: "liftoff.io", color: "#E91E63" },
+          { name: "Bidmachine", domain: "bidmachine.io", color: "#27AE60" },
+        ];
+        const row3 = [
+          { name: "Affinity Global", domain: "affinityglobal.com", color: "#F39C12" },
+          { name: "Pubpower", domain: "pubpower.io", color: "#00ACC1" },
+          { name: "AdMile", domain: "admile.com", color: "#E67E22" },
+          { name: "Mobilefuse", domain: "mobilefuse.com", color: "#3498DB" },
+          { name: "Bigo Ads", domain: "bigo.tv", color: "#2ECC71" },
+          { name: "Nexxen", domain: "nexxen.com", color: "#9B59B6" },
+          { name: "Freewheel", domain: "freewheel.com", color: "#1ABC9C" },
+          { name: "Beachfront", domain: "beachfront.com", color: "#E74C3C" },
+          { name: "Playbuzz", domain: "ex.co", color: "#F1C40F" },
+          { name: "Amagi", domain: "amagi.com", color: "#00BCD4" },
+          { name: "MediaFuse", domain: "mediafuse.com", color: "#FF6B6B" },
+        ];
+        const row4 = [
+          { name: "Mintegral", domain: "mintegral.com", color: "#6C5CE7" },
+          { name: "Improve Digital", domain: "improvedigital.com", color: "#27AE60" },
+          { name: "Algorix", domain: "algorix.co", color: "#3F51B5" },
+          { name: "Edge226", domain: "edge226.com", color: "#FF5722" },
+          { name: "SportX", domain: "sportxmedia.com", color: "#009688" },
+          { name: "Unity Technology", domain: "unity.com", color: "#E91E63" },
+          { name: "Perion", domain: "perion.com", color: "#FF9800" },
+          { name: "Optima", domain: "optimadigital.com", color: "#00ACC1" },
+          { name: "Seedtag", domain: "seedtag.com", color: "#4CAF50" },
+          { name: "Sun Media", domain: "sunmedia.tv", color: "#FFC107" },
+          { name: "TaurusX", domain: "taurusx.com", color: "#7C4DFF" },
+        ];
+        const row5 = [
+          { name: "SilverMob", domain: "silvermob.com", color: "#607D8B" },
+          { name: "CPMStar", domain: "cpmstar.com", color: "#FF4081" },
+          { name: "LoopMe", domain: "loopme.com", color: "#00E676" },
+          { name: "TopOn", domain: "topon.com", color: "#536DFE" },
+          { name: "Actirise", domain: "actirise.com", color: "#FF6D00" },
+          { name: "Gadsme", domain: "gadsme.com", color: "#76FF03" },
+          { name: "Nimbus Ads", domain: "adsbynimbus.com", color: "#448AFF" },
+          { name: "Pixalate", domain: "pixalate.com", color: "#D500F9" },
+          { name: "Media.net", domain: "media.net", color: "#00B0FF" },
+          { name: "AdYouLike", domain: "adyoulike.com", color: "#FF3D00" },
+          { name: "33Across", domain: "33across.com", color: "#1DE9B6" },
+        ];
+        const row6 = [
+          { name: "Gannett", domain: "gannett.com", color: "#2979FF" },
+          { name: "Teads.tv", domain: "teads.com", color: "#651FFF" },
+          { name: "ConnectAd", domain: "connectad.io", color: "#F50057" },
+          { name: "Vistar Media", domain: "vistarmedia.com", color: "#00C853" },
+          { name: "GumGum", domain: "gumgum.com", color: "#AA00FF" },
+          { name: "Nativo Edge", domain: "nativo.com", color: "#0091EA" },
+          { name: "E-Planning", domain: "e-planning.net", color: "#DD2C00" },
+          { name: "AdMob", domain: "admob.google.com", color: "#FFD600" },
+          { name: "AdColony", domain: "adcolony.com", color: "#304FFE" },
+          { name: "Adform", domain: "adform.com", color: "#C51162" },
+          { name: "Kevel", domain: "kevel.com", color: "#00BFA5" },
+          { name: "Underdog Media", domain: "underdogmedia.com", color: "#6200EA" },
+        ];
+
+        const renderPartnerCard = (p: {name: string; domain: string; color: string}) => `
+          <div class="flex-shrink-0 mx-3">
+            <div class="glass-card px-4 py-3 flex items-center gap-3" style="border-radius: 12px;">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden relative" style="background: ${p.color}10;">
+                <img src="https://logo.clearbit.com/${p.domain}" alt="${p.name}" class="w-7 h-7 object-contain" style="filter: brightness(1.1);" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                <div class="w-8 h-8 rounded-lg items-center justify-center text-xs font-bold absolute inset-0" style="background: ${p.color}20; color: ${p.color}; display: none;">${p.name.substring(0, 2).toUpperCase()}</div>
+              </div>
+              <span class="text-sm font-semibold text-white/60 whitespace-nowrap">${p.name}</span>
             </div>
-          </div>`
-          )
-          .join("")}
-      </div>
+          </div>`;
+
+        const renderRow = (partners: typeof row1, scrollClass: string) => `
+          <div class="relative overflow-hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[var(--surface)] to-transparent z-10"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[var(--surface)] to-transparent z-10"></div>
+            <div class="flex ${scrollClass}" style="width: max-content;">
+              ${[...partners, ...partners].map(renderPartnerCard).join("")}
+            </div>
+          </div>`;
+
+        return renderRow(row1, "logo-scroll") +
+               renderRow(row2, "logo-scroll-reverse") +
+               renderRow(row3, "logo-scroll") +
+               renderRow(row4, "logo-scroll-reverse") +
+               renderRow(row5, "logo-scroll") +
+               renderRow(row6, "logo-scroll-reverse");
+      })()}
     </div>
   </section>
 
@@ -4000,7 +4110,7 @@ export function renderFaqSupportPage(): string {
 
       <div class="glass-card p-8 sm:p-12 animate-on-scroll stagger-1" data-testid="support-form-card"
            x-data="{
-             formData: { name: '', email: '', subject: '', priority: 'Medium', message: '' },
+             formData: { name: '', email: '', subject: '', priority: 'Medium', message: '', _hp_website: '' },
              submitting: false,
              submitted: false,
              error: false,
@@ -4015,9 +4125,10 @@ export function renderFaqSupportPage(): string {
                      name: this.formData.name,
                      email: this.formData.email,
                      company: this.formData.subject + ' [Priority: ' + this.formData.priority + ']',
-                     website: '',
-                     monthlyPageviews: '',
-                     message: this.formData.message
+                     impressions: 'support-request',
+                     message: this.formData.message,
+                     _hp_website: this.formData._hp_website,
+                     _source: 'support'
                    })
                  });
                  if (res.ok) {
@@ -4034,6 +4145,10 @@ export function renderFaqSupportPage(): string {
            }">
         <div x-show="!submitted">
           <form @submit.prevent="submitForm()" data-testid="support-form">
+            <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;height:0;width:0;overflow:hidden;" aria-hidden="true" tabindex="-1">
+              <label for="hp_support_website">Website</label>
+              <input type="text" id="hp_support_website" name="website" x-model="formData._hp_website" autocomplete="off" tabindex="-1" />
+            </div>
             <div class="grid sm:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-white/60 mb-2">Name</label>

@@ -24,12 +24,18 @@ export const contactLeads = pgTable("contact_leads", {
   company: text("company").notNull(),
   impressions: text("impressions").notNull(),
   message: text("message"),
+  ip: text("ip"),
+  source: text("source").default("contact"),
+  status: text("status").default("new"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertContactLeadSchema = createInsertSchema(contactLeads).omit({
   id: true,
   createdAt: true,
+  ip: true,
+  source: true,
+  status: true,
 }).extend({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
