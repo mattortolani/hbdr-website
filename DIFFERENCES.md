@@ -1,243 +1,191 @@
 # DIFFERENCES.md
 
-## Changes Since Last Assessment
+## Changes Between Assessments
 
-This document catalogs all changes between the previous codebase assessment (initial 16-page site) and the current state.
-
----
-
-## Summary of Changes
-
-| Area | Before | After |
-|------|--------|-------|
-| template.ts line count | 3,363 lines | 5,212 lines (+55%) |
-| routes.ts line count | ~170 lines | 212 lines |
-| worker.ts line count | ~130 lines | 177 lines (but **missing new routes**) |
-| Total page templates | 16 pages | 26 pages (+10 new) |
-| Solution pages | 9 | 10 (+Video Player) |
-| Legal pages | 0 | 3 (Privacy Policy, Terms, GDPR/Cookie) |
-| Audience pages | 0 | 2 (Publishers, Advertisers) |
-| Utility pages | 0 | 4 (Partners, Dashboard, Trust, FAQ/Support) |
-| Navigation dropdowns | 1 (Solutions) | 2 (Solutions + Company) |
-| Footer link columns | 4 (with `#` links) | 4 (with real page links) |
+This document catalogs all differences between the initial codebase assessment and the current state. It serves as a changelog for understanding what changed, what was added, what was removed, and what new issues were discovered.
 
 ---
 
-## New Pages Added
+## Assessment Timeline
 
-### 1. Privacy Policy (`/privacy-policy`)
-- **Render function**: `renderPrivacyPolicyPage()` in template.ts
-- **Content**: Full legal privacy policy covering data collection, use, sharing, cookies, GDPR/CCPA rights, international transfers, children's privacy, security measures, data retention, and contact info
-- **Contact info**: privacy@hbdr.com, DPO at 1200 Brickell Ave Ste 1950, Miami, FL 33131
-- **Notes**: Comprehensive legal content with proper section numbering and cross-links to GDPR & Cookie Policy
-
-### 2. Terms & Conditions (`/terms`)
-- **Render function**: `renderTermsPage()` in template.ts
-- **Content**: Full legal terms covering acceptance, service description, account terms, payment, IP rights, liability limits, indemnification, termination, governing law (Florida), and modifications
-- **Contact info**: legal@hbdr.com
-- **Notes**: Jurisdiction set to Miami-Dade County, Florida courts
-
-### 3. GDPR & Cookie Policy (`/gdpr-cookie-policy`)
-- **Render function**: `renderGdprCookiePolicyPage()` in template.ts
-- **Content**: GDPR rights, data subject rights, cookie consent management, detailed cookie table listing 9 cookies by category (Essential, Analytics, Advertising, Preferences)
-- **Cookies listed**: `_hbdr_session`, `_hbdr_csrf`, `_hbdr_consent`, `_ga`, `_ga_*`, `_gid`, `_pbjs_userid_*`, `__gads`, `_hbdr_prefs`, `_hbdr_tz`
-- **Contact info**: DPO at privacy@hbdr.com, 1200 Brickell Ave Ste 1950, Miami, FL 33131
-
-### 4. FAQ & Support (`/support`)
-- **Render function**: `renderFaqSupportPage()` in template.ts
-- **Content**: 4 FAQ categories (General: 4 items, Technical: 4, Account & Billing: 3, Integration & Setup: 4), support channels, support request form
-- **Support channels**: support@hbdr.com, (786) 675-6080, Mon-Fri 9am-6pm ET
-- **Support form**: Reuses `/api/contact` endpoint but maps subject+priority into the `company` field -- schema mismatch issue (see New Issues below)
-
-### 5. Dashboard (`/dashboard`)
-- **Render function**: `renderDashboardPage()` in template.ts
-- **Content**: Analytics Dashboard product page with 6 data dimensions, 3 revenue views (AdX, Ad Server, SSP), 8 platform features
-- **External link**: Links to `https://dashboard.hbdr.com` for login/signup
-- **Notes**: Marketing page describing the dashboard product, not an actual dashboard
-
-### 6. Video Player (`/solutions/video-player`)
-- **Render function**: `renderVideoPlayerPage()` in template.ts
-- **Content**: Video ad formats (Instream, Outstream, Floating/Sticky, Mobile-Optimized), revenue engine features, 8 technical capabilities
-- **Notes**: Added to Solutions dropdown in nav alongside existing 9 solution pages
-
-### 7. Partners & Integrations (`/partners`)
-- **Render function**: `renderPartnersPage()` in template.ts
-- **Content**: Partner categories with specific named partners:
-  - SSP Partners (16): Google AdX, Pubmatic, Magnite, Index Exchange, OpenX, Sovrn, TripleLift, Amazon TAM, Xandr, GumGum, Sharethrough, Media.net, Yieldmo, Rise, Criteo, Kargo
-  - DSP Partners (8): Google DV360, The Trade Desk, Amazon DSP, MediaMath, Xandr Invest, StackAdapt, Basis Technologies, Adelphic
-  - Identity Partners (6): LiveRamp, The Trade Desk UID2, ID5, Lotame Panorama, Criteo Commerce, Audigent
-  - Compliance Partners (7): Google CMP, OneTrust, Cookiebot, TrustArc, Usercentrics, Quantcast, Didomi
-  - Technology Partners (8): Google Cloud, AWS, Cloudflare, Fastly, Prebid.org, IAB Tech Lab, comScore, Moat by Oracle
-
-### 8. For Publishers (`/publishers`)
-- **Render function**: `renderPublishersPage()` in template.ts
-- **Content**: 6 value propositions, 5 onboarding steps, "What HBDR Manages" (10 items) vs "What You Do" (4 items), requirements (50K+ monthly page views, etc.), 8 publisher FAQs
-- **Notes**: Uses Alpine.js FAQ accordion pattern
-
-### 9. For Advertisers (`/advertisers`)
-- **Render function**: `renderAdvertisersPage()` in template.ts
-- **Content**: 3 deal types (Private Marketplaces, Programmatic Guaranteed, Direct Sales), 6 inventory stats, 7 brand safety features, 4 getting-started steps
-
-### 10. Trust & Compliance (`/trust`)
-- **Render function**: `renderTrustCompliancePage()` in template.ts
-- **Content**: Supply chain transparency (4 cards), anti-fraud measures (5 cards), privacy compliance (6 cards), 6 certifications (ads.txt/app-ads.txt, sellers.json, TAG Certified, Google MCM Certified, IAB Tech Lab Member, SOC 2 Type II), 12 capabilities, who we serve sections
+- **Assessment 1** (initial): 16-page site with ~70 npm dependencies
+- **Assessment 2** (second pass): 26-page site, same ~70 dependencies, worker.ts drift discovered
+- **Assessment 3** (current — this document): 26-page site, dependencies drastically cleaned to 8, multiple new issues found
 
 ---
 
-## Navigation Changes
+## Major Changes Since Assessment 2
 
-### Before
-- **Desktop nav**: Solutions dropdown (9 items) + standalone links (About, How It Works, Careers, Press, Blog, Contact)
-- **Mobile nav**: Same structure in hamburger menu
+### package.json — Dramatic Cleanup
 
-### After
-- **Desktop nav**: Solutions dropdown (10 items, added Video Player) + standalone links (Publishers, Advertisers, Partners) + Company dropdown (About, How It Works, Careers, Press, Trust & Compliance, Blog, FAQ & Support, Contact, Dashboard)
-- **Mobile nav**: Updated to match desktop structure with expandable Solutions and Company submenus
-- **Top-level nav items removed**: About, How It Works, Careers, Press were moved into the Company dropdown
-- **Top-level nav items added**: Publishers, Advertisers, Partners as standalone links
+**Before** (Assessment 2): ~70 dependencies including React, 20+ Radix UI packages, Express, Passport, connect-pg-simple, Drizzle-kit, memorystore, Framer Motion, Recharts, Wouter, class-variance-authority, clsx, tailwind-merge, lucide-react, react-hook-form, @hookform/resolvers, neon-serverless, ws, and many more. Package name was `rest-express`.
 
----
-
-## Footer Changes
-
-### Before
-- **Solutions column**: Header Bidding, Display Ads, CTV & OTT, Open Bidding, Ad Exchange AdX
-- **Company column**: Links to real pages (About, How It Works, Careers, Press, Contact)
-- **Resources column**: Case Studies (#), Documentation (#), Support (#), FAQ (#) -- all broken `#` links
-- **Legal column**: Privacy Policy (#), Terms of Service (#), Cookie Policy (#), GDPR (#) -- all broken `#` links
-- **Social icons**: LinkedIn (#), Twitter/X (#), Email (mailto:contact@hbdr.com)
-
-### After
-- **Solutions column**: Same as before (Header Bidding, Display Ads, In-App Ads, CTV & OTT, Open Bidding, Ad Exchange AdX)
-- **Company column**: Uses `companyLinks` variable from nav
-- **Resources column**: For Publishers (/publishers), For Advertisers (/advertisers), Partners (/partners), Trust & Compliance (/trust), Blog (/blog), FAQ & Support (/support), Dashboard (/dashboard) -- **all real links now**
-- **Legal column**: Privacy Policy (/privacy-policy), Terms & Conditions (/terms), GDPR & Cookie Policy (/gdpr-cookie-policy) -- **all real links now**
-- **Social icons**: Unchanged (LinkedIn and Twitter/X still `#`, email still mailto)
-- **Scroll-to-top button**: Added at bottom right of footer
-
----
-
-## Route Changes in routes.ts
-
-### New routes added (lines 44-54):
-```
-GET /dashboard              -> renderDashboardPage()
-GET /solutions/video-player -> renderVideoPlayerPage()
-GET /partners               -> renderPartnersPage()
-GET /publishers             -> renderPublishersPage()
-GET /advertisers            -> renderAdvertisersPage()
-GET /trust                  -> renderTrustCompliancePage()
-GET /privacy-policy         -> renderPrivacyPolicyPage()
-GET /terms                  -> renderTermsPage()
-GET /gdpr-cookie-policy     -> renderGdprCookiePolicyPage()
-GET /support                -> renderFaqSupportPage()
+**After** (Assessment 3):
+```json
+{
+  "name": "hbdr-website",
+  "dependencies": {
+    "hono": "^4.11.9",
+    "zod": "^3.24.2",
+    "zod-validation-error": "^3.4.0",
+    "drizzle-orm": "^0.39.3",
+    "drizzle-zod": "^0.7.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260207.0",
+    "wrangler": "^4.63.0",
+    "typescript": "5.6.3"
+  }
+}
 ```
 
-### Existing routes: Unchanged
+Changes:
+- Package name: `rest-express` → `hbdr-website`
+- Dependencies: ~70 → 5 runtime + 3 dev (total 8)
+- Scripts: `dev`, `build`, `check`, `db:push` all removed. Only `"deploy": "wrangler deploy"` remains.
+- **New issue created**: `@hono/node-server` was removed along with the unused packages, but it's still actively imported in `server/index.ts`. The dev server is now broken.
+- **New issue created**: `tsx` was removed, so there's no way to run the dev script even if it existed.
+
+### package-lock.json — Deleted
+
+**Before**: Lockfile existed (generated from ~70 dependencies)
+**After**: No lockfile. Builds are non-reproducible.
+
+### node_modules — Deleted
+
+**Before**: Existed (installed from ~70 dependencies)
+**After**: Directory does not exist. Nothing is installed.
+
+### Scripts Removed
+
+| Script | Was | Now |
+|--------|-----|-----|
+| `dev` | `tsx server/index.ts` | Removed |
+| `build` | `tsx script/build.ts` | Removed |
+| `check` | `tsc --noEmit` | Removed |
+| `db:push` | `drizzle-kit push` | Removed |
+| `deploy` | `wrangler deploy` | Still present |
 
 ---
 
-## Worker.ts Drift (NEW CRITICAL ISSUE)
+## Changes Since Assessment 1 (Initial → Current)
 
-**worker.ts is now significantly out of sync with routes.ts.** The worker does NOT have:
+### New Pages Added (10)
 
-1. **Missing imports**: `renderPrivacyPolicyPage`, `renderTermsPage`, `renderGdprCookiePolicyPage`, `renderFaqSupportPage`, `renderDashboardPage`, `renderVideoPlayerPage`, `renderPartnersPage`, `renderPublishersPage`, `renderAdvertisersPage`, `renderTrustCompliancePage`
-2. **Missing routes**: All 10 new page routes listed above
-3. **Impact**: Deploying to Cloudflare Workers will result in 404s for all 10 new pages. The legal pages (Privacy Policy, Terms, GDPR) are linked from the footer on every page -- all broken in production.
+| Page | Route | Template Function | In worker.ts? |
+|------|-------|-------------------|---------------|
+| Privacy Policy | `/privacy-policy` | `renderPrivacyPolicyPage()` | NO |
+| Terms & Conditions | `/terms` | `renderTermsPage()` | NO |
+| GDPR & Cookie Policy | `/gdpr-cookie-policy` | `renderGdprCookiePolicyPage()` | NO |
+| FAQ & Support | `/support` | `renderFaqSupportPage()` | NO |
+| Dashboard | `/dashboard` | `renderDashboardPage()` | NO |
+| Video Player Solution | `/solutions/video-player` | `renderVideoPlayerPage()` | NO |
+| Partners | `/partners` | `renderPartnersPage()` | NO |
+| For Publishers | `/publishers` | `renderPublishersPage()` | NO |
+| For Advertisers | `/advertisers` | `renderAdvertisersPage()` | NO |
+| Trust & Compliance | `/trust` | `renderTrustCompliancePage()` | NO |
 
-This is the most critical new issue. The worker.ts/routes.ts duplication problem has now produced a real dev/prod mismatch.
+All 10 new pages exist in `routes.ts` but are missing from `worker.ts`.
 
----
+### Navigation Expanded
 
-## Design Pattern Changes
+**Before**: Solutions dropdown with fewer items, Company dropdown with fewer items
+**After**:
+- Solutions dropdown: 10 items (added Video Player)
+- Company dropdown: 9 items (added Dashboard, Partners, Trust, Support, 3 legal pages)
+- Standalone nav links: Publishers, Advertisers, Partners (desktop + mobile)
 
-### data-testid Attributes
-All new pages include `data-testid` attributes on key sections and interactive elements. Examples:
-- `data-testid="section-hero"`, `data-testid="section-cookie-table"`, `data-testid="section-support-form"`
-- `data-testid="link-publisher-signup"`, `data-testid="button-scroll-top"`
-- These were also retroactively added to existing components (nav, footer)
-- No test framework exists to use these attributes
+### Footer Updated
 
-### Contact Info Now Consistent Across Pages
-- **Address**: 1200 Brickell Ave, Suite 1950, Miami, FL 33131
-- **Phone**: (786) 675-6080
-- **General email**: contact@hbdr.com
-- **Support email**: support@hbdr.com
-- **Privacy/DPO email**: privacy@hbdr.com
-- **Legal email**: legal@hbdr.com
-- **Press email**: press@hbdr.com
+**Before**: Resources and Legal columns had `href="#"` placeholder links
+**After**:
+- Resources column: 7 real page links (How It Works, Blog, Partners, Dashboard, Publishers, Advertisers, Support)
+- Legal column: 3 real page links (Privacy Policy, Terms, GDPR & Cookie Policy)
+- Social icons: LinkedIn and Twitter/X still `href="#"` (not fixed)
 
-### New External Link
-- Dashboard page links to `https://dashboard.hbdr.com` as the login/signup destination
+### template.ts Growth
 
----
+**Before**: ~3500 lines (16 pages)
+**After**: 5212 lines (26 pages) — grew by ~1700 lines
 
-## New Issues Discovered
+### Font Change
 
-### 1. Worker.ts Out of Sync (CRITICAL)
-See "Worker.ts Drift" section above. 10 new pages exist in routes.ts but not in worker.ts.
+**Before**: Inter (sans-serif) loaded from Google Fonts
+**After**: Figtree (sans-serif) + Instrument Serif (serif) loaded from Google Fonts. Inter is no longer referenced.
 
-### 2. Support Form Schema Mismatch (MEDIUM)
-The FAQ/Support page at `/support` has a support request form that submits to `/api/contact` but maps fields incorrectly:
-```javascript
-body: JSON.stringify({
-  name: this.formData.name,
-  email: this.formData.email,
-  company: this.formData.subject + ' [Priority: ' + this.formData.priority + ']',
-  website: '',              // NOT in the Zod schema
-  monthlyPageviews: '',     // NOT in the Zod schema (schema has 'impressions')
-  message: this.formData.message
-})
-```
-The Zod `insertContactLeadSchema` expects `impressions` (required), not `monthlyPageviews`. The `website` field does not exist in the schema. This form will likely fail validation silently or send malformed data.
+### data-testid Attributes Added
 
-### 3. Template Monolith Worsened (LOW)
-template.ts grew from 3,363 to 5,212 lines (+55%). The maintenance burden is now even larger. All 26 page templates remain in a single file.
-
-### 4. Social Links Still Broken (LOW)
-LinkedIn and Twitter/X social icons in the footer still point to `#`. Only the email icon has a real link.
+New pages include `data-testid` attributes on interactive elements and key sections. Original pages do not have these consistently. No test framework exists to use them.
 
 ---
 
-## Files Changed vs Unchanged
+## Issues Status Tracker
 
-### Changed
-| File | Change |
-|------|--------|
-| `server/template.ts` | 3,363 → 5,212 lines. +10 new render functions, nav restructured, footer links updated, data-testid attrs added |
-| `server/routes.ts` | +10 new route registrations, +10 new imports from template |
-| `worker.ts` | **NOT updated** -- missing all new routes (critical drift) |
-
-### Unchanged
-| File | Status |
-|------|--------|
-| `shared/schema.ts` | 73 lines, no changes |
-| `server/storage.ts` | 304 lines, no changes |
-| `server/index.ts` | No changes |
-| `script/build.ts` | 68 lines, no changes |
-| `package.json` | No changes (same dependency bloat) |
-| `wrangler.toml` | No changes |
-| `tsconfig.json` | No changes |
-| `tsconfig.worker.json` | No changes |
-| `README.md` | No changes |
-| `.gitignore` | No changes |
-
----
-
-## Previously Reported Issues -- Status Update
+### Issues Present in Assessment 1, Still Present
 
 | Issue | Status |
 |-------|--------|
-| No auth on admin panel | **Still open** -- no change |
-| No data persistence | **Still open** -- no change |
-| ~60 unused npm dependencies | **Still open** -- no change |
-| sanitizeHtml() duplicated | **Still open** -- still in both routes.ts and worker.ts |
-| Blog category filters broken | **Still open** -- no change |
-| Footer links broken (`#`) | **Partially fixed** -- Resources and Legal columns now link to real pages; social icons still `#` |
-| OG image URLs relative | **Still open** -- no change |
-| No 404 page | **Still open** -- no change |
-| No sitemap.xml/robots.txt | **Still open** -- no change |
-| `published` field is string | **Still open** -- no change |
-| Package name `rest-express` | **Still open** -- no change |
-| `components.json` orphaned | **Still open** -- no change |
-| `client/public/favicon.png` orphaned | **Still open** -- no change |
+| No auth on `/admin/blog` | Still broken |
+| In-memory storage (no persistence) | Still broken |
+| Blog category filters broken | Still broken |
+| sanitizeHtml() is regex-based and bypassable | Still broken |
+| No automated tests | Still no tests |
+| No CI/CD pipeline | Still none |
+| No error pages (404, 500) | Still none |
+| No rate limiting | Still none |
+| No CSRF protection | Still none |
+| OG image uses relative URL | Still broken |
+| No sitemap.xml | Still missing |
+| No robots.txt | Still missing |
+
+### Issues Present in Assessment 2, Still Present
+
+| Issue | Status |
+|-------|--------|
+| worker.ts missing 10 page routes | Still broken (same 10 pages) |
+| Support form schema mismatch | Still broken |
+| Social icons link to `#` | Still broken (LinkedIn, Twitter/X) |
+| sanitizeHtml() duplicated in worker.ts | Still duplicated |
+
+### NEW Issues Found in Assessment 3
+
+| Issue | Severity | Description |
+|-------|----------|-------------|
+| @hono/node-server missing from package.json | **CRITICAL** | Dev server cannot start. `server/index.ts` line 1 imports it. |
+| No package-lock.json | High | Lockfile deleted. Builds non-reproducible. |
+| No node_modules | High | Dependencies not installed. Nothing runs. |
+| No dev script in package.json | High | `"dev"` script removed. No documented way to start dev server. |
+| tsx not in package.json | High | TypeScript executor removed. Can't run `server/index.ts` directly. |
+| HTMX loaded but never used | Medium | CDN script on every page, zero `hx-*` attributes in codebase. ~14KB wasted per page load. |
+| script/build.ts is dead code | Medium | References Vite, Express, Passport, pg — all removed. No script invokes it. |
+| Fonts changed from Inter to Figtree + Instrument Serif | Low | Prior docs were wrong about Inter. CSS and CDN links use Figtree/Instrument Serif. |
+| Tailwind Play CDN not production-suitable | Medium | Play CDN generates styles at runtime. Documented as "dev only" by Tailwind. |
+| tsconfig.json has phantom paths | Low | References `client/src/**/*` and `vite/client` types that don't exist. |
+| components.json is orphaned | Low | shadcn/ui config for non-existent paths. |
+| client/public/favicon.png is non-HBDR | Low | Orange checkered icon, not HBDR branding. |
+
+### Issues Resolved
+
+| Issue | Resolution |
+|-------|-----------|
+| ~60 unused npm dependencies | **Resolved**: Cleaned from ~70 to 8 packages. However, @hono/node-server was accidentally removed too. |
+| Footer Resources links to `#` | **Resolved**: Now link to real pages. |
+| Footer Legal links to `#` | **Resolved**: Now link to Privacy Policy, Terms, GDPR. |
+| Package name `rest-express` | **Resolved**: Changed to `hbdr-website`. |
+
+---
+
+## Documentation Updates in Assessment 3
+
+All documentation files were rewritten from scratch to reflect the current state:
+
+| Document | Key Changes |
+|----------|-------------|
+| ARCHITECTURE.md | Updated dependency count (8 vs ~70), added missing @hono/node-server issue, updated font names, added HTMX-unused finding, updated orphaned files list, comprehensive 21-issue catalog |
+| IMPLEMENTATION_SPEC.md | 34-item current state audit, 5 implementation phases, 12 detailed tasks, updated dependency/security audit |
+| CLAUDE.md | 15 gotchas (up from 11), new entries for missing @hono/node-server, no lockfile, HTMX unused, fonts changed, dead build script |
+| API_REFERENCE.md | Complete rewrite with exact line numbers, request/response examples, validation details |
+| DEVELOPMENT.md | Complete rewrite documenting broken dev setup, missing packages, orphaned files |
+| DEPLOYMENT.md | Complete rewrite with 3 pre-deployment blockers, deployment caveats, verification checklist |
+| QUICK_WINS.md | Rewritten and reordered: 10 items (up from 6), new #1 is missing @hono/node-server |
+| DIFFERENCES.md | This file — complete changelog across all 3 assessments |
