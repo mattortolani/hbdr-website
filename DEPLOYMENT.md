@@ -116,14 +116,16 @@ After deploying, verify:
 - [ ] Individual blog post pages load
 - [ ] Static assets load (logo in nav, favicon)
 - [ ] Mobile responsive (test on phone or DevTools)
-- [ ] Solution pages load (check 2-3 from the dropdown)
+- [ ] Solution pages load (check 2-3 from the dropdown, including new Video Player page)
+- [ ] Legal pages load (`/privacy-policy`, `/terms`, `/gdpr-cookie-policy`)
+- [ ] New pages load (`/publishers`, `/advertisers`, `/partners`, `/trust`, `/dashboard`, `/support`)
 
 ---
 
 ## Known Deployment Caveats
 
 1. **Data resets on every deploy**: In-memory storage means all user-created blog posts and contact leads are lost on each deployment. Seeded blog posts will reappear.
-2. **worker.ts duplicates routes**: If you changed routes in `routes.ts` but forgot to update `worker.ts`, the deployed Worker will not reflect those changes.
+2. **worker.ts is 10 pages behind routes.ts (CRITICAL)**: As of this assessment, worker.ts does NOT have routes for: `/privacy-policy`, `/terms`, `/gdpr-cookie-policy`, `/support`, `/dashboard`, `/solutions/video-player`, `/partners`, `/publishers`, `/advertisers`, `/trust`. **These pages will 404 in production.** Legal pages are linked from every page's footer. You MUST sync worker.ts with routes.ts before deploying.
 3. **No staging environment**: There is no staging deployment. All deploys go directly to production.
 4. **Cold start latency**: Cloudflare Workers have a small cold-start penalty. The first request after idle may be slower.
 5. **Static assets directory**: Workers serve files from `public/` (configured in `wrangler.toml [assets]`). Dev server serves from `attached_assets/` via the `/assets/:filename` route. Make sure needed assets exist in both locations.

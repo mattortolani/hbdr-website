@@ -65,7 +65,7 @@ Runs `tsc --noEmit` to check for type errors without producing output.
 4. Open `server/routes.ts`
 5. Add the import: `import { renderMyNewPage } from "./template";`
 6. Add the route: `app.get("/my-page", (c) => c.html(renderMyNewPage()));`
-7. **IMPORTANT**: Also add the same route to `worker.ts` (routes are duplicated -- see ARCHITECTURE.md Known Issues)
+7. **CRITICAL**: Also add the same route to `worker.ts` (routes are duplicated -- see ARCHITECTURE.md Known Issues). **worker.ts is currently 10 pages behind routes.ts** -- do not let this gap grow further.
 8. Add the page to the nav and/or footer in `renderNav()` / `renderFooter()` in `template.ts`
 
 ### Modifying API Endpoints
@@ -117,6 +117,10 @@ There are currently no automated tests. Manual testing:
 4. Test the blog admin at `/admin/blog` (create, edit, delete posts)
 5. Test mobile responsiveness using browser DevTools
 6. Test the blog listing category filters (known to be broken)
+7. Test the new legal pages: `/privacy-policy`, `/terms`, `/gdpr-cookie-policy`
+8. Test the support form at `/support` (known schema mismatch issue)
+9. Test the new audience pages: `/publishers`, `/advertisers`, `/partners`
+10. Test navigation Company dropdown and mobile nav submenus
 
 ---
 

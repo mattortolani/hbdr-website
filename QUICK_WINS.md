@@ -22,23 +22,25 @@
 
 ---
 
-### 3. Deduplicate Worker Routes (2 hours)
+### 3. Sync Worker.ts with Routes.ts (1 hour) then Deduplicate (2 hours)
 
-**Impact**: Every route handler is written twice -- once in `server/routes.ts` and again in `worker.ts`. This means every bug fix, new page, or API change must be applied to two files, and forgetting one creates a dev/prod behavioral mismatch. The `sanitizeHtml()` function is also duplicated.
+**Impact**: worker.ts is now **10 pages behind** routes.ts. The production Cloudflare Workers deployment will 404 on Privacy Policy, Terms, GDPR & Cookie Policy, FAQ & Support, Dashboard, Video Player, Partners, Publishers, Advertisers, and Trust & Compliance pages. Legal pages are linked from every page's footer -- all broken in production. The `sanitizeHtml()` function is also duplicated.
 
-**What to do**: Refactor `routes.ts` to conditionally handle the `/assets/:filename` route (the only Node.js-specific code using `fs`). Then modify `worker.ts` to import and call `registerRoutes(app)` instead of re-implementing everything. Move `sanitizeHtml` to a shared module.
+**What to do (immediate)**: Add the 10 missing imports and route registrations to `worker.ts` to match `routes.ts`. This unblocks production deployment.
+
+**What to do (proper fix)**: Refactor `routes.ts` to conditionally handle the `/assets/:filename` route (the only Node.js-specific code using `fs`). Then modify `worker.ts` to import and call `registerRoutes(app)` instead of re-implementing everything. Move `sanitizeHtml` to a shared module.
 
 **Files**: `server/routes.ts`, `worker.ts`, new `server/sanitize.ts`
 
 ---
 
-### 4. Fix Footer Dead Links (30 min)
+### 4. Fix Remaining Footer Dead Links (15 min)
 
-**Impact**: Social media icons (LinkedIn, Twitter/X, email), the Resources column (Case Studies, Documentation, Support, FAQ), and the Legal column (Privacy Policy, Terms, Cookie Policy, GDPR) all link to `"#"`. This looks unprofessional and breaks user trust on a marketing site that's asking for contact information.
+**Impact**: Resources and Legal footer columns are now fixed with real page links. However, the LinkedIn and Twitter/X social icons still link to `"#"`. This looks unprofessional on a polished marketing site.
 
-**What to do**: Remove Resources links that have no pages. Remove Legal links that have no pages (or create minimal stub pages). Set the email social icon to `mailto:contact@hbdr.com`. Remove LinkedIn/Twitter icons if no real URLs exist, or set them to actual company profiles.
+**What to do**: Set the social icons to real HBDR company profiles (if they exist), or remove the icons entirely. The email icon already links to `mailto:contact@hbdr.com`.
 
-**Files**: `server/template.ts` (renderFooter function, ~line 567)
+**Files**: `server/template.ts` (renderFooter function, ~line 690)
 
 ---
 
@@ -52,7 +54,20 @@
 
 ---
 
+### 6. Fix Support Form Schema Mismatch (15 min)
+
+**Impact**: The FAQ & Support page at `/support` has a support request form that submits to `/api/contact` but sends the wrong fields. It sends `website` and `monthlyPageviews` which don't exist in the Zod schema -- the schema expects `impressions` (required). The form will fail validation, and users will get an unhelpful error.
+
+**What to do**: In `server/template.ts` in `renderFaqSupportPage()`, update the form's `fetch` body to send `impressions` instead of `monthlyPageviews`, and remove the `website` field. Map the subject and priority into the `message` field instead of `company` (or add a default value for `impressions`).
+
+**Files**: `server/template.ts` (renderFaqSupportPage function)
+
+---
+
 ## Time Bombs (Things That Will Break Soon)
+
+### 0. Worker.ts is 10 Pages Behind = Broken Production Deploy
+The worker.ts file (Cloudflare Workers entry point) does not have the 10 new page routes that were added to routes.ts (Privacy Policy, Terms, GDPR, Support, Dashboard, Video Player, Partners, Publishers, Advertisers, Trust). If deployed right now, all these pages will 404 in production. The legal pages (Privacy Policy, Terms, GDPR) are linked from the footer of **every page** -- so every visitor can reach a broken link. **This must be fixed before any Cloudflare Workers deployment.**
 
 ### 1. No Admin Auth = Public Blog Vandalism
 The blog admin panel is at `/admin/blog` with zero authentication. The moment this site gets any traffic or is indexed by search engines, bots and bad actors will discover it. They can delete all blog posts, inject malicious HTML content (persistent XSS), or spam thousands of fake posts. **This must be fixed before any public deployment.**
@@ -71,7 +86,7 @@ Contact form submissions are stored in memory and never forwarded anywhere (no e
 The UI is complete: filter buttons exist, they toggle Alpine.js state, they have active/inactive styling. The only missing piece is a single `x-show` attribute on each blog post card. Literally a one-line template change per card.
 
 ### Cloudflare Workers Deployment
-`wrangler.toml` is configured, `worker.ts` exists and has all routes, static assets are in `public/`. The deployment pipeline is complete -- it just needs `npx wrangler deploy`. The blocker is that it should not be deployed without auth on the admin panel first (see Time Bomb #1).
+`wrangler.toml` is configured, static assets are in `public/`. The deployment pipeline is nearly complete -- it just needs `npx wrangler deploy`. **Two blockers**: (1) worker.ts is missing 10 page routes that exist in routes.ts, and (2) it should not be deployed without auth on the admin panel (see Time Bomb #1).
 
 ### Schema for Persistent Storage
 `shared/schema.ts` already defines PostgreSQL table schemas for `blog_posts` and `contact_leads` with proper column types, defaults, and relationships. The `IStorage` interface in `storage.ts` defines the exact method signatures any storage implementation needs. Swapping in a real database just requires implementing a new class that satisfies `IStorage` -- the interface is already designed for it.

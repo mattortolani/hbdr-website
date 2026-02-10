@@ -2,7 +2,7 @@
 
 ## System Overview
 
-HBDR Website is a server-rendered marketing site for HBDR, an ad-tech company specializing in header bidding and publisher monetization. It is a multi-page website with a blog CMS, built on the Hono framework (Node.js) with server-side HTML template generation. All pages are rendered as complete HTML strings on the server with no client-side JavaScript framework -- interactivity is handled via Alpine.js and native browser APIs.
+HBDR Website is a server-rendered marketing site for HBDR, an ad-tech company specializing in header bidding and publisher monetization. It is a 26-page website with a blog CMS, built on the Hono framework (Node.js) with server-side HTML template generation. All pages are rendered as complete HTML strings on the server with no client-side JavaScript framework -- interactivity is handled via Alpine.js and native browser APIs.
 
 ## Component Map
 
@@ -18,14 +18,23 @@ HBDR Website is a server-rendered marketing site for HBDR, an ad-tech company sp
           |                            |                            |
    Static Pages              Blog CRUD API              Contact Form API
    (GET /, /about,            (GET/POST/PUT/DELETE       (POST /api/contact)
-    /solutions/*, etc.)        /api/blog/*)
+    /solutions/*,              /api/blog/*)
+    /publishers,
+    /advertisers,
+    /partners,
+    /trust,
+    /dashboard,
+    /privacy-policy,
+    /terms,
+    /gdpr-cookie-policy,
+    /support, etc.)
           |                            |                            |
    Template Functions          Storage Layer                Storage Layer
    (template.ts)              (storage.ts)                (storage.ts)
           |                            |                            |
    renderLayout()          MemStorage (in-memory Map)    MemStorage (in-memory Map)
    renderHomePage()               |                            |
-   render*Page()           blogPosts Map             contactSubmissions Map
+   render*Page() (26)      blogPosts Map             contactSubmissions Map
           |
    HTML string with:
    - Tailwind CSS (CDN)
@@ -89,7 +98,7 @@ express, ws, @octokit/rest, date-fns, @jridgewell/trace-mapping
 ## Data Flow
 
 ### Page Request (e.g., GET /about)
-1. Request hits Hono router in `routes.ts`
+1. Request hits Hono router in `routes.ts` (or `worker.ts` in production -- **note: worker.ts is 10 pages behind**)
 2. Route handler calls `renderAboutPage()` from `template.ts`
 3. `renderAboutPage()` builds HTML content string using template literals
 4. Content is wrapped by `renderLayout()` which adds `<html>`, `<head>`, nav, footer
@@ -126,7 +135,7 @@ hbdr-website/
 |   +-- index.ts          # Dev server entry point (Hono + @hono/node-server, port 5000)
 |   +-- routes.ts         # All HTTP route definitions (pages + API endpoints)
 |   +-- storage.ts        # In-memory data storage (MemStorage class with Maps)
-|   +-- template.ts       # ALL HTML templates (3363 lines, monolithic)
+|   +-- template.ts       # ALL HTML templates (5212 lines, monolithic)
 +-- shared/
 |   +-- schema.ts         # Zod schemas for blogPosts and contactSubmissions
 +-- worker.ts             # Cloudflare Workers entry point (duplicates route setup)
@@ -230,18 +239,18 @@ There are no secrets, API keys, or environment variables in use. The application
 1. **No data persistence**: All blog posts and contact submissions are stored in-memory Maps. Every server restart or Cloudflare Worker cold start loses all data.
 2. **No authentication on admin panel**: `/admin/blog` is publicly accessible. Anyone can CRUD blog posts.
 3. **XSS risk in blog content**: Blog posts accept raw HTML content rendered directly into pages. The `sanitizeHtml()` function is regex-based and likely bypassable.
-4. **sanitizeHtml() is duplicated**: Identical function exists in both `routes.ts:6-13` and `worker.ts:7-14`. Any fix must be applied to both files.
+4. **sanitizeHtml() is duplicated**: Identical function exists in both `routes.ts:9-21` and `worker.ts:19-29`. Any fix must be applied to both files.
+5. **worker.ts is 10 pages behind routes.ts**: New pages (Privacy Policy, Terms, GDPR, Support, Dashboard, Video Player, Partners, Publishers, Advertisers, Trust) exist in routes.ts but NOT in worker.ts. Deploying to Cloudflare Workers will 404 on all these pages, including legal pages linked from every page's footer.
 
 ### Significant
-5. **Massive dependency bloat**: 60+ packages installed, ~10 actually used. `node_modules` is enormous with React, Radix UI, Express, Drizzle, Passport, etc. that are never imported.
-6. **template.ts is a 3363-line monolith**: All 16+ page templates in a single file. No separation of concerns, extremely hard to maintain.
-7. **Blog category filters don't work**: The Alpine.js `x-data="{ activeCategory: '' }"` state on the blog listing page is never connected to actual DOM filtering logic. Clicking a category button changes state but posts are not filtered.
-8. **`published` field is a string**: `"true"/"false"` instead of a boolean. Fragile string comparisons throughout.
-9. **Worker duplicates route registration**: `worker.ts` re-registers all routes instead of importing from `routes.ts`, creating a maintenance burden where any route change must be made in two places.
+6. **Massive dependency bloat**: 60+ packages installed, ~10 actually used. `node_modules` is enormous with React, Radix UI, Express, Drizzle, Passport, etc. that are never imported.
+7. **template.ts is a 5212-line monolith**: All 26 page templates in a single file. No separation of concerns, extremely hard to maintain. Grew 55% since initial build.
+8. **Blog category filters don't work**: The Alpine.js `x-data="{ activeCategory: '' }"` state on the blog listing page is never connected to actual DOM filtering logic. Clicking a category button changes state but posts are not filtered.
+9. **`published` field is a string**: `"true"/"false"` instead of a boolean. Fragile string comparisons throughout.
+10. **Support form schema mismatch**: The `/support` page form submits to `/api/contact` but sends `website` and `monthlyPageviews` fields that don't exist in the Zod schema (expects `impressions`). Will fail validation.
 
 ### Minor
-10. **Footer links are broken**: Social media links (LinkedIn, Twitter/X, GitHub) point to `"#"`. Legal links (Privacy Policy, Terms of Service, Cookie Policy) also point to `"#"`.
-11. **Placeholder contact info**: Press page shows `press@hbdr.com` and `+1 (555) 123-4567` -- likely placeholders.
+11. **Social icon links are broken**: LinkedIn and Twitter/X icons in footer point to `"#"`. (Resources and Legal footer links are now fixed with real page links.)
 12. **OG image URL is relative**: `<meta property="og:image" content="/assets/HBDR_Logo_Pack_all_sizes_-_8_1770577514801.jpeg">` -- social media crawlers need absolute URLs.
 13. **Hardcoded stats**: Stats section shows "1T+ Ads Served", "500+ Publishers", "40-60% Revenue Uplift", "$2B+ Revenue Generated" -- hardcoded in template, not configurable.
 14. **No 404 page**: Unmatched routes return Hono's default "404 Not Found" text, not a branded error page.
@@ -250,3 +259,4 @@ There are no secrets, API keys, or environment variables in use. The application
 17. **`client/public/favicon.png` is orphaned**: Leftover from prior React SPA architecture.
 18. **Package name is `rest-express`**: Does not match the project (HBDR website using Hono, not Express).
 19. **`db:push` script references Drizzle**: `"db:push": "drizzle-kit push"` -- no database exists.
+20. **External dashboard link unverified**: Dashboard page links to `https://dashboard.hbdr.com` -- not verified if live.
