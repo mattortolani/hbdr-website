@@ -1,3 +1,5 @@
+export const SITE_URL = (typeof process !== "undefined" && process.env?.SITE_URL) || "https://hbdr.com";
+
 export interface LayoutOptions {
   title: string;
   description: string;
@@ -8,6 +10,7 @@ export interface LayoutOptions {
 }
 
 function renderHead(options: LayoutOptions): string {
+  const canonicalUrl = `${SITE_URL}${options.canonicalPath || '/'}`;
   return `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -18,10 +21,11 @@ function renderHead(options: LayoutOptions): string {
   <meta property="og:title" content="${options.ogTitle || options.title}" />
   <meta property="og:description" content="${options.ogDescription || options.description}" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/assets/HBDR_Logo_Pack_all_sizes_-_2_1770577514801.jpeg" />
-  <meta property="og:url" content="${options.canonicalPath || '/'}" />
+  <meta property="og:image" content="${SITE_URL}/assets/HBDR_Logo_Pack_all_sizes_-_2_1770577514801.jpeg" />
+  <meta property="og:url" content="${canonicalUrl}" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="${options.ogTitle || options.title}" />
+  <meta name="twitter:image" content="${SITE_URL}/assets/HBDR_Logo_Pack_all_sizes_-_2_1770577514801.jpeg" />
   <meta name="twitter:description" content="${options.ogDescription || options.description}" />
   <link rel="icon" type="image/jpeg" href="/assets/HBDR_Logo_Pack_all_sizes_-_8_1770577514801.jpeg" />
 
@@ -681,13 +685,7 @@ function renderFooter(): string {
             Global leader in ad monetization and header bidding solutions. Maximize your revenue with our enterprise-grade platform.
           </p>
           <div class="flex gap-3">
-            <a href="#" class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all" data-testid="button-social-linkedin">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-            </a>
-            <a href="#" class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all" data-testid="button-social-twitter">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="#" class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all" data-testid="button-social-email">
+            <a href="mailto:contact@hbdr.com" class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all" data-testid="button-social-email">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </a>
           </div>
@@ -2105,7 +2103,7 @@ export function renderBlogPage(posts: BlogPostData[]): string {
   const categories = Array.from(new Set(posts.map(p => p.category)));
 
   const postCards = posts.map(post => `
-    <article class="glass-card overflow-hidden group" data-testid="blog-card-${post.slug}">
+    <article class="glass-card overflow-hidden group" x-show="!activeCategory || activeCategory === '${post.category}'" x-transition.opacity.duration.300ms data-testid="blog-card-${post.slug}">
       <div class="p-6 sm:p-8">
         <div class="flex items-center gap-3 mb-4">
           <span class="text-xs font-medium px-3 py-1 rounded-full border ${getCategoryColor(post.category)}" data-testid="badge-category">${post.category}</span>
@@ -2144,8 +2142,8 @@ export function renderBlogPage(posts: BlogPostData[]): string {
   ${renderPageHero("Blog", "Insights & Updates", "Expert perspectives on header bidding, ad monetization, and the future of programmatic advertising.")}
 
   <section class="py-16 lg:py-24" data-testid="blog-listing">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-wrap items-center gap-3 mb-12" x-data="{ activeCategory: '' }" data-testid="blog-filters">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ activeCategory: '' }">
+      <div class="flex flex-wrap items-center gap-3 mb-12" data-testid="blog-filters">
         <button @click="activeCategory = ''"
                 :class="!activeCategory ? 'bg-[var(--accent)] text-black border-[var(--accent)]' : 'border-white/10 text-white/50 hover:text-white hover:border-white/20'"
                 class="text-sm px-4 py-2 rounded-full border transition-all"
