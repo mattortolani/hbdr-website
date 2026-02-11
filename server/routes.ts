@@ -4,7 +4,7 @@ import { insertContactLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { fromError } from "zod-validation-error";
 import { checkRateLimit, getClientIp } from "./rateLimit";
 import { sendContactNotification } from "./email";
-import { renderPage, renderAboutPage, renderHowItWorksPage, renderCareersPage, renderPressPage, renderContactPage, renderBlogPage, renderBlogPostPage, renderBlogAdminPage, renderBlogEditorPage, renderHeaderBiddingPage, renderDisplayAdsPage, renderCtvOttPage, renderInAppAdsPage, renderMcmPage, renderManageAccountPage, renderManageInventoryPage, renderOpenBiddingPage, renderAdExchangePage, renderPrivacyPolicyPage, renderTermsPage, renderGdprCookiePolicyPage, renderFaqSupportPage, renderDashboardPage, renderVideoPlayerPage, renderPartnersPage, renderPublishersPage, renderAdvertisersPage, renderTrustCompliancePage, SITE_URL } from "./template";
+import { renderPage, renderAboutPage, renderHowItWorksPage, renderCareersPage, renderPressPage, renderContactPage, renderBlogPage, renderBlogPostPage, renderBlogAdminPage, renderBlogEditorPage, renderHeaderBiddingPage, renderDisplayAdsPage, renderCtvOttPage, renderInAppAdsPage, renderMcmPage, renderManageAccountPage, renderManageInventoryPage, renderOpenBiddingPage, renderAdExchangePage, renderPrivacyPolicyPage, renderTermsPage, renderGdprCookiePolicyPage, renderFaqSupportPage, renderDashboardPage, renderVideoPlayerPage, renderPartnersPage, renderPublishersPage, renderAdvertisersPage, renderTrustCompliancePage, renderCdnPage, SITE_URL } from "./template";
 import { renderPublisherToolsPage } from "./toolsTemplate";
 import { renderAdminLoginPage, renderAdminLeadsPage } from "./adminTemplate";
 import { sanitizeHtml, sanitizeText } from "./sanitize";
@@ -57,6 +57,7 @@ export function registerRoutes(app: Hono) {
   app.get("/solutions/manage-inventory", (c) => c.html(renderManageInventoryPage()));
   app.get("/solutions/open-bidding", (c) => c.html(renderOpenBiddingPage()));
   app.get("/solutions/ad-exchange-adx", (c) => c.html(renderAdExchangePage()));
+  app.get("/solutions/cdn", (c) => c.html(renderCdnPage()));
 
   app.get("/dashboard", (c) => c.html(renderDashboardPage()));
   app.get("/solutions/video-player", (c) => c.html(renderVideoPlayerPage()));
@@ -88,7 +89,7 @@ Sitemap: ${SITE_URL}/sitemap.xml
       "/solutions/header-bidding", "/solutions/display-ads", "/solutions/ctv-ott",
       "/solutions/in-app-ads", "/solutions/mcm", "/solutions/manage-account",
       "/solutions/manage-inventory", "/solutions/open-bidding", "/solutions/ad-exchange-adx",
-      "/solutions/video-player", "/dashboard", "/partners", "/publishers",
+      "/solutions/video-player", "/solutions/cdn", "/dashboard", "/partners", "/publishers",
       "/advertisers", "/trust", "/tools", "/blog",
       "/privacy-policy", "/terms", "/gdpr-cookie-policy", "/support",
     ];
