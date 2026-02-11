@@ -2,28 +2,26 @@
 
 ## Project Purpose
 
-HBDR Website is a server-rendered marketing site for HBDR, an ad-tech company specializing in header bidding and publisher monetization. It includes 26 pages, a blog with CMS admin panel, and a contact form with lead capture.
+HBDR Website is a server-rendered marketing site for HBDR, an ad-tech company specializing in header bidding and publisher monetization. It includes 26+ pages, a blog with CMS admin panel, contact form with lead capture, and publisher revenue calculators.
 
 ## Tech Stack
 
 - **Server**: Hono (TypeScript) on Node.js, deployable to Cloudflare Workers
-- **Interactivity**: Alpine.js (CDN) for form state, toggles, accordions
+- **Interactivity**: Alpine.js (CDN) for form state, toggles, accordions, tool calculators
 - **Styling**: Tailwind CSS + DaisyUI (CDN), dark glassmorphism theme
 - **Fonts**: Figtree (body) + Instrument Serif (display headings) via Google Fonts CDN
-- **Validation**: Zod schemas for blog posts and contact leads (generated from Drizzle table defs)
-- **Storage**: In-memory Maps (no database -- data lost on restart)
+- **Validation**: Zod schemas (pure, no Drizzle dependency)
+- **Storage**: D1 (Cloudflare production), MemStorage (local dev — ephemeral)
+- **Auth**: Cookie-based session auth for admin panel
 - **Build**: Wrangler for Workers deployment. No frontend build step.
 
 ## Key Commands
 
 ```bash
-# IMPORTANT: @hono/node-server and tsx are NOT in package.json.
-# You must add them before these commands will work:
-#   npm install @hono/node-server tsx
-
-npx tsx server/index.ts  # Start dev server on port 5000
-npx tsc --noEmit         # TypeScript type checking
-npx wrangler deploy      # Deploy to Cloudflare Workers
+npm install              # Install all dependencies (5 prod + 4 dev)
+npm run dev              # Start dev server on port 5000
+npm run check            # TypeScript type checking (tsc --noEmit)
+npm run deploy           # Deploy to Cloudflare Workers via wrangler
 ```
 
 There are no tests (`npm test` does not exist).
@@ -31,43 +29,67 @@ There are no tests (`npm test` does not exist).
 ## File Structure
 
 ```
+worker.ts                    # Cloudflare Workers entry (38 lines, uses shared routes)
 server/
-  index.ts          # Node.js dev server entry (Hono + @hono/node-server, port 5000)
-  routes.ts         # All HTTP routes (26 page renders + 5 API endpoints, 213 lines)
-  storage.ts        # IStorage interface + MemStorage (in-memory Maps, 305 lines)
-  template.ts       # ALL page templates (5212 lines, monolithic)
+  index.ts                   # Node.js dev server entry (72 lines, uses shared routes)
+  config.ts                  # Site-wide constants (SITE_URL, PAGE_ROUTES)
+  d1Storage.ts               # D1 implementation of IStorage (production)
+  routes/
+    pages.ts                 # All page GET routes (single source of truth)
+    api.ts                   # API endpoints (contact, blog CRUD, leads)
+    admin.ts                 # Admin routes (login, logout, leads, blog admin)
+    seo.ts                   # robots.txt and sitemap.xml
+  middleware/
+    auth.ts                  # Session management (create, verify, destroy)
+    sanitize.ts              # HTML and text sanitization
+    rate-limit.ts            # IP-based rate limiting
+  services/
+    storage.ts               # IStorage interface + type definitions
+    mem-storage.ts           # In-memory implementation (dev)
+    email.ts                 # Contact notification emails (Resend API)
+  templates/
+    layout.ts                # renderLayout() — head, nav, footer, scripts
+    index.ts                 # Barrel re-export of all templates
+    components/
+      hero.ts                # Reusable page hero section
+      cta.ts                 # Call-to-action section
+      stats.ts               # Stats section
+      contact-form.ts        # Contact form section
+      blog-helpers.ts        # Shared BlogPostData type, formatDate, getCategoryColor
+    pages/
+      home.ts, about.ts, how-it-works.ts, careers.ts, press.ts, contact.ts
+      blog.ts, dashboard.ts, partners.ts, trust.ts, support.ts
+      solutions/             # 10 solution pages
+      audience/              # publishers.ts, advertisers.ts
+      legal/                 # privacy-policy.ts, terms.ts, gdpr-cookie-policy.ts
+    admin/
+      leads.ts               # Admin login page + leads panel
+      blog.ts                # Blog manager + post editor
+    tools/
+      index.ts               # Publisher revenue calculators (5 tools)
 shared/
-  schema.ts         # Zod validation schemas via Drizzle pgTable defs (73 lines)
-worker.ts           # Cloudflare Workers entry (DUPLICATES routes -- missing 10 pages)
-public/assets/      # Static files served by Workers
-attached_assets/    # Source branding files (logos, competitor research)
+  schema.ts                  # Zod validation schemas (pure, no Drizzle)
+public/assets/               # Static files served by Workers
+attached_assets/             # Source branding files (logos, research)
+migrations/                  # D1 database schema (0001_init.sql)
 ```
 
 ## Architecture Patterns
 
 - **Server-side rendering**: All HTML generated as template literal strings in TypeScript functions. No React, no JSX, no client-side rendering.
 - **Template composition**: `renderLayout()` wraps page content with shared head/nav/footer/scripts. Individual pages export `render*Page()` functions.
-- **Storage interface**: `IStorage` interface in `storage.ts` allows swapping implementations. Currently only `MemStorage` exists.
-- **Dual entry points**: `server/index.ts` for Node.js dev, `worker.ts` for Cloudflare Workers. Routes are **duplicated** in both (this is a known issue). **worker.ts is currently 10 pages behind routes.ts.**
-- **CDN dependencies**: Tailwind, Alpine.js, HTMX (unused), DaisyUI loaded from CDNs. No frontend build step.
+- **Shared routes**: Both entry points (`worker.ts` and `server/index.ts`) call the same `register*Routes()` functions from `server/routes/`. Zero route duplication.
+- **Storage interface**: `IStorage` interface in `services/storage.ts`. Implementations: `D1Storage` (production), `MemStorage` (dev). Dependency-injected via `getStorage(c)` factory functions.
+- **CDN dependencies**: Tailwind, Alpine.js, DaisyUI loaded from CDNs. No frontend build step.
 
 ## Common Gotchas
 
-1. **@hono/node-server missing from package.json** -- imported in `server/index.ts` but not in dependencies. Must be added before dev server can run.
-2. **No lockfile** -- No package-lock.json. Run `npm install` to generate one.
-3. **worker.ts is OUT OF SYNC with routes.ts** -- worker.ts is missing 10 page routes (legal, audience, partners, dashboard, trust, support, video-player). Deploying to Workers will 404 on these pages. Any route change MUST be made in both files.
-4. **template.ts is 5212 lines** -- All 26 page templates live in one file. Use search, not scrolling.
-5. **Data is ephemeral** -- In-memory storage. All blog posts reset to seed data on restart. Contact leads disappear.
-6. **Blog category filters are broken** -- Alpine.js state changes but posts are never actually filtered in the DOM.
-7. **No auth on admin panel** -- `/admin/blog` is publicly accessible. Do not deploy without adding auth.
-8. **`published` is a string** -- Blog post `published` field is `"true"`/`"false"` string, not boolean. Use string comparison.
-9. **sanitizeHtml is regex-based and duplicated** -- Exists in both `routes.ts` and `worker.ts`. Regex approach is bypassable.
-10. **Support form schema mismatch** -- `/support` form sends `website` and `monthlyPageviews` fields to `/api/contact`, but the Zod schema expects `impressions` and has no `website` field. Will fail validation.
-11. **Social icon links still go to `#`** -- LinkedIn and Twitter/X icons in footer are placeholder `href="#"`.
-12. **OG image URLs are relative** -- Social media previews won't show images because `og:image` uses `/assets/...` instead of absolute URL.
-13. **HTMX loaded but never used** -- HTMX 2.0.4 CDN script in `<head>` of every page, zero `hx-*` attributes anywhere.
-14. **script/build.ts is dead code** -- References Vite, Express, Passport, pg, etc. that are no longer installed. No `build` script in package.json.
-15. **Fonts are Figtree + Instrument Serif, not Inter** -- Prior docs say Inter but code loads Figtree and Instrument Serif.
+1. **`published` is a string** -- Blog post `published` field is `"true"`/`"false"` string, not boolean. Use string comparison.
+2. **Dev data is ephemeral** -- MemStorage resets on restart. D1 persists in production.
+3. **Support form schema mismatch** -- `/support` form sends `website` and `monthlyPageviews` fields to `/api/contact`, but the Zod schema expects `impressions` and has no `website` field. Needs fixing.
+4. **ADMIN_PASSWORD** -- Must be set via `wrangler secret put ADMIN_PASSWORD`. Fallback is `hbdr2025!` (change in production).
+5. **Tailwind via CDN** -- Uses the Play CDN (`cdn.tailwindcss.com`), which is not recommended for production. Consider migrating to a build step.
+6. **No tests** -- No test suite exists yet. `data-testid` attributes are on key elements for future E2E testing.
 
 ## Design System
 
@@ -81,44 +103,48 @@ attached_assets/    # Source branding files (logos, competitor research)
 
 ## Environment Setup
 
-1. `npm install` (will warn about missing @hono/node-server)
-2. Add `@hono/node-server` to dependencies: `npm install @hono/node-server`
-3. Add tsx for dev: `npm install -D tsx`
-4. `npx tsx server/index.ts`
-5. Open `http://localhost:5000`
+1. `npm install`
+2. `npm run dev`
+3. Open `http://localhost:5000`
 
-No environment variables are required. No database setup needed.
+No environment variables required for dev. For production, set secrets via wrangler:
+```bash
+wrangler secret put ADMIN_PASSWORD
+wrangler secret put RESEND_API_KEY
+```
+
+## Adding New Pages
+
+1. Create `server/templates/pages/your-page.ts` with `export function renderYourPage(): string { ... }`
+2. Import `renderLayout` from `../layout` and any components from `../components/`
+3. Add the route in `server/routes/pages.ts`
+4. Add the path to `PAGE_ROUTES` in `server/config.ts` (for sitemap)
+5. Add nav/footer links in `server/templates/layout.ts` if needed
 
 ## Current Project Status
 
 ### Done
-- 26 page templates: Homepage, About, How It Works, Careers, Press, Contact, 10 Solution pages (incl. Video Player), Blog listing/post/admin, Privacy Policy, Terms, GDPR & Cookie Policy, FAQ & Support, Dashboard, Partners, Publishers, Advertisers, Trust & Compliance
-- Navigation with Solutions dropdown (10 items) + Company dropdown (9 items) + standalone Publisher/Advertiser/Partners links (desktop + mobile)
-- Footer with Resources column (7 real links) and Legal column (3 real links)
-- Contact form with client-side state and server-side validation
-- Blog CRUD API with Zod validation
-- Responsive design across all pages
-- Glassmorphism design system
-- Cloudflare Workers deployment config
-- Legal pages (Privacy Policy, Terms & Conditions, GDPR & Cookie Policy)
-- data-testid attributes on key elements (for future E2E testing)
+- 26 page templates fully decomposed into individual files
+- Shared route modules (zero duplication between worker.ts and index.ts)
+- Blog category filters (fixed — Alpine.js x-show on articles)
+- Admin authentication (cookie-based sessions)
+- D1 persistent storage (production)
+- Rate limiting on contact form
+- Honeypot spam protection
+- Email notifications via Resend API
+- SEO: robots.txt, sitemap.xml
+- Social links (LinkedIn, X, email) in footer
+- Absolute OG image URLs
+- Publisher revenue calculators (5 tools)
+- HTMX removed (was loaded but unused)
+- Package.json cleaned (5 prod deps, 4 dev deps)
+- Dead code removed (React app, Vite, Express, Drizzle ORM, 60+ unused packages)
 
-### In Progress / Broken
-- Blog category filters (buttons exist but don't filter)
-- Blog admin has no authentication
-- Data persistence (in-memory only)
-- worker.ts route duplication -- **now 10 pages behind routes.ts**
-- HTML sanitization (regex-based, bypassable)
-- Support form sends wrong fields to /api/contact (schema mismatch)
-- @hono/node-server missing from package.json (dev server won't start)
-- No lockfile
-
-### Not Started
-- Authentication
-- Persistent storage (database)
-- Testing
-- CI/CD
-- Rate limiting
-- CSRF protection
-- SEO files (sitemap.xml, robots.txt)
-- Error pages (404, 500)
+### Still Needs Work
+- Support form schema mismatch (sends wrong fields)
+- Tailwind CDN should be replaced with build step for production
+- No test suite
+- No CI/CD pipeline
+- No error pages (404, 500)
+- No CSRF protection
+- sanitizeHtml is regex-based (consider DOMPurify or similar for production)
