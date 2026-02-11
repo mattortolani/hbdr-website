@@ -12,7 +12,7 @@ import {
   renderAdExchangePage, renderPrivacyPolicyPage, renderTermsPage,
   renderGdprCookiePolicyPage, renderFaqSupportPage, renderDashboardPage,
   renderVideoPlayerPage, renderPartnersPage, renderPublishersPage,
-  renderAdvertisersPage, renderTrustCompliancePage, SITE_URL
+  renderAdvertisersPage, renderTrustCompliancePage, renderCdnPage, SITE_URL
 } from "./server/template";
 import { renderPublisherToolsPage } from "./server/toolsTemplate";
 import { renderAdminLoginPage, renderAdminLeadsPage } from "./server/adminTemplate";
@@ -140,6 +140,7 @@ app.get("/solutions/manage-inventory", (c) => c.html(renderManageInventoryPage()
 app.get("/solutions/open-bidding", (c) => c.html(renderOpenBiddingPage()));
 app.get("/solutions/ad-exchange-adx", (c) => c.html(renderAdExchangePage()));
 app.get("/solutions/video-player", (c) => c.html(renderVideoPlayerPage()));
+app.get("/solutions/cdn", (c) => c.html(renderCdnPage()));
 
 app.get("/dashboard", (c) => c.html(renderDashboardPage()));
 app.get("/partners", (c) => c.html(renderPartnersPage()));
@@ -170,7 +171,7 @@ app.get("/sitemap.xml", (c) => {
     "/solutions/header-bidding", "/solutions/display-ads", "/solutions/ctv-ott",
     "/solutions/in-app-ads", "/solutions/mcm", "/solutions/manage-account",
     "/solutions/manage-inventory", "/solutions/open-bidding", "/solutions/ad-exchange-adx",
-    "/solutions/video-player", "/dashboard", "/partners", "/publishers",
+    "/solutions/video-player", "/solutions/cdn", "/dashboard", "/partners", "/publishers",
     "/advertisers", "/trust", "/tools", "/blog",
     "/privacy-policy", "/terms", "/gdpr-cookie-policy", "/support",
   ];

@@ -580,6 +580,7 @@ function renderNav(): string {
               <a href="/solutions/manage-inventory" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-manage-inventory">Manage Inventory</a>
               <a href="/solutions/open-bidding" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-open-bidding">Open Bidding</a>
               <a href="/solutions/ad-exchange-adx" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-ad-exchange">Ad Exchange AdX</a>
+              <a href="/solutions/cdn" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-cdn">HBDR CDN</a>
             </div>
           </div>
           <a href="/publishers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-publishers">Publishers</a>
@@ -652,6 +653,7 @@ function renderNav(): string {
           <a href="/solutions/manage-inventory" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-manage-inventory">Manage Inventory</a>
           <a href="/solutions/open-bidding" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-open-bidding">Open Bidding</a>
           <a href="/solutions/ad-exchange-adx" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-ad-exchange">Ad Exchange AdX</a>
+          <a href="/solutions/cdn" @click="mobileOpen = false" class="block py-2 text-base text-white/60 hover:text-white transition-colors" data-testid="mobile-link-cdn">HBDR CDN</a>
         </div>
         <a href="/publishers" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-publishers">For Publishers</a>
         <a href="/advertisers" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-advertisers">For Advertisers</a>
@@ -705,6 +707,7 @@ function renderFooter(): string {
               { label: "MCM", href: "/solutions/mcm" },
               { label: "Manage Account", href: "/solutions/manage-account" },
               { label: "Manage Inventory", href: "/solutions/manage-inventory" },
+              { label: "HBDR CDN", href: "/solutions/cdn" },
             ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors" data-testid="link-footer-${l.href.replace(/\//g, '-').slice(1)}">${l.label}</a></li>`).join("")}
           </ul>
         </div>
@@ -5320,6 +5323,285 @@ export function renderTrustCompliancePage(): string {
     title: "Trust & Compliance - HBDR",
     description: "HBDR's commitment to transparency, compliance, and trust in ad technology. Learn about our certifications, policies, and industry partnerships.",
     canonicalPath: "/trust",
+    bodyContent: content,
+  });
+}
+
+export function renderCdnPage(): string {
+  const content = `
+  ${renderPageHero("Solutions", "HBDR CDN", "One script. Under 2KB. Infinite possibilities. Deploy HBDR's entire monetization stack through a single lightweight tag powered by Cloudflare's global edge network.")}
+
+  <section class="py-24 lg:py-32" data-testid="cdn-overview-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto animate-on-scroll">
+        <div class="glass-card p-8 sm:p-12" data-testid="card-cdn-overview">
+          <div class="glass-tag mb-6">Edge-Powered Delivery</div>
+          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-6 text-gradient">What is the HBDR CDN?</h2>
+          <p class="text-lg text-white/50 leading-relaxed mb-6">
+            The HBDR CDN is our proprietary script delivery network built on top of Cloudflare's global infrastructure. Publishers integrate a single lightweight tag — under 2KB — into their site. That one line of code becomes the gateway for HBDR's entire technology suite: header bidding, ad refresh, viewability tracking, analytics, and every tool we build next.
+          </p>
+          <p class="text-lg text-white/50 leading-relaxed mb-6">
+            Because scripts are loaded asynchronously from edge nodes closest to each user, there is zero render-blocking impact on publisher pages. We can push updates, new bidder adapters, optimization rules, and entirely new features without publishers ever touching their code again.
+          </p>
+          <div class="glass-card p-6 bg-white/[0.02] border border-white/10 rounded-xl mt-8">
+            <p class="text-sm text-white/30 font-mono mb-2">// One line. That's it.</p>
+            <code class="text-[var(--accent)] text-sm sm:text-base font-mono break-all">&lt;script async src="https://cdn.hbdr.com/v1/hbdr.js"&gt;&lt;/script&gt;</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="cdn-diagram-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Architecture</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">How the HBDR CDN Works</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">From a single script tag to a fully optimized monetization stack — delivered at the edge in milliseconds.</p>
+      </div>
+
+      <div class="max-w-5xl mx-auto animate-on-scroll">
+        <div class="glass-card p-6 sm:p-10 overflow-hidden">
+          <!-- Flow Diagram -->
+          <div class="relative">
+            <!-- Step 1: Publisher Site -->
+            <div class="flex flex-col items-center mb-4">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mb-3">
+                <svg class="w-8 h-8 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+              </div>
+              <span class="text-white font-semibold text-sm">Publisher Website</span>
+              <span class="text-white/30 text-xs mt-1">Adds one &lt;script&gt; tag</span>
+            </div>
+
+            <!-- Arrow Down -->
+            <div class="flex justify-center mb-4">
+              <div class="w-px h-10 bg-gradient-to-b from-[var(--accent)] to-[var(--accent)]/30"></div>
+            </div>
+            <div class="flex justify-center mb-4">
+              <svg class="w-5 h-5 text-[var(--accent)] -mt-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </div>
+
+            <!-- Step 2: Cloudflare Edge -->
+            <div class="flex flex-col items-center mb-4">
+              <div class="w-full max-w-md glass-card p-5 border border-[var(--accent)]/20 text-center">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>
+                  </div>
+                  <div>
+                    <span class="text-white font-semibold text-sm">Cloudflare Edge Network</span>
+                    <span class="block text-white/30 text-xs">300+ cities worldwide &bull; &lt;50ms latency</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Arrow Down -->
+            <div class="flex justify-center mb-4">
+              <div class="w-px h-10 bg-gradient-to-b from-[var(--accent)] to-[var(--accent)]/30"></div>
+            </div>
+            <div class="flex justify-center mb-4">
+              <svg class="w-5 h-5 text-[var(--accent)] -mt-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </div>
+
+            <!-- Step 3: HBDR Loader -->
+            <div class="flex flex-col items-center mb-4">
+              <div class="w-full max-w-md glass-card p-5 border border-[var(--accent)]/30 bg-[var(--accent)]/[0.03] text-center">
+                <span class="text-[var(--accent)] font-bold text-sm tracking-wide">HBDR.JS LOADER</span>
+                <span class="block text-white/30 text-xs mt-1">&lt; 2KB &bull; Async &bull; Non-blocking</span>
+                <span class="block text-white/40 text-xs mt-1">Evaluates publisher config & loads modules</span>
+              </div>
+            </div>
+
+            <!-- Branching Arrow -->
+            <div class="flex justify-center mb-2">
+              <div class="w-px h-8 bg-gradient-to-b from-[var(--accent)] to-[var(--accent)]/30"></div>
+            </div>
+
+            <!-- Step 4: Modules Fan-out -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-2">
+              ${[
+                { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>', label: "Header Bidding", sub: "Prebid.js + S2S" },
+                { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>', label: "Ad Refresh", sub: "Viewable refresh" },
+                { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>', label: "Viewability", sub: "MRC compliant" },
+                { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>', label: "Analytics", sub: "Real-time data" },
+                { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>', label: "Custom Scripts", sub: "Your tools, our pipe" },
+              ].map((m) => `
+              <div class="glass-card p-4 text-center group hover:border-[var(--accent)]/20 transition-colors">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                  <svg class="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">${m.icon}</svg>
+                </div>
+                <span class="text-white text-xs font-semibold block">${m.label}</span>
+                <span class="text-white/30 text-[0.65rem] block mt-0.5">${m.sub}</span>
+              </div>`).join("")}
+            </div>
+
+            <!-- Bottom arrow to ad slots -->
+            <div class="flex justify-center mt-4 mb-2">
+              <div class="w-px h-8 bg-gradient-to-b from-[var(--accent)]/30 to-[var(--accent)]"></div>
+            </div>
+            <div class="flex justify-center mb-2">
+              <svg class="w-5 h-5 text-[var(--accent)] -mt-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </div>
+
+            <!-- Step 5: Result -->
+            <div class="flex flex-col items-center">
+              <div class="glass-card p-5 text-center max-w-md w-full bg-gradient-to-br from-emerald-500/[0.05] to-transparent border border-emerald-500/20">
+                <span class="text-[var(--accent)] font-bold text-sm">Fully Monetized Page</span>
+                <span class="block text-white/30 text-xs mt-1">Zero render blocking &bull; Highest CPMs &bull; Instant updates</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="cdn-advantages-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Why HBDR CDN</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">One Tag, Total Control</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Traditional ad setups require publishers to manage dozens of scripts. HBDR CDN replaces all of them with a single integration point.</p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-8">
+        <div class="glass-card p-8 animate-on-scroll stagger-1" data-testid="card-cdn-traditional">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+            <h3 class="text-xl font-semibold text-white">Traditional Setup</h3>
+          </div>
+          <ul class="space-y-3 text-white/40 text-[0.9375rem]">
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">&#x2717;</span> 10-20 separate script tags on every page</li>
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">&#x2717;</span> Each bidder adapter loaded individually</li>
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">&#x2717;</span> Manual updates require developer time</li>
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">&#x2717;</span> Render-blocking scripts hurt Core Web Vitals</li>
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">&#x2717;</span> Version conflicts between vendor scripts</li>
+            <li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">&#x2717;</span> 150KB+ of ad-tech JavaScript per page</li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-8 border-[var(--accent)]/20 animate-on-scroll stagger-2" data-testid="card-cdn-hbdr">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h3 class="text-xl font-semibold text-white">HBDR CDN</h3>
+          </div>
+          <ul class="space-y-3 text-white/40 text-[0.9375rem]">
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-0.5">&#10003;</span> Single &lt;script&gt; tag — under 2KB</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-0.5">&#10003;</span> All modules loaded asynchronously on demand</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-0.5">&#10003;</span> HBDR pushes updates instantly — no dev work</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-0.5">&#10003;</span> Zero render-blocking, perfect Core Web Vitals</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-0.5">&#10003;</span> Bundled and optimized — no conflicts</li>
+            <li class="flex items-start gap-2"><span class="text-[var(--accent)] mt-0.5">&#10003;</span> Edge-cached globally via Cloudflare</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="cdn-features-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Capabilities</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">What Ships Through the CDN</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Every piece of HBDR technology — current and future — is delivered through this single pipeline.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${[
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>', title: "Header Bidding Stack", description: "Complete Prebid.js wrapper with server-side bidding, dynamic floor pricing, and 50+ demand partner adapters — all loaded and configured remotely." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>', title: "Smart Ad Refresh", description: "Viewability-gated ad refresh that maximizes impressions per session without violating demand partner policies or hurting user experience." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>', title: "Real-Time Analytics", description: "Session-level and impression-level data collection that feeds HBDR's reporting dashboards — no additional pixel or tag required." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>', title: "Viewability Tracking", description: "MRC-compliant viewability measurement built into the loader. Track active view rates across every ad unit without third-party scripts." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>', title: "Consent & Privacy", description: "CMP integration, TCF 2.2 support, and GDPR/CCPA signal passing baked in. Privacy compliance is handled at the CDN level automatically." },
+          { icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>', title: "Remote Configuration", description: "Every publisher's setup is managed server-side. Change bidder timeouts, add new demand partners, or adjust floor rules — all without touching the publisher's site." },
+        ].map((f, i) => `
+        <div class="glass-card p-7 group animate-on-scroll stagger-${(i % 3) + 1}" data-testid="cdn-feature-card-${i}">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">${f.icon}</svg>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-3 group-hover:text-[var(--accent)] transition-colors">${f.title}</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem]">${f.description}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="cdn-performance-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Performance</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Built for Speed at Scale</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Powered by Cloudflare's network spanning 300+ cities across 100+ countries.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${[
+          { value: "&lt;2KB", label: "Loader Size", detail: "Lighter than a small image" },
+          { value: "&lt;50ms", label: "Edge Latency", detail: "Served from nearest PoP" },
+          { value: "300+", label: "Edge Locations", detail: "Cloudflare global network" },
+          { value: "99.99%", label: "Uptime SLA", detail: "Enterprise-grade reliability" },
+        ].map((s, i) => `
+        <div class="glass-card p-6 text-center animate-on-scroll stagger-${(i % 4) + 1}">
+          <div class="text-3xl sm:text-4xl font-bold text-gradient mb-2">${s.value}</div>
+          <div class="text-white font-semibold text-sm mb-1">${s.label}</div>
+          <div class="text-white/30 text-xs">${s.detail}</div>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  <section class="py-24 lg:py-32" data-testid="cdn-how-it-works-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-20 animate-on-scroll">
+        <div class="glass-tag mb-6 mx-auto w-fit">Integration</div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display tracking-tight mb-6 text-gradient">Live in 3 Steps</h2>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">Getting started takes minutes, not weeks.</p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        ${[
+          { step: "01", title: "Add the Tag", description: "Paste a single async script tag into your site's &lt;head&gt;. Works with any CMS, framework, or static site. That's the only code change you'll ever make." },
+          { step: "02", title: "We Configure Everything", description: "HBDR's team sets up your bidder stack, floor pricing, refresh rules, and analytics — all managed remotely through the CDN. No publisher-side config files." },
+          { step: "03", title: "Revenue Flows, Updates Ship", description: "Your monetization is live. As we add new demand partners, optimize configurations, or ship new tools, they deploy instantly through the CDN. Zero effort on your end." },
+        ].map((s, i) => `
+        <div class="glass-card p-8 animate-on-scroll stagger-${i + 1}" data-testid="cdn-step-${i}">
+          <div class="text-5xl font-bold text-[var(--accent)]/20 mb-4">${s.step}</div>
+          <h3 class="text-xl font-semibold text-white mb-3">${s.title}</h3>
+          <p class="text-white/40 leading-relaxed text-[0.9375rem]">${s.description}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderStatsSection()}
+
+  <div class="section-divider max-w-5xl mx-auto"></div>
+
+  ${renderCTASection("Ready to simplify your ad stack?", "Deploy HBDR CDN")}`;
+
+  return renderLayout({
+    title: "HBDR CDN - One Script, Entire Monetization Stack | HBDR",
+    description: "Deploy HBDR's full ad-tech suite through a single 2KB script tag. Powered by Cloudflare's global edge network. Header bidding, analytics, ad refresh, and more — all delivered asynchronously.",
+    ogTitle: "HBDR CDN - One Script. Under 2KB. Infinite Possibilities.",
+    ogDescription: "A single lightweight tag powers your entire monetization stack. Header bidding, ad refresh, viewability, analytics — all delivered at the edge via Cloudflare.",
+    canonicalPath: "/solutions/cdn",
     bodyContent: content,
   });
 }
