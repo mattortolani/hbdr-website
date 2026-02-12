@@ -9,8 +9,8 @@ directory = "./public"
 
 [vars]
 ENVIRONMENT = "production"
-ADMIN_PASSWORD = "hbdr2025!"
-SITE_URL = "https://hbdr.com"
+# ADMIN_PASSWORD is set as a secret — run: wrangler secret put ADMIN_PASSWORD
+# RESEND_API_KEY is set as a secret — run: wrangler secret put RESEND_API_KEY
 
 [[d1_databases]]
 binding = "DB"

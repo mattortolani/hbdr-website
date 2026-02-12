@@ -1,20 +1,19 @@
 {
-  "include": ["shared/**/*", "server/**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  "include": ["shared/**/*", "server/**/*", "worker.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"],
   "compilerOptions": {
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
     "noEmit": true,
     "module": "ESNext",
     "strict": true,
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "jsx": "preserve",
+    "lib": ["esnext"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "moduleResolution": "bundler",
     "baseUrl": ".",
-    "types": ["node"],
+    "types": ["node", "@cloudflare/workers-types"],
     "paths": {
       "@shared/*": ["./shared/*"]
     }
