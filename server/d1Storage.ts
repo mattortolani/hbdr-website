@@ -1,6 +1,5 @@
 /// <reference types="@cloudflare/workers-types" />
-import type { IStorage } from "./storage";
-import type { User, InsertUser, ContactLead, InsertContactLead, BlogPost, InsertBlogPost } from "@shared/schema";
+import type { IStorage, User, ContactLead, BlogPost, InsertContactLead, InsertBlogPost } from "./services/storage";
 
 export class D1Storage implements IStorage {
   constructor(private db: D1Database) {}
@@ -15,7 +14,7 @@ export class D1Storage implements IStorage {
     return row ? this.mapUser(row) : undefined;
   }
 
-  async createUser(user: InsertUser): Promise<User> {
+  async createUser(user: { username: string; password: string }): Promise<User> {
     const id = crypto.randomUUID();
     await this.db.prepare("INSERT INTO users (id, username, password) VALUES (?, ?, ?)")
       .bind(id, user.username, user.password).run();

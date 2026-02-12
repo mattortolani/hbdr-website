@@ -2,34 +2,27 @@
 
 ## Overview
 
-All API endpoints are served by the Hono framework. JSON APIs use `Content-Type: application/json`. Page routes return `Content-Type: text/html`.
+All routes are defined in `server/routes.ts` (Node.js dev) and **partially** duplicated in `worker.ts` (Cloudflare Workers -- missing 10 page routes).
 
-**Base URL (dev)**: `http://localhost:5000`
-**Base URL (prod)**: `https://hbdr-website.<subdomain>.workers.dev` (or custom domain)
-
-**Authentication**: None. All endpoints are currently public. See IMPLEMENTATION_SPEC.md Task 0-1 for planned auth.
+Base URL: `http://localhost:5000` (dev) or `https://hbdr-website.<subdomain>.workers.dev` (production)
 
 ---
 
 ## Page Routes
 
-All page routes return `200` with full HTML documents (nav, content, footer).
+All page routes return `200 text/html` with a complete HTML document.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/` | Homepage |
-| GET | `/about` | About Us |
-| GET | `/how-it-works` | How It Works (3-step process + FAQ) |
-| GET | `/careers` | Careers (benefits + open positions) |
-| GET | `/press` | Press & News (press releases + media contact) |
-| GET | `/contact` | Contact page with lead capture form |
-| GET | `/blog` | Blog listing (published posts only, sorted by date desc) |
-| GET | `/blog/:slug` | Individual blog post (returns 404 if not found or not published) |
-| GET | `/admin/blog` | Blog admin panel (lists all posts incl. unpublished) |
-| GET | `/admin/blog/new` | Blog post editor (new post) |
-| GET | `/admin/blog/edit/:id` | Blog post editor (edit existing post) |
+| GET | `/` | Homepage (hero, solutions, comparison, testimonials, stats) |
+| GET | `/about` | About Us (mission, timeline, values) |
+| GET | `/how-it-works` | How It Works (3-step process, FAQs) |
+| GET | `/careers` | Careers (benefits, positions) |
+| GET | `/press` | Press & News (releases, media contact) |
+| GET | `/contact` | Contact (form with Alpine.js) |
 | GET | `/solutions/header-bidding` | Header Bidding solution page |
 | GET | `/solutions/display-ads` | Display Ads solution page |
+| GET | `/solutions/video-player` | Video Player solution page |
 | GET | `/solutions/ctv-ott` | CTV & OTT solution page |
 | GET | `/solutions/in-app-ads` | In-App Ads solution page |
 | GET | `/solutions/mcm` | MCM solution page |
@@ -37,6 +30,22 @@ All page routes return `200` with full HTML documents (nav, content, footer).
 | GET | `/solutions/manage-inventory` | Manage Inventory solution page |
 | GET | `/solutions/open-bidding` | Open Bidding solution page |
 | GET | `/solutions/ad-exchange-adx` | Ad Exchange AdX solution page |
+| GET | `/dashboard` | Analytics Dashboard (links to dashboard.hbdr.com) |
+| GET | `/partners` | Partners & Integrations (45 named partners) |
+| GET | `/publishers` | For Publishers (onboarding, FAQs) |
+| GET | `/advertisers` | For Advertisers (deal types, brand safety) |
+| GET | `/trust` | Trust & Compliance (certs, capabilities) |
+| GET | `/privacy-policy` | Privacy Policy (legal page) |
+| GET | `/terms` | Terms & Conditions (legal page) |
+| GET | `/gdpr-cookie-policy` | GDPR & Cookie Policy (legal page) |
+| GET | `/support` | FAQ & Support (15 FAQs + support form) |
+| GET | `/blog` | Blog listing (published posts only) |
+| GET | `/blog/:slug` | Individual blog post |
+| GET | `/admin/blog` | Blog admin panel (**NO AUTH**) |
+| GET | `/admin/blog/new` | Blog post editor (new) |
+| GET | `/admin/blog/edit/:id` | Blog post editor (edit existing) |
+
+**worker.ts is missing**: `/dashboard`, `/solutions/video-player`, `/partners`, `/publishers`, `/advertisers`, `/trust`, `/privacy-policy`, `/terms`, `/gdpr-cookie-policy`, `/support`
 
 ---
 
@@ -47,76 +56,66 @@ All page routes return `200` with full HTML documents (nav, content, footer).
 Creates a new contact lead.
 
 **Auth**: None (public)
-**Content-Type**: `application/json`
 
-**Request Body**:
+**Request Body** (JSON):
 ```json
 {
-  "name": "John Smith",
-  "email": "john@company.com",
-  "company": "Acme Publishing",
-  "impressions": "10m-50m",
-  "message": "Optional message text"
+  "name": "John Doe",
+  "email": "john@example.com",
+  "company": "Acme Corp",
+  "impressions": "1M-5M",
+  "message": "I'm interested in header bidding solutions"
 }
 ```
 
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| name | string | Yes | Min 2 characters |
-| email | string | Yes | Valid email format |
-| company | string | Yes | Min 2 characters |
-| impressions | string | Yes | Min 1 character (select value) |
-| message | string | No | Optional free text |
+**Validation** (Zod):
+- `name`: string, min 2 chars, required
+- `email`: string, valid email format, required
+- `company`: string, min 2 chars, required
+- `impressions`: string, min 1 char, required
+- `message`: string, optional
 
-**Success Response** (200):
-Returns HTML fragment (for HTMX/Alpine.js integration):
+**Success Response** (200, text/html):
 ```html
 <div id="contact-form-result" class="glass-card p-8 text-center">
-  ...Message Sent!...
+  <h3>Message Sent!</h3>
+  <p>We'll get back to you within 24 hours.</p>
 </div>
 ```
 
-**Validation Error** (400):
+**Validation Error** (400, application/json):
 ```json
 {
   "message": "Validation error: Name must be at least 2 characters",
-  "errors": {
-    "name": ["Name must be at least 2 characters"]
-  }
+  "errors": { "name": ["Name must be at least 2 characters"] }
 }
 ```
 
-**Server Error** (500):
-Returns HTML error fragment.
+**Server Error** (500, text/html): Error card HTML fragment
+
+**Note**: The support form at `/support` submits to this endpoint but sends incorrect fields (`website`, `monthlyPageviews` instead of `impressions`). This will fail validation.
 
 ---
 
 ### GET /api/contact
 
-Returns all submitted contact leads.
+Returns all contact leads. **NO AUTH -- PII EXPOSURE RISK.**
 
-**Auth**: None (PUBLIC -- security issue, see IMPLEMENTATION_SPEC.md Task 0-3)
+**Auth**: None (should require admin auth)
 
-**Response** (200):
+**Response** (200, application/json):
 ```json
 [
   {
-    "id": "uuid-string",
-    "name": "John Smith",
-    "email": "john@company.com",
-    "company": "Acme Publishing",
-    "impressions": "10m-50m",
-    "message": "Optional message",
+    "id": "uuid",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "company": "Acme Corp",
+    "impressions": "1M-5M",
+    "message": "...",
     "createdAt": "2025-01-15T00:00:00.000Z"
   }
 ]
-```
-
-**Server Error** (500):
-```json
-{
-  "message": "Internal server error"
-}
 ```
 
 ---
@@ -125,103 +124,57 @@ Returns all submitted contact leads.
 
 Creates a new blog post.
 
-**Auth**: None (security issue -- see IMPLEMENTATION_SPEC.md Task 0-1)
-**Content-Type**: `application/json`
+**Auth**: None (should require admin auth)
 
-**Request Body**:
+**Request Body** (JSON):
 ```json
 {
-  "title": "My Blog Post Title",
-  "slug": "my-blog-post-title",
-  "excerpt": "A brief summary of the post content...",
-  "content": "<h2>Heading</h2><p>HTML content...</p>",
-  "coverImage": "https://example.com/image.jpg",
-  "author": "Jane Doe",
+  "title": "Post Title",
+  "slug": "post-title",
+  "excerpt": "Short description...",
+  "content": "<h2>Content HTML</h2><p>...</p>",
+  "author": "Author Name",
   "category": "Industry Trends",
-  "tags": "header bidding,programmatic,trends",
+  "coverImage": "https://...",
+  "tags": "tag1,tag2",
   "published": "true"
 }
 ```
 
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| title | string | Yes | Min 3 characters |
-| slug | string | Yes | Min 3 chars, lowercase alphanumeric + hyphens only (`/^[a-z0-9-]+$/`) |
-| excerpt | string | Yes | Min 10 characters |
-| content | string | Yes | Min 20 characters. Accepts HTML (sanitized server-side) |
-| coverImage | string | No | URL string |
-| author | string | Yes | Min 2 characters |
-| category | string | Yes | Min 2 characters |
-| tags | string | No | Comma-separated tag list |
-| published | string | No | `"true"` or `"false"` (defaults to `"true"`) |
+**Validation** (Zod):
+- `title`: string, min 3 chars, required
+- `slug`: string, min 3 chars, regex `^[a-z0-9-]+$`, required, must be unique
+- `excerpt`: string, min 10 chars, required
+- `content`: string, min 20 chars, required (passed through regex sanitizeHtml)
+- `author`: string, min 2 chars, required
+- `category`: string, min 2 chars, required
+- `coverImage`: string, optional
+- `tags`: string, optional (comma-separated)
+- `published`: string, optional, defaults to `"true"`
 
-**Success Response** (201):
-```json
-{
-  "id": "uuid-string",
-  "title": "My Blog Post Title",
-  "slug": "my-blog-post-title",
-  "excerpt": "A brief summary...",
-  "content": "<h2>Heading</h2><p>Sanitized HTML content...</p>",
-  "coverImage": null,
-  "author": "Jane Doe",
-  "category": "Industry Trends",
-  "tags": "header bidding,programmatic,trends",
-  "published": "true",
-  "publishedAt": "2025-01-15T00:00:00.000Z",
-  "updatedAt": "2025-01-15T00:00:00.000Z"
-}
-```
+**Success** (201, application/json): Full post object with generated id, publishedAt, updatedAt
 
-**Duplicate Slug Error** (400):
-```json
-{
-  "message": "A post with this slug already exists"
-}
-```
+**Duplicate Slug** (400): `{ "message": "A post with this slug already exists" }`
 
-**Validation Error** (400):
-```json
-{
-  "message": "Validation error: ...",
-  "errors": { "field": ["error message"] }
-}
-```
-
-**Server Error** (500):
-```json
-{
-  "message": "Internal server error"
-}
-```
+**Validation Error** (400): `{ "message": "...", "errors": { ... } }`
 
 ---
 
 ### PUT /api/blog/:id
 
-Updates an existing blog post. Supports partial updates.
+Updates an existing blog post. All fields are optional (partial update).
 
-**Auth**: None (security issue)
-**Content-Type**: `application/json`
-**URL Params**: `id` -- the blog post UUID
+**Auth**: None (should require admin auth)
 
-**Request Body**: Same fields as POST, all optional (partial update).
+**URL Params**: `id` -- blog post UUID
 
-**Success Response** (200): Updated blog post object (same shape as POST response).
+**Request Body** (JSON): Same fields as POST, all optional
 
-**Not Found** (404):
-```json
-{
-  "message": "Post not found"
-}
-```
+**Success** (200): Updated post object
 
-**Duplicate Slug Error** (400):
-```json
-{
-  "message": "A post with this slug already exists"
-}
-```
+**Not Found** (404): `{ "message": "Post not found" }`
+
+**Duplicate Slug** (400): If changing slug to one that already exists
 
 ---
 
@@ -229,28 +182,19 @@ Updates an existing blog post. Supports partial updates.
 
 Deletes a blog post.
 
-**Auth**: None (security issue)
-**URL Params**: `id` -- the blog post UUID
+**Auth**: None (should require admin auth)
 
-**Success Response** (200):
-```json
-{
-  "message": "Post deleted"
-}
-```
+**URL Params**: `id` -- blog post UUID
 
-**Not Found** (404):
-```json
-{
-  "message": "Post not found"
-}
-```
+**Success** (200): `{ "message": "Post deleted" }`
+
+**Not Found** (404): `{ "message": "Post not found" }`
 
 ---
 
 ### GET /assets/:filename
 
-Serves static files from the `attached_assets/` directory (Node.js dev) or `public/assets/` directory (Workers).
+Serves static files from the `attached_assets/` directory.
 
 **Node.js only** -- Workers serve static files via wrangler.toml `[assets]` config.
 
