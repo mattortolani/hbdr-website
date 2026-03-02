@@ -47,6 +47,7 @@ function renderHead(options: LayoutOptions): string {
   </script>
 
   <style>
+    [x-cloak] { display: none !important; }
     * { font-family: 'Figtree', system-ui, sans-serif; }
 
     :root {
@@ -767,7 +768,7 @@ function renderScripts(): string {
     });
   </script>
 
-  <style>[x-cloak] { display: none !important; }</style>`;
+`;
 }
 
 export function renderLayout(options: LayoutOptions): string {
