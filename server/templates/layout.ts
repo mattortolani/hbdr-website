@@ -520,145 +520,6 @@ function renderHead(options: LayoutOptions): string {
     .htmx-request .htmx-indicator { display: inline-flex; }
     .htmx-request .submit-text { display: none; }
 
-    /* ── Animated counter ── */
-    .counter-value {
-      display: inline-block;
-      min-width: 1ch;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ── Card shimmer on hover ── */
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(
-        105deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.04) 45%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.04) 55%,
-        transparent 60%
-      );
-      background-size: 200% 100%;
-      background-position: 200% 0;
-      transition: background-position 0.6s ease;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .glass-card { position: relative; overflow: hidden; }
-    .glass-card:hover::before { background-position: -200% 0; }
-
-    /* ── Nav link underline reveal ── */
-    .nav-link {
-      position: relative;
-    }
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 50%;
-      width: 0;
-      height: 1.5px;
-      background: var(--accent);
-      transition: width 0.25s ease, left 0.25s ease;
-    }
-    .nav-link:hover::after {
-      width: 100%;
-      left: 0;
-    }
-
-    /* ── Button press feedback ── */
-    .glass-btn:active {
-      transform: translateY(1px) scale(0.98);
-      box-shadow: 0 1px 8px var(--accent-glow);
-      transition-duration: 0.08s;
-    }
-    .glass-btn-outline:active {
-      transform: translateY(1px) scale(0.98);
-      transition-duration: 0.08s;
-    }
-
-    /* ── Text gradient reveal ── */
-    @keyframes gradientReveal {
-      from {
-        background-size: 0% 100%;
-      }
-      to {
-        background-size: 100% 100%;
-      }
-    }
-
-    /* ── Icon float on hover ── */
-    .icon-hover {
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .group:hover .icon-hover {
-      transform: scale(1.12) rotate(-3deg);
-    }
-
-    /* ── Comparison row slide-in ── */
-    .comparison-row {
-      opacity: 0;
-      transform: translateX(-20px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-    .comparison-row.visible {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    /* ── Check icon draw ── */
-    @keyframes drawCheck {
-      from { stroke-dashoffset: 20; }
-      to { stroke-dashoffset: 0; }
-    }
-    .check-animate svg path {
-      stroke-dasharray: 20;
-      stroke-dashoffset: 20;
-    }
-    .check-animate.visible svg path {
-      animation: drawCheck 0.4s ease forwards;
-    }
-
-    /* ── Step connector line ── */
-    @keyframes lineGrow {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-    .step-connector {
-      position: absolute;
-      top: 28px;
-      left: 0;
-      right: 0;
-      height: 1px;
-      overflow: hidden;
-    }
-    .step-connector::after {
-      content: '';
-      display: block;
-      height: 100%;
-      width: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    }
-    .step-connector.visible::after {
-      animation: lineGrow 1.2s ease forwards;
-    }
-
-    /* ── Smooth scale entrance for cards ── */
-    .animate-scale-in {
-      opacity: 0;
-      transform: scale(0.92) translateY(20px);
-      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .animate-scale-in.visible {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-
     @media (max-width: 768px) {
       .orb { opacity: 0.1; }
       .glass-card { border-radius: 10px; }
@@ -705,10 +566,10 @@ function renderNav(): string {
               <a href="/solutions/ad-exchange-adx" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-ad-exchange">Ad Exchange AdX</a>
             </div>
           </div>
-          <a href="/publishers" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-publishers">Publishers</a>
-          <a href="/advertisers" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-advertisers">Advertisers</a>
-          <a href="/tools" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-tools">Tools</a>
-          <a href="/partners" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-partners">Partners</a>
+          <a href="/publishers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-publishers">Publishers</a>
+          <a href="/advertisers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-advertisers">Advertisers</a>
+          <a href="/tools" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-tools">Tools</a>
+          <a href="/partners" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-partners">Partners</a>
           <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
             <button class="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1 cursor-pointer" data-testid="link-company">
               Company
@@ -890,58 +751,19 @@ function renderScripts(): string {
   return `
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Unified scroll observer for all animated elements
-      var observer = new IntersectionObserver(
-        function(entries) {
-          entries.forEach(function(entry) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
             if (entry.isIntersecting) {
               entry.target.classList.add('visible');
-              var counter = entry.target.querySelector('[data-count]');
-              if (counter && !counter.dataset.counted) animateCounter(counter);
             }
           });
         },
         { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
       );
 
-      var targets = '.animate-on-scroll, .animate-scale-in, .comparison-row, .check-animate, .step-connector';
-      document.querySelectorAll(targets).forEach(function(el) {
+      document.querySelectorAll('.animate-on-scroll').forEach((el) => {
         observer.observe(el);
-      });
-
-      // Counter animation — eased count from 0 to target
-      function animateCounter(el) {
-        el.dataset.counted = 'true';
-        var target = el.dataset.count;
-        var suffix = el.dataset.suffix || '';
-        var prefix = el.dataset.prefix || '';
-        var num = parseFloat(target);
-        if (isNaN(num)) { el.textContent = target; return; }
-        var duration = 2000;
-        var start = performance.now();
-        var isDecimal = target.indexOf('.') !== -1;
-        function update(now) {
-          var elapsed = now - start;
-          var progress = Math.min(elapsed / duration, 1);
-          var ease = 1 - Math.pow(1 - progress, 3);
-          var current = num * ease;
-          el.textContent = prefix + (isDecimal ? current.toFixed(1) : Math.round(current).toLocaleString()) + suffix;
-          if (progress < 1) requestAnimationFrame(update);
-        }
-        requestAnimationFrame(update);
-      }
-
-      // Standalone counter observer for elements not inside animate-on-scroll
-      var counterObserver = new IntersectionObserver(
-        function(entries) {
-          entries.forEach(function(entry) {
-            if (entry.isIntersecting && !entry.target.dataset.counted) animateCounter(entry.target);
-          });
-        },
-        { threshold: 0.3 }
-      );
-      document.querySelectorAll('[data-count]').forEach(function(el) {
-        counterObserver.observe(el);
       });
     });
   </script>
