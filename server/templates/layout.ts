@@ -527,30 +527,6 @@ function renderHead(options: LayoutOptions): string {
       font-variant-numeric: tabular-nums;
     }
 
-    /* ── Card shimmer on hover ── */
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(
-        105deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.04) 45%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.04) 55%,
-        transparent 60%
-      );
-      background-size: 200% 100%;
-      background-position: 200% 0;
-      transition: background-position 0.6s ease;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .glass-card { position: relative; overflow: hidden; }
-    .glass-card:hover::before { background-position: -200% 0; }
-
     /* ── Nav link underline reveal ── */
     .nav-link {
       position: relative;
