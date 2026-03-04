@@ -44,15 +44,15 @@ export function renderPage(): string {
 
           <div class="grid grid-cols-3 gap-6 mt-14" style="animation: fadeInUp 0.6s 0.5s ease both">
             <div class="text-center lg:text-left">
-              <div class="text-2xl sm:text-3xl font-bold text-white" data-testid="text-stat-revenue">50%+</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white" data-testid="text-stat-revenue"><span data-count="50" data-suffix="%+">0%+</span></div>
               <div class="text-xs sm:text-sm text-white/40 mt-1">Revenue Increase</div>
             </div>
             <div class="text-center lg:text-left">
-              <div class="text-2xl sm:text-3xl font-bold text-white" data-testid="text-stat-publishers">500+</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white" data-testid="text-stat-publishers"><span data-count="500" data-suffix="+">0+</span></div>
               <div class="text-xs sm:text-sm text-white/40 mt-1">Publishers</div>
             </div>
             <div class="text-center lg:text-left">
-              <div class="text-2xl sm:text-3xl font-bold text-white" data-testid="text-stat-impressions">1B+</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white" data-testid="text-stat-impressions"><span data-count="1" data-suffix="B+">0B+</span></div>
               <div class="text-xs sm:text-sm text-white/40 mt-1">Daily Impressions</div>
             </div>
           </div>
@@ -71,22 +71,22 @@ export function renderPage(): string {
             <div class="grid grid-cols-2 gap-3 mb-6">
               <div class="metric-card">
                 <div class="text-white/40 text-xs mb-1">Today's Revenue</div>
-                <div class="text-xl font-bold text-white">$12,847</div>
+                <div class="text-xl font-bold text-white"><span data-count="12847" data-prefix="$">$0</span></div>
                 <div class="text-green-400 text-xs mt-1">+23%</div>
               </div>
               <div class="metric-card">
                 <div class="text-white/40 text-xs mb-1">Fill Rate</div>
-                <div class="text-xl font-bold text-white">94.2%</div>
+                <div class="text-xl font-bold text-white"><span data-count="94.2" data-suffix="%">0.0%</span></div>
                 <div class="text-green-400 text-xs mt-1">+5.1%</div>
               </div>
               <div class="metric-card">
                 <div class="text-white/40 text-xs mb-1">eCPM</div>
-                <div class="text-xl font-bold text-white">$4.82</div>
+                <div class="text-xl font-bold text-white"><span data-count="4.82" data-prefix="$">$0.00</span></div>
                 <div class="text-green-400 text-xs mt-1">+18%</div>
               </div>
               <div class="metric-card">
                 <div class="text-white/40 text-xs mb-1">Impressions</div>
-                <div class="text-xl font-bold text-white">2.7M</div>
+                <div class="text-xl font-bold text-white"><span data-count="2.7" data-suffix="M">0.0M</span></div>
                 <div class="text-green-400 text-xs mt-1">+31%</div>
               </div>
             </div>
@@ -303,8 +303,8 @@ export function renderPage(): string {
         ]
           .map(
             (s, i) => `
-        <a href="${s.href}" class="glass-card p-7 group animate-on-scroll stagger-${i + 1} block" data-testid="card-service-${i}">
-          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+        <a href="${s.href}" class="glass-card p-7 group animate-scale-in stagger-${i + 1} block" data-testid="card-service-${i}">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-5 icon-hover">
             <svg class="w-7 h-7 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">${s.icon}</svg>
           </div>
           <h3 class="text-xl font-semibold text-white mb-3 group-hover:text-[var(--accent)] transition-colors">${s.title}</h3>
@@ -367,11 +367,11 @@ export function renderPage(): string {
               ]
                 .map(
                   (row, i) => `
-              <tr class="border-t border-white/5 ${i % 2 === 0 ? "" : "bg-white/[0.02]"}" data-testid="comparison-row-${i}">
+              <tr class="border-t border-white/5 comparison-row ${i % 2 === 0 ? "" : "bg-white/[0.02]"}" style="transition-delay: ${i * 0.08}s" data-testid="comparison-row-${i}">
                 <td class="p-4 lg:p-5 text-sm font-medium text-white/80">${row[0]}</td>
                 ${[row[1], row[2], row[3]]
                   .map((val) => {
-                    if (val === true) return '<td class="p-4 lg:p-5 text-center"><span class="check-icon"><svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></span></td>';
+                    if (val === true) return '<td class="p-4 lg:p-5 text-center"><span class="check-icon check-animate"><svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></span></td>';
                     if (val === false) return '<td class="p-4 lg:p-5 text-center"><span class="x-icon"><svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></span></td>';
                     return '<td class="p-4 lg:p-5 text-center"><span class="partial-icon"><svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></span></td>';
                   })
@@ -403,7 +403,7 @@ export function renderPage(): string {
       </div>
 
       <div class="grid lg:grid-cols-3 gap-8 relative">
-        <div class="hidden lg:block absolute top-8 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div class="hidden lg:block step-connector" style="left: 16%; right: 16%;"></div>
 
         ${[
           {
@@ -427,7 +427,7 @@ export function renderPage(): string {
         ]
           .map(
             (step, i) => `
-        <div class="glass-card p-8 text-center relative animate-on-scroll stagger-${i + 1}" data-testid="step-card-${i}">
+        <div class="glass-card p-8 text-center relative animate-scale-in stagger-${i + 1}" data-testid="step-card-${i}">
           <div class="step-number mx-auto mb-6">${step.step}</div>
           <h3 class="text-xl font-semibold text-white mb-4">${step.title}</h3>
           <p class="text-white/40 mb-6 leading-relaxed text-[0.9375rem]">${step.description}</p>
@@ -476,25 +476,18 @@ export function renderPage(): string {
         </p>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
-           x-data="{ shown: false }"
-           x-intersect:enter="shown = true">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         ${[
-          { value: "1T+", label: "Ads Served", sub: "And counting every second" },
-          { value: "50%+", label: "Revenue Increase", sub: "Average publisher improvement" },
-          { value: "1B+", label: "Daily Impressions", sub: "Across all platforms" },
-          { value: "500+", label: "Publishers", sub: "Trust us worldwide" },
+          { count: "1", suffix: "T+", label: "Ads Served", sub: "And counting every second" },
+          { count: "50", suffix: "%+", label: "Revenue Increase", sub: "Average publisher improvement" },
+          { count: "1", suffix: "B+", label: "Daily Impressions", sub: "Across all platforms" },
+          { count: "500", suffix: "+", label: "Publishers", sub: "Trust us worldwide" },
         ]
           .map(
             (stat, i) => `
-        <div class="glass-card p-8 text-center animate-on-scroll stagger-${i + 1}" data-testid="stat-card-${i}">
-          <div class="text-4xl sm:text-5xl font-bold text-white mb-2"
-               x-show="shown"
-               x-transition:enter="transition ease-out duration-700"
-               x-transition:enter-start="opacity-0 translate-y-3"
-               x-transition:enter-end="opacity-1 translate-y-0"
-               style="transition-delay: ${i * 150}ms">
-            ${stat.value}
+        <div class="glass-card p-8 text-center animate-scale-in stagger-${i + 1}" data-testid="stat-card-${i}">
+          <div class="text-4xl sm:text-5xl font-bold text-white mb-2">
+            <span data-count="${stat.count}" data-suffix="${stat.suffix}">0${stat.suffix}</span>
           </div>
           <div class="text-[var(--accent)] font-semibold mb-1">${stat.label}</div>
           <div class="text-sm text-white/30">${stat.sub}</div>
