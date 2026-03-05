@@ -711,6 +711,7 @@ function renderNav(): string {
         </div>
 
         <div class="hidden lg:flex items-center gap-3">
+          <a href="https://dashboard.hbdr.com" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-login">Login</a>
           <a href="/contact" class="glass-btn-outline text-sm" data-testid="button-schedule-call">Schedule a Call</a>
           <a href="/contact" class="glass-btn text-sm" data-testid="button-get-started">Get Started</a>
         </div>
@@ -762,6 +763,7 @@ function renderNav(): string {
         <a href="/dashboard" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-dashboard">Dashboard</a>
         <a href="/blog" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-blog">Blog</a>
         <a href="/contact" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-contact">Contact</a>
+        <a href="https://dashboard.hbdr.com" @click="mobileOpen = false" class="block py-3 text-lg text-white/80 hover:text-white transition-colors" data-testid="mobile-link-login">Login</a>
         <div class="pt-4 flex flex-col gap-3">
           <a href="/contact" @click="mobileOpen = false" class="glass-btn text-center text-sm" data-testid="mobile-button-get-started">Get Started</a>
         </div>
@@ -823,6 +825,7 @@ function renderFooter(): string {
               { label: "Press", href: "/press" },
               { label: "Contact", href: "/contact" },
               { label: "Dashboard", href: "/dashboard" },
+              { label: "Login", href: "https://dashboard.hbdr.com" },
             ].map((l) => `<li><a href="${l.href}" class="text-sm text-white/30 hover:text-white/60 transition-colors" data-testid="link-footer-${l.href.slice(1)}">${l.label}</a></li>`).join("")}
           </ul>
         </div>
