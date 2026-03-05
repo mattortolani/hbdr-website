@@ -47,12 +47,13 @@ function renderHead(options: LayoutOptions): string {
   </script>
 
   <style>
+    [x-cloak] { display: none !important; }
     * { font-family: 'Figtree', system-ui, sans-serif; }
 
     :root {
-      --glass-bg: rgba(255, 255, 255, 0.04);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-highlight: rgba(255, 255, 255, 0.12);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-highlight: rgba(255, 255, 255, 0.16);
       --glass-shadow: rgba(0, 0, 0, 0.4);
       --accent: #2BDE73;
       --accent-glow: rgba(43, 222, 115, 0.25);
@@ -76,7 +77,7 @@ function renderHead(options: LayoutOptions): string {
       position: fixed;
       inset: 0;
       background-image:
-        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.015) 1px, transparent 0);
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
@@ -89,7 +90,7 @@ function renderHead(options: LayoutOptions): string {
       background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
-      opacity: 0.5;
+      opacity: 0.25;
     }
 
     body > * { position: relative; z-index: 1; }
@@ -97,36 +98,36 @@ function renderHead(options: LayoutOptions): string {
     .font-display { font-family: 'Instrument Serif', Georgia, serif; }
 
     .glass-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(48px) saturate(200%);
-      -webkit-backdrop-filter: blur(48px) saturate(200%);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .glass-card:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
       box-shadow:
-        0 12px 48px rgba(0, 0, 0, 0.4),
+        0 8px 32px rgba(0, 0, 0, 0.35),
         inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
 
     .glass-nav {
-      background: rgba(6, 6, 10, 0.75);
-      backdrop-filter: blur(48px) saturate(200%);
-      -webkit-backdrop-filter: blur(48px) saturate(200%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(6, 6, 10, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .glass-input {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
       color: #e8e8ed;
       transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -143,52 +144,40 @@ function renderHead(options: LayoutOptions): string {
     .glass-btn {
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       border: none;
-      border-radius: 980px;
+      border-radius: 8px;
       color: #06060a;
       font-weight: 700;
       font-family: 'Figtree', system-ui, sans-serif;
       letter-spacing: -0.01em;
       padding: 14px 32px;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
     }
 
-    .glass-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.25), transparent 60%);
-      border-radius: inherit;
-      opacity: 0;
-      transition: opacity 0.35s;
-    }
-
     .glass-btn:hover {
-      transform: translateY(-1px) scale(1.01);
-      box-shadow: 0 6px 32px var(--accent-glow), 0 0 80px rgba(43, 222, 115, 0.12);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--accent-glow), 0 0 40px rgba(43, 222, 115, 0.08);
     }
-
-    .glass-btn:hover::before { opacity: 1; }
 
     .glass-btn-outline {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.04);
       border: 1.5px solid rgba(255, 255, 255, 0.15);
-      border-radius: 980px;
+      border-radius: 8px;
       color: #e8e8ed;
       font-weight: 600;
       font-family: 'Figtree', system-ui, sans-serif;
       letter-spacing: -0.01em;
       padding: 14px 32px;
-      backdrop-filter: blur(20px);
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(12px);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .glass-btn-outline:hover {
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.3);
       transform: translateY(-1px);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     }
 
     .liquid-gradient {
@@ -201,7 +190,7 @@ function renderHead(options: LayoutOptions): string {
       position: absolute;
       border-radius: 50%;
       filter: blur(100px);
-      opacity: 0.3;
+      opacity: 0.15;
       animation: orbFloat 12s ease-in-out infinite;
       will-change: transform;
     }
@@ -341,9 +330,9 @@ function renderHead(options: LayoutOptions): string {
     }
 
     h1, h2, h3, h4, h5, h6 {
-      line-height: 1.25;
+      line-height: 1.2;
       overflow: visible;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
     }
 
     h1 .text-gradient,
@@ -436,7 +425,7 @@ function renderHead(options: LayoutOptions): string {
       align-items: center;
       gap: 6px;
       padding: 6px 18px;
-      border-radius: 980px;
+      border-radius: 6px;
       background: rgba(43, 222, 115, 0.06);
       border: 1px solid rgba(43, 222, 115, 0.15);
       color: var(--accent);
@@ -475,7 +464,7 @@ function renderHead(options: LayoutOptions): string {
 
     .step-number {
       width: 56px; height: 56px;
-      border-radius: 16px;
+      border-radius: 10px;
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       display: flex;
       align-items: center;
@@ -488,10 +477,10 @@ function renderHead(options: LayoutOptions): string {
 
     .glass-select {
       appearance: none;
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
       color: #e8e8ed;
       padding: 14px 44px 14px 18px;
       width: 100%;
@@ -508,9 +497,9 @@ function renderHead(options: LayoutOptions): string {
     }
 
     .metric-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
       padding: 18px;
       transition: border-color 0.4s ease;
     }
@@ -531,9 +520,124 @@ function renderHead(options: LayoutOptions): string {
     .htmx-request .htmx-indicator { display: inline-flex; }
     .htmx-request .submit-text { display: none; }
 
+    /* ── Animated counter ── */
+    .counter-value {
+      display: inline-block;
+      min-width: 1ch;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Nav link underline reveal ── */
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      width: 0;
+      height: 1.5px;
+      background: var(--accent);
+      transition: width 0.25s ease, left 0.25s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+      left: 0;
+    }
+
+    /* ── Button press feedback ── */
+    .glass-btn:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 1px 8px var(--accent-glow);
+      transition-duration: 0.08s;
+    }
+    .glass-btn-outline:active {
+      transform: translateY(1px) scale(0.98);
+      transition-duration: 0.08s;
+    }
+
+    /* ── Text gradient reveal ── */
+    @keyframes gradientReveal {
+      from {
+        background-size: 0% 100%;
+      }
+      to {
+        background-size: 100% 100%;
+      }
+    }
+
+    /* ── Icon float on hover ── */
+    .icon-hover {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .group:hover .icon-hover {
+      transform: scale(1.12) rotate(-3deg);
+    }
+
+    /* ── Comparison row slide-in ── */
+    .comparison-row {
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .comparison-row.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── Check icon draw ── */
+    @keyframes drawCheck {
+      from { stroke-dashoffset: 20; }
+      to { stroke-dashoffset: 0; }
+    }
+    .check-animate svg path {
+      stroke-dasharray: 20;
+      stroke-dashoffset: 20;
+    }
+    .check-animate.visible svg path {
+      animation: drawCheck 0.4s ease forwards;
+    }
+
+    /* ── Step connector line ── */
+    @keyframes lineGrow {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    .step-connector {
+      position: absolute;
+      top: 28px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      overflow: hidden;
+    }
+    .step-connector::after {
+      content: '';
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    .step-connector.visible::after {
+      animation: lineGrow 1.2s ease forwards;
+    }
+
+    /* ── Smooth scale entrance for cards ── */
+    .animate-scale-in {
+      opacity: 0;
+      transform: scale(0.92) translateY(20px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .animate-scale-in.visible {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
     @media (max-width: 768px) {
-      .orb { opacity: 0.2; }
-      .glass-card { border-radius: 16px; }
+      .orb { opacity: 0.1; }
+      .glass-card { border-radius: 10px; }
     }
   </style>
 </head>`;
@@ -564,7 +668,7 @@ function renderNav(): string {
                  x-transition:leave="transition ease-in duration-100"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-1"
-                 class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-2xl py-2 z-50" data-testid="solutions-dropdown">
+                 class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-lg border border-white/12 bg-black/92 backdrop-blur-xl shadow-2xl py-2 z-50" data-testid="solutions-dropdown">
               <a href="/solutions/header-bidding" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-header-bidding">Header Bidding</a>
               <a href="/solutions/display-ads" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-display-ads">Display Ads</a>
               <a href="/solutions/video-player" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-video-player">Video Player</a>
@@ -577,10 +681,10 @@ function renderNav(): string {
               <a href="/solutions/ad-exchange-adx" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-ad-exchange">Ad Exchange AdX</a>
             </div>
           </div>
-          <a href="/publishers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-publishers">Publishers</a>
-          <a href="/advertisers" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-advertisers">Advertisers</a>
-          <a href="/tools" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-tools">Tools</a>
-          <a href="/partners" class="text-sm text-white/60 hover:text-white transition-colors" data-testid="link-partners">Partners</a>
+          <a href="/publishers" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-publishers">Publishers</a>
+          <a href="/advertisers" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-advertisers">Advertisers</a>
+          <a href="/tools" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-tools">Tools</a>
+          <a href="/partners" class="nav-link text-sm text-white/60 hover:text-white transition-colors" data-testid="link-partners">Partners</a>
           <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
             <button class="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1 cursor-pointer" data-testid="link-company">
               Company
@@ -593,7 +697,7 @@ function renderNav(): string {
                  x-transition:leave="transition ease-in duration-100"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-1"
-                 class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-xl border border-white/10 bg-black/90 backdrop-blur-2xl shadow-2xl py-2 z-50" data-testid="company-dropdown">
+                 class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-lg border border-white/12 bg-black/92 backdrop-blur-xl shadow-2xl py-2 z-50" data-testid="company-dropdown">
               <a href="/about" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-about">About Us</a>
               <a href="/how-it-works" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-how-it-works">How It Works</a>
               <a href="/trust" class="block px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors" data-testid="link-trust">Trust & Compliance</a>
@@ -629,7 +733,7 @@ function renderNav(): string {
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 -translate-y-2"
-         class="lg:hidden border-t border-white/5 bg-black/90 backdrop-blur-xl overflow-y-auto" style="max-height: calc(100vh - 64px); max-height: calc(100dvh - 64px);"
+         class="lg:hidden border-t border-white/8 bg-black/92 backdrop-blur-lg overflow-y-auto" style="max-height: calc(100vh - 64px); max-height: calc(100dvh - 64px);"
          data-testid="mobile-menu">
       <div class="px-4 py-6 space-y-1" x-data="{ solOpen: false }">
         <button @click="solOpen = !solOpen" class="w-full text-left py-3 text-lg text-white/80 hover:text-white transition-colors flex items-center justify-between cursor-pointer" data-testid="mobile-link-solutions">
@@ -762,24 +866,63 @@ function renderScripts(): string {
   return `
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
+      // Unified scroll observer for all animated elements
+      var observer = new IntersectionObserver(
+        function(entries) {
+          entries.forEach(function(entry) {
             if (entry.isIntersecting) {
               entry.target.classList.add('visible');
+              var counter = entry.target.querySelector('[data-count]');
+              if (counter && !counter.dataset.counted) animateCounter(counter);
             }
           });
         },
         { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
       );
 
-      document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+      var targets = '.animate-on-scroll, .animate-scale-in, .comparison-row, .check-animate, .step-connector';
+      document.querySelectorAll(targets).forEach(function(el) {
         observer.observe(el);
+      });
+
+      // Counter animation — eased count from 0 to target
+      function animateCounter(el) {
+        el.dataset.counted = 'true';
+        var target = el.dataset.count;
+        var suffix = el.dataset.suffix || '';
+        var prefix = el.dataset.prefix || '';
+        var num = parseFloat(target);
+        if (isNaN(num)) { el.textContent = target; return; }
+        var duration = 2000;
+        var start = performance.now();
+        var isDecimal = target.indexOf('.') !== -1;
+        function update(now) {
+          var elapsed = now - start;
+          var progress = Math.min(elapsed / duration, 1);
+          var ease = 1 - Math.pow(1 - progress, 3);
+          var current = num * ease;
+          el.textContent = prefix + (isDecimal ? current.toFixed(1) : Math.round(current).toLocaleString()) + suffix;
+          if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+      }
+
+      // Standalone counter observer for elements not inside animate-on-scroll
+      var counterObserver = new IntersectionObserver(
+        function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting && !entry.target.dataset.counted) animateCounter(entry.target);
+          });
+        },
+        { threshold: 0.3 }
+      );
+      document.querySelectorAll('[data-count]').forEach(function(el) {
+        counterObserver.observe(el);
       });
     });
   </script>
 
-  <style>[x-cloak] { display: none !important; }</style>`;
+`;
 }
 
 export function renderLayout(options: LayoutOptions): string {
