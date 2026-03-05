@@ -86,7 +86,7 @@ migrations/                  # D1 database schema (0001_init.sql)
 
 1. **`published` is a string** -- Blog post `published` field is `"true"`/`"false"` string, not boolean. Use string comparison.
 2. **Dev data is ephemeral** -- MemStorage resets on restart. D1 persists in production.
-3. **Support form schema mismatch** -- `/support` form sends `website` and `monthlyPageviews` fields to `/api/contact`, but the Zod schema expects `impressions` and has no `website` field. Needs fixing.
+3. **Support form reuses contact schema** -- `/support` form packs subject+priority into the `company` field and sets `impressions` to `'support-request'` to reuse the contact lead schema. The email service parses these back out for proper display.
 4. **ADMIN_PASSWORD** -- Must be set via `wrangler secret put ADMIN_PASSWORD`. Fallback is `hbdr2025!` (change in production).
 5. **Tailwind via CDN** -- Uses the Play CDN (`cdn.tailwindcss.com`), which is not recommended for production. Consider migrating to a build step.
 6. **No tests** -- No test suite exists yet. `data-testid` attributes are on key elements for future E2E testing.
@@ -141,7 +141,7 @@ wrangler secret put RESEND_API_KEY
 - Dead code removed (React app, Vite, Express, Drizzle ORM, 60+ unused packages)
 
 ### Still Needs Work
-- Support form schema mismatch (sends wrong fields)
+- Resend domain verification (hbdr.com must be verified in Resend dashboard for email delivery)
 - Tailwind CDN should be replaced with build step for production
 - No test suite
 - No CI/CD pipeline
