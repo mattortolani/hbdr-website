@@ -9,6 +9,7 @@ import { sanitizeHtml, sanitizeText } from "../middleware/sanitize";
 import { checkRateLimit, getClientIp } from "../middleware/rate-limit";
 import { isAuthenticated } from "../middleware/auth";
 import { sendContactNotification } from "../services/email";
+import { validateOrigin } from "../middleware/csrf";
 
 interface ApiConfig {
   resendApiKey?: string;
@@ -19,6 +20,16 @@ export function registerApiRoutes(
   getStorage: (c: any) => IStorage,
   getConfig: (c: any) => ApiConfig
 ) {
+  // Origin validation for all API mutations
+  app.use("/api/*", async (c, next) => {
+    if (["POST", "PUT", "DELETE"].includes(c.req.method)) {
+      if (!validateOrigin(c.req.raw.headers)) {
+        return c.json({ message: "Forbidden" }, 403);
+      }
+    }
+    await next();
+  });
+
   // Contact form submission
   app.post("/api/contact", async (c) => {
     try {

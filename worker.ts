@@ -8,6 +8,7 @@ import { registerPageRoutes } from "./server/routes/pages";
 import { registerApiRoutes } from "./server/routes/api";
 import { registerAdminRoutes } from "./server/routes/admin";
 import { registerSeoRoutes } from "./server/routes/seo";
+import { registerErrorHandlers } from "./server/routes/errors";
 
 type Env = {
   DB: D1Database;
@@ -34,5 +35,6 @@ registerAdminRoutes(app, getStorage, (c) => ({
   adminPassword: c.env.ADMIN_PASSWORD || "hbdr2025!",
 }));
 registerSeoRoutes(app);
+registerErrorHandlers(app);
 
 export default app;

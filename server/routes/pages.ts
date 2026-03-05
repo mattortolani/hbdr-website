@@ -43,6 +43,9 @@ import { renderBlogPage, renderBlogPostPage } from "../templates/pages/blog";
 // Tools
 import { renderPublisherToolsPage } from "../templates/tools/index";
 
+// Error pages
+import { render404Page } from "../templates/pages/error";
+
 export function registerPageRoutes(app: Hono<any>, getStorage: (c: any) => IStorage) {
   // Static pages
   app.get("/", (c) => c.html(renderPage()));
@@ -90,8 +93,15 @@ export function registerPageRoutes(app: Hono<any>, getStorage: (c: any) => IStor
     const storage = getStorage(c);
     const slug = c.req.param("slug");
     const post = await storage.getBlogPostBySlug(slug);
-    if (!post) return c.text("Post not found", 404);
-    if (post.published !== "true") return c.text("Post not found", 404);
-    return c.html(renderBlogPostPage(post));
+    if (!post) return c.html(render404Page(), 404);
+    if (post.published !== "true") return c.html(render404Page(), 404);
+
+    // Fetch related posts: same category first, then recent, excluding current
+    const allPosts = await storage.getBlogPosts(true);
+    const sameCategory = allPosts.filter(p => p.category === post.category && p.slug !== post.slug);
+    const otherPosts = allPosts.filter(p => p.category !== post.category && p.slug !== post.slug);
+    const relatedPosts = [...sameCategory, ...otherPosts].slice(0, 3);
+
+    return c.html(renderBlogPostPage(post, relatedPosts));
   });
 }

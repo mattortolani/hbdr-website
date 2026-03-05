@@ -6,6 +6,8 @@ import type { IStorage } from "../services/storage";
 import { isAuthenticated, createSession, destroySession } from "../middleware/auth";
 import { renderAdminLoginPage, renderAdminLeadsPage } from "../templates/admin/leads";
 import { renderBlogAdminPage, renderBlogEditorPage } from "../templates/admin/blog";
+import { render404Page } from "../templates/pages/error";
+import { generateCsrfToken, validateCsrfToken } from "../middleware/csrf";
 
 interface AdminConfig {
   adminPassword: string;
@@ -19,11 +21,22 @@ export function registerAdminRoutes(
   // Auth routes
   app.get("/admin/login", (c) => {
     if (isAuthenticated(c.req.header("cookie"))) return c.redirect("/admin/leads");
-    return c.html(renderAdminLoginPage());
+    const token = generateCsrfToken();
+    c.header("Set-Cookie", `hbdr_csrf=${token}; Path=/admin; HttpOnly; SameSite=Strict; Max-Age=3600`);
+    return c.html(renderAdminLoginPage(undefined, token));
   });
 
   app.post("/admin/login", async (c) => {
     const body = await c.req.parseBody();
+
+    // Validate CSRF token
+    const csrfToken = body._csrf as string;
+    if (!validateCsrfToken(c.req.header("cookie"), csrfToken)) {
+      const newToken = generateCsrfToken();
+      c.header("Set-Cookie", `hbdr_csrf=${newToken}; Path=/admin; HttpOnly; SameSite=Strict; Max-Age=3600`);
+      return c.html(renderAdminLoginPage("Invalid request. Please try again.", newToken), 403);
+    }
+
     const username = body.username as string;
     const password = body.password as string;
     const config = getConfig(c);
@@ -34,7 +47,9 @@ export function registerAdminRoutes(
       return c.redirect("/admin/leads", 302);
     }
 
-    return c.html(renderAdminLoginPage("Invalid username or password"), 401);
+    const newToken = generateCsrfToken();
+    c.header("Set-Cookie", `hbdr_csrf=${newToken}; Path=/admin; HttpOnly; SameSite=Strict; Max-Age=3600`);
+    return c.html(renderAdminLoginPage("Invalid username or password", newToken), 401);
   });
 
   app.get("/admin/logout", (c) => {
@@ -97,7 +112,7 @@ export function registerAdminRoutes(
     const storage = getStorage(c);
     const id = c.req.param("id");
     const post = await storage.getBlogPostById(id);
-    if (!post) return c.text("Post not found", 404);
+    if (!post) return c.html(render404Page(), 404);
     return c.html(renderBlogEditorPage(post));
   });
 }
