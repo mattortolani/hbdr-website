@@ -539,7 +539,7 @@ export function renderPage(): string {
             <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z"/>
           </svg>
 
-          <div class="relative min-h-[200px] sm:min-h-[180px]">
+          <div class="relative min-h-[320px] sm:min-h-[180px]">
             <template x-for="(t, index) in testimonials" :key="index">
               <div x-show="current === index"
                    x-transition:enter="transition ease-out duration-500"
