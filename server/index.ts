@@ -8,7 +8,9 @@ import { registerPageRoutes } from "./routes/pages";
 import { registerApiRoutes } from "./routes/api";
 import { registerAdminRoutes } from "./routes/admin";
 import { registerSeoRoutes } from "./routes/seo";
+import { registerErrorHandlers } from "./routes/errors";
 import { MemStorage } from "./services/mem-storage";
+import { render404Page } from "./templates/pages/error";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -41,7 +43,7 @@ app.get("/assets/:filename", (c) => {
       headers: { "Content-Type": contentType, "Cache-Control": "public, max-age=86400" },
     });
   } catch {
-    return c.text("Not found", 404);
+    return c.html(render404Page(), 404);
   }
 });
 
@@ -54,6 +56,7 @@ registerAdminRoutes(app, getStorage, () => ({
   adminPassword: process.env.ADMIN_PASSWORD || "hbdr2025!",
 }));
 registerSeoRoutes(app);
+registerErrorHandlers(app);
 
 const port = parseInt(process.env.PORT || "5000", 10);
 

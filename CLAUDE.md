@@ -39,9 +39,11 @@ server/
     api.ts                   # API endpoints (contact, blog CRUD, leads)
     admin.ts                 # Admin routes (login, logout, leads, blog admin)
     seo.ts                   # robots.txt and sitemap.xml
+    errors.ts                # Global 404/500 error handlers
   middleware/
     auth.ts                  # Session management (create, verify, destroy)
-    sanitize.ts              # HTML and text sanitization
+    csrf.ts                  # CSRF protection (double-submit cookie + Origin validation)
+    sanitize.ts              # Allowlist-based HTML and text sanitization
     rate-limit.ts            # IP-based rate limiting
   services/
     storage.ts               # IStorage interface + type definitions
@@ -55,10 +57,10 @@ server/
       cta.ts                 # Call-to-action section
       stats.ts               # Stats section
       contact-form.ts        # Contact form section
-      blog-helpers.ts        # Shared BlogPostData type, formatDate, getCategoryColor
+      blog-helpers.ts        # Shared BlogPostData type, formatDate, getCategoryColor, estimateReadTime
     pages/
       home.ts, about.ts, how-it-works.ts, careers.ts, press.ts, contact.ts
-      blog.ts, dashboard.ts, partners.ts, trust.ts, support.ts
+      blog.ts, dashboard.ts, partners.ts, trust.ts, support.ts, error.ts
       solutions/             # 10 solution pages
       audience/              # publishers.ts, advertisers.ts
       legal/                 # privacy-policy.ts, terms.ts, gdpr-cookie-policy.ts
@@ -135,16 +137,21 @@ wrangler secret put RESEND_API_KEY
 - SEO: robots.txt, sitemap.xml
 - Social links (LinkedIn, X, email) in footer
 - Absolute OG image URLs
-- Publisher revenue calculators (5 tools)
+- Publisher revenue calculators (5 tools with tabbed UI, enhanced inputs, HBDR uplift projections)
 - HTMX removed (was loaded but unused)
 - Package.json cleaned (5 prod deps, 4 dev deps)
 - Dead code removed (React app, Vite, Express, Drizzle ORM, 60+ unused packages)
+- Branded error pages (404 with link grid, 500 with support link)
+- Global error handlers via `registerErrorHandlers()` in `server/routes/errors.ts`
+- CSRF protection (double-submit cookie for admin login, Origin validation for API endpoints)
+- Allowlist-based HTML sanitizer (replaces regex approach)
+- Blog search (Alpine.js client-side filtering by title/excerpt)
+- Blog read time estimates (WPM-based, shown on cards and post pages)
+- Blog cover image support (cards + post hero)
+- Blog related posts (up to 3, same-category prioritized)
+- CI/CD: production deploy workflow for main branch
 
 ### Still Needs Work
 - Resend domain verification (hbdr.com must be verified in Resend dashboard for email delivery)
 - Tailwind CDN should be replaced with build step for production
 - No test suite
-- No CI/CD pipeline
-- No error pages (404, 500)
-- No CSRF protection
-- sanitizeHtml is regex-based (consider DOMPurify or similar for production)

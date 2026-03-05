@@ -57,7 +57,7 @@ ${bodyContent}
 </html>`;
 }
 
-export function renderAdminLoginPage(error?: string): string {
+export function renderAdminLoginPage(error?: string, csrfToken?: string): string {
   const isSuccess = error === "success";
   const bodyContent = `
   <div class="min-h-screen flex items-center justify-center px-4">
@@ -79,6 +79,7 @@ export function renderAdminLoginPage(error?: string): string {
         </div>` : ''}
 
         <form method="POST" action="/admin/login" class="space-y-6" data-testid="admin-login-form">
+          ${csrfToken ? `<input type="hidden" name="_csrf" value="${csrfToken}" />` : ""}
           <div>
             <label class="block text-sm font-medium text-white/60 mb-2">Username</label>
             <input type="text" name="username" required autocomplete="username" class="glass-input w-full px-4 py-3" placeholder="admin" data-testid="input-admin-username" />

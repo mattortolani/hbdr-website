@@ -15,6 +15,12 @@ export interface BlogPostData {
   updatedAt: Date | null;
 }
 
+export function estimateReadTime(content: string): number {
+  const text = content.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  const wordCount = text.split(" ").filter(Boolean).length;
+  return Math.max(1, Math.round(wordCount / 200));
+}
+
 export function formatDate(date: Date | null): string {
   if (!date) return "";
   return new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });

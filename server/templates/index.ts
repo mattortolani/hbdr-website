@@ -49,5 +49,8 @@ export { renderAdvertisersPage } from "./pages/audience/advertisers";
 export { renderBlogAdminPage, renderBlogEditorPage } from "./admin/blog";
 export { renderAdminLoginPage, renderAdminLeadsPage } from "./admin/leads";
 
+// Error pages
+export { render404Page, render500Page } from "./pages/error";
+
 // Tools
 export { renderPublisherToolsPage } from "./tools/index";
