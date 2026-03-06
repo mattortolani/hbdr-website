@@ -27,13 +27,17 @@ function getStorage() {
 }
 
 // Static assets (dev only — Workers serves from public/ via wrangler)
+// Check public/assets/ first (built CSS), then fall back to attached_assets/
 app.get("/assets/:filename", (c) => {
   const filename = c.req.param("filename");
-  const filePath = path.join(process.cwd(), "attached_assets", filename);
+  const publicPath = path.join(process.cwd(), "public", "assets", filename);
+  const attachedPath = path.join(process.cwd(), "attached_assets", filename);
+  const filePath = fs.existsSync(publicPath) ? publicPath : attachedPath;
   try {
     const file = fs.readFileSync(filePath);
     const ext = path.extname(filename).toLowerCase();
     const contentType =
+      ext === ".css" ? "text/css" :
       ext === ".jpeg" || ext === ".jpg" ? "image/jpeg" :
       ext === ".png" ? "image/png" :
       ext === ".svg" ? "image/svg+xml" :
