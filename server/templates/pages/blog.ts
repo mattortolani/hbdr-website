@@ -208,5 +208,24 @@ export function renderBlogPostPage(post: BlogPostData, relatedPosts?: BlogPostDa
     ogDescription: post.excerpt,
     canonicalPath: `/blog/${post.slug}`,
     bodyContent: content,
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "description": post.excerpt,
+      "author": { "@type": "Person", "name": post.author },
+      "datePublished": post.publishedAt,
+      ...(post.updatedAt ? { "dateModified": post.updatedAt } : {}),
+      ...(post.coverImage ? { "image": post.coverImage } : {}),
+      "publisher": {
+        "@type": "Organization",
+        "name": "HBDR",
+        "logo": { "@type": "ImageObject", "url": "https://hbdr-website.matt-ortolani.workers.dev/assets/HBDR_Logo_Pack_all_sizes_-_2_1770577514801.jpeg" }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": `https://hbdr-website.matt-ortolani.workers.dev/blog/${post.slug}`
+      }
+    },
   });
 }

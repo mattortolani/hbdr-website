@@ -103,6 +103,7 @@ export function renderBlogEditorPage(post?: BlogPostData): string {
              },
              saving: false,
              error: "",
+             viewMode: "edit",
              autoSlug() {
                if (!${isEdit}) {
                  this.formData.slug = this.formData.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -170,6 +171,17 @@ export function renderBlogEditorPage(post?: BlogPostData): string {
           </div>
 
           <div>
+            <label class="block text-sm font-medium text-white/60 mb-2">Cover Image URL</label>
+            <input type="url" x-model="formData.coverImage"
+                   class="glass-input w-full px-4 py-3 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
+                   placeholder="https://example.com/image.jpg" data-testid="input-cover-image" />
+            <p class="text-xs text-white/30 mt-1.5">Optional. Displays as hero image on the post and thumbnail on cards.</p>
+            <div x-show="formData.coverImage" x-cloak class="mt-3 rounded-lg overflow-hidden border border-white/10 max-w-xs">
+              <img :src="formData.coverImage" alt="Cover preview" class="w-full h-auto" @error="$el.style.display='none'" @load="$el.style.display='block'" />
+            </div>
+          </div>
+
+          <div>
             <label class="block text-sm font-medium text-white/60 mb-2">Excerpt</label>
             <textarea x-model="formData.excerpt" rows="3"
                       class="glass-input w-full px-4 py-3 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 resize-none"
@@ -177,10 +189,24 @@ export function renderBlogEditorPage(post?: BlogPostData): string {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-white/60 mb-2">Content (HTML)</label>
-            <textarea x-model="formData.content" rows="16"
-                      class="glass-input w-full px-4 py-3 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 resize-y font-mono text-sm"
-                      placeholder="<h2>Your heading</h2><p>Your content here...</p>" data-testid="input-content"></textarea>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-white/60">Content (HTML)</label>
+              <div class="flex items-center gap-1 bg-white/5 rounded-lg p-0.5" data-testid="view-mode-toggle">
+                <button @click="viewMode = 'edit'" :class="viewMode === 'edit' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'" class="text-xs px-3 py-1.5 rounded-md transition-all cursor-pointer">Edit</button>
+                <button @click="viewMode = 'split'" :class="viewMode === 'split' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'" class="text-xs px-3 py-1.5 rounded-md transition-all cursor-pointer hidden sm:block">Split</button>
+                <button @click="viewMode = 'preview'" :class="viewMode === 'preview' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'" class="text-xs px-3 py-1.5 rounded-md transition-all cursor-pointer">Preview</button>
+              </div>
+            </div>
+            <div class="flex gap-4" :class="viewMode === 'split' ? 'flex-row' : 'flex-col'">
+              <div x-show="viewMode !== 'preview'" :class="viewMode === 'split' ? 'w-1/2' : 'w-full'">
+                <textarea x-model="formData.content" rows="16"
+                          class="glass-input w-full px-4 py-3 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 resize-y font-mono text-sm"
+                          placeholder="<h2>Your heading</h2><p>Your content here...</p>" data-testid="input-content"></textarea>
+              </div>
+              <div x-show="viewMode !== 'edit'" x-cloak :class="viewMode === 'split' ? 'w-1/2' : 'w-full'">
+                <div class="glass-input rounded-xl px-6 py-4 overflow-y-auto prose-content" style="min-height: 400px; max-height: 600px;" x-html="formData.content" data-testid="content-preview"></div>
+              </div>
+            </div>
           </div>
 
           <div class="flex items-center gap-3">

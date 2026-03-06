@@ -5,6 +5,9 @@ export interface LayoutOptions {
   ogDescription?: string;
   canonicalPath?: string;
   bodyContent: string;
+  jsonLd?: object | object[];
+  cfAnalyticsToken?: string;
+  adminPage?: boolean;
 }
 
 function renderHead(options: LayoutOptions): string {
@@ -14,6 +17,7 @@ function renderHead(options: LayoutOptions): string {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${options.title}</title>
+  ${options.adminPage ? '<meta name="robots" content="noindex, nofollow" />' : ''}
   <meta name="description" content="${options.description}" />
   <meta property="og:title" content="${options.ogTitle || options.title}" />
   <meta property="og:description" content="${options.ogDescription || options.description}" />
@@ -31,6 +35,32 @@ function renderHead(options: LayoutOptions): string {
   <link rel="stylesheet" href="/assets/styles.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.14.8/dist/cdn.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <script type="application/ld+json">${JSON.stringify([
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "HBDR",
+      "url": "https://hbdr-website.matt-ortolani.workers.dev",
+      "logo": "https://hbdr-website.matt-ortolani.workers.dev/assets/HBDR_Logo_Pack_all_sizes_-_2_1770577514801.jpeg",
+      "description": "Global leader in ad monetization and header bidding solutions.",
+      "sameAs": [
+        "https://linkedin.com/company/hbdr",
+        "https://x.com/haborMedia"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "contact@hbdr.com",
+        "contactType": "sales"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "HBDR",
+      "url": "https://hbdr-website.matt-ortolani.workers.dev"
+    },
+    ...(Array.isArray(options.jsonLd) ? options.jsonLd : options.jsonLd ? [options.jsonLd] : [])
+  ])}</script>
 </head>`;
 }
 
@@ -258,8 +288,9 @@ function renderFooter(): string {
   </footer>`;
 }
 
-function renderScripts(): string {
+function renderScripts(options: LayoutOptions): string {
   return `
+  ${options.cfAnalyticsToken ? `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${options.cfAnalyticsToken}"}'></script>` : ""}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Unified scroll observer for all animated elements
@@ -324,15 +355,15 @@ function renderScripts(): string {
 export function renderLayout(options: LayoutOptions): string {
   return `${renderHead(options)}
 
-<body class="antialiased">
+<body class="${options.adminPage ? 'min-h-screen text-white ' : ''}antialiased">
 
-  ${renderNav()}
+  ${options.adminPage ? '' : renderNav()}
 
   ${options.bodyContent}
 
-  ${renderFooter()}
+  ${options.adminPage ? '' : renderFooter()}
 
-  ${renderScripts()}
+  ${renderScripts(options)}
 
 </body>
 </html>`;
