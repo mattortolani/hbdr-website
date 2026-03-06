@@ -2,7 +2,15 @@
 export const SITE_URL = "https://hbdr-website.matt-ortolani.workers.dev";
 export const SITE_NAME = "HBDR";
 export const CONTACT_EMAIL = "contact@hbdr.com";
+// IMPORTANT: Using Resend sandbox sender until hbdr.com domain is verified in Resend dashboard.
+// Sandbox sender (onboarding@resend.dev) only delivers to the Resend account owner's email.
+// Once hbdr.com is verified with DNS records (SPF, DKIM), change this to:
+//   export const EMAIL_FROM = "HBDR Leads <leads@hbdr.com>";
 export const EMAIL_FROM = "HBDR Leads <onboarding@resend.dev>";
+
+// Where notification emails are sent (these receive the lead notifications)
+export const CONTACT_NOTIFY_EMAIL = "contact@hbdr.com";
+export const SUPPORT_NOTIFY_EMAIL = "support@hbdr.com";
 
 // All page routes for sitemap generation and nav building
 export const PAGE_ROUTES = [
