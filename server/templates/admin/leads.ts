@@ -1,3 +1,5 @@
+import { renderLayout } from "../layout";
+
 interface LeadData {
   id: string;
   name: string;
@@ -11,55 +13,9 @@ interface LeadData {
   createdAt: Date | null;
 }
 
-function renderAdminLayout(title: string, bodyContent: string): string {
-  return `<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${title} - HBDR Admin</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Figtree', 'system-ui', 'sans-serif'],
-          },
-        },
-      },
-    }
-  </script>
-  <style>
-    body { background: #0a0a0c; font-family: 'Figtree', sans-serif; }
-    .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; backdrop-filter: blur(40px) saturate(180%); }
-    .glass-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: all 0.2s; }
-    .glass-input:focus { border-color: #2BDE73; box-shadow: 0 0 0 3px rgba(43,222,115,0.1); }
-    .glass-btn { background: linear-gradient(135deg, #2BDE73, #1AAF5C); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-    .glass-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(43,222,115,0.3); }
-    .status-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
-    .status-new { background: rgba(59,130,246,0.15); color: #60a5fa; }
-    .status-contacted { background: rgba(245,158,11,0.15); color: #fbbf24; }
-    .status-qualified { background: rgba(43,222,115,0.15); color: #2BDE73; }
-    .status-converted { background: rgba(139,92,246,0.15); color: #a78bfa; }
-    .status-archived { background: rgba(107,114,128,0.15); color: #9ca3af; }
-  </style>
-</head>
-<body class="min-h-screen text-white antialiased">
-${bodyContent}
-</body>
-</html>`;
-}
-
 export function renderAdminLoginPage(error?: string, csrfToken?: string): string {
   const isSuccess = error === "success";
-  const bodyContent = `
+  const content = `
   <div class="min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
@@ -100,7 +56,13 @@ export function renderAdminLoginPage(error?: string, csrfToken?: string): string
     </div>
   </div>`;
 
-  return renderAdminLayout("Login", bodyContent);
+  return renderLayout({
+    title: "Login - HBDR Admin",
+    description: "HBDR Admin Login",
+    canonicalPath: "/admin/login",
+    bodyContent: content,
+    adminPage: true,
+  });
 }
 
 export function renderAdminLeadsPage(leads: LeadData[]): string {
@@ -149,7 +111,8 @@ export function renderAdminLeadsPage(leads: LeadData[]): string {
               }).then(() => updating = false).catch(() => updating = false);
             "
             :disabled="updating"
-            class="status-badge status-${status} cursor-pointer border-0 appearance-none pr-6 bg-no-repeat"
+            class="status-badge cursor-pointer border-0 appearance-none pr-6 bg-no-repeat"
+            :class="'status-' + status"
             style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22rgba(255,255,255,0.4)%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>'); background-position: right 4px center;"
             data-testid="select-status-${lead.id}"
           >
@@ -175,9 +138,9 @@ export function renderAdminLeadsPage(leads: LeadData[]): string {
     </tr>`;
   }).join("");
 
-  const bodyContent = `
-  <div class="min-h-screen" x-data="{ 
-    filterStatus: '', 
+  const content = `
+  <div class="min-h-screen" x-data="{
+    filterStatus: '',
     filterSource: '',
     searchQuery: '',
     showMessageModal: false,
@@ -308,5 +271,11 @@ export function renderAdminLeadsPage(leads: LeadData[]): string {
     </div>
   </div>`;
 
-  return renderAdminLayout("Leads", bodyContent);
+  return renderLayout({
+    title: "Leads - HBDR Admin",
+    description: "HBDR Admin - Contact Leads",
+    canonicalPath: "/admin/leads",
+    bodyContent: content,
+    adminPage: true,
+  });
 }

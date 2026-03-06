@@ -624,6 +624,23 @@ h2 .text-gradient-accent {
   transform: scale(1) translateY(0);
 }
 
+/* ── Admin Status Badges ── */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.status-new { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.status-contacted { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.status-qualified { background: rgba(43, 222, 115, 0.15); color: #2BDE73; }
+.status-converted { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+.status-archived { background: rgba(107, 114, 128, 0.15); color: #9ca3af; }
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .orb { opacity: 0.1; }

@@ -30,6 +30,7 @@ function getStorage(c: any) {
 registerPageRoutes(app, getStorage);
 registerApiRoutes(app, getStorage, (c) => ({
   resendApiKey: c.env.RESEND_API_KEY,
+  db: c.env.DB,
 }));
 registerAdminRoutes(app, getStorage, (c) => ({
   adminPassword: c.env.ADMIN_PASSWORD || "hbdr2025!",

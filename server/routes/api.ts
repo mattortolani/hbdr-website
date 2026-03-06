@@ -10,9 +10,11 @@ import { checkRateLimit, getClientIp } from "../middleware/rate-limit";
 import { isAuthenticated } from "../middleware/auth";
 import { sendContactNotification } from "../services/email";
 import { validateOrigin } from "../middleware/csrf";
+import { isDisposableEmail } from "../middleware/email-blocklist";
 
 interface ApiConfig {
   resendApiKey?: string;
+  db?: any;
 }
 
 export function registerApiRoutes(
@@ -35,7 +37,8 @@ export function registerApiRoutes(
     try {
       const ip = getClientIp(c.req.raw.headers);
 
-      const rateCheck = checkRateLimit(ip);
+      const config = getConfig(c);
+      const rateCheck = await checkRateLimit(ip, config.db);
       if (!rateCheck.allowed) {
         return c.html(`
           <div id="contact-form-result" class="glass-card p-8 text-center">
@@ -78,6 +81,20 @@ export function registerApiRoutes(
         return c.json({ message: validationError.toString(), errors: validatedData.error.flatten().fieldErrors }, 400);
       }
 
+      if (isDisposableEmail(validatedData.data.email)) {
+        return c.html(`
+          <div id="contact-form-result" class="glass-card p-8 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 mb-4">
+              <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-semibold text-white mb-2">Invalid Email</h3>
+            <p class="text-white/50">Please use a permanent email address. Temporary or disposable email addresses are not accepted.</p>
+          </div>
+        `, 422);
+      }
+
       const sanitizedData = {
         ...validatedData.data,
         name: sanitizeText(validatedData.data.name),
@@ -89,7 +106,6 @@ export function registerApiRoutes(
       const storage = getStorage(c);
       const lead = await storage.createContactLead({ ...sanitizedData, ip, source });
 
-      const config = getConfig(c);
       if (config.resendApiKey) {
         sendContactNotification(config.resendApiKey, {
           name: sanitizedData.name,
