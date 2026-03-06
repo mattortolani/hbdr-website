@@ -20,7 +20,11 @@ jobs:
 
       - run: npm install
 
+      - run: npm run css:build
+
       - run: npm run check
+
+      - run: npm test
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
