@@ -5,14 +5,19 @@ on:
     branches-ignore:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   preview:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       deployments: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v4
         with:
@@ -23,7 +28,7 @@ jobs:
       - run: npm run check
 
       - name: Deploy preview to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
